@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: redirect the folder
-        run: echo pwd
+        run: authentic_ecommerce/authentic_client
 
       - name: copy the code
         uses: actions/checkout@v4
