@@ -8,10 +8,10 @@ on:
 jobs:
   auth_server:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: authentic_server
     steps:
-      - name: redirect the folder
-        run: authentic_ecommerce/authentic_client
-
       - name: copy the code
         uses: actions/checkout@v4
       - name: instal node
@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 20.15
       - name: install dependency
-        run: npm i
+        run: npm i --frozen-lockfile
       - name: build code 
         run: npm run build
 
