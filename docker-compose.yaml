@@ -1,0 +1,113 @@
+# services:
+#   psql:
+#     image:  postgres:16-alpine
+#     volumes:
+#       - authenticDB:/data/db
+
+#     env_file:
+#       - ./authentic_server/.env
+  
+
+
+#   authenticServer:
+
+#     build:
+#       context: ./authentic_server
+#       dockerfile: Dockerfile
+
+#     ports:
+#       - "5000:5000"
+
+#     volumes:
+#       - loges: /app/loges #named volume
+#       - ./authentic_server:/app #bind mount
+#       - /app/node_modules
+
+#     env_file:
+#       - ./authentic_server/.env
+#     depends_on:
+#       - psql
+#   authenticClient:
+#     build:
+#       context: ./authentic_client
+#       dockerfile: Dockerfile
+    
+
+#     ports:
+#       - "3000:3000"
+    
+#     volumes:
+#       - ./authentic_client:/app #bind mount
+#       - /app/node_modules
+      
+#     env_file:
+#       - ./authentic_client/.env
+
+#     depends_on:
+#       - authenticServer
+
+  
+  
+# volumes:
+#   loges:
+#   authenticDB:
+
+
+version: '3.7'
+
+services:
+  psql:
+    image: postgres:16-alpine
+    container_name: authentic_psql
+    restart: unless-stopped
+    volumes:
+      - authenticDB:/var/lib/postgresql/data
+    env_file:
+      - ./authentic_server/.env
+    networks:
+      - authentic_network
+
+  authenticserver:
+    build:
+      context: ./authentic_server
+      dockerfile: Dockerfile
+    container_name: authentic_server
+    ports:
+      - "5000:5000"
+    volumes:
+      - loges:/app/loges
+      - ./authentic_server:/app
+      - /app/node_modules
+    env_file:
+      - ./authentic_server/.env
+    depends_on:
+      - psql
+    restart: unless-stopped
+    networks:
+      - authentic_network
+
+  authenticclient:
+    build:
+      context: ./authentic_client
+      dockerfile: Dockerfile
+    container_name: authentic_client
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./authentic_client:/app
+      - /app/node_modules
+    env_file:
+      - ./authentic_client/.env
+    depends_on:
+      - authenticserver
+    restart: unless-stopped
+    networks:
+      - authentic_network
+
+volumes:
+  loges:
+  authenticDB:
+
+networks:
+  authentic_network:
+    driver: bridge

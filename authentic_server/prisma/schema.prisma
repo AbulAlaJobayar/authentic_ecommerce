@@ -1,0 +1,385 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// model User {
+//   id        String     @id @default(cuid())
+//   email     String     @unique
+//   password  String
+//   name      String
+//   role      Role       @default(USER)
+//   phone     String?    @unique
+//   address   Address[]
+//   orders    Order[]
+//   cartItems CartItem[]
+//   createdAt DateTime   @default(now())
+//   updatedAt DateTime   @updatedAt
+//   Review    Review[]
+
+//   @@index([email])
+// }
+
+enum Role {
+  ADMIN
+  CUSTOMER
+  STAFF
+}
+
+enum Status {
+  DRAFT
+  ACTIVE
+  DISCONTINUED
+}
+
+enum ActionType {
+  IN
+  OUT
+  ADJUST
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BKASH
+  NAGAD
+  ROCKET
+  COD
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum DiscountType {
+  ALL_PRODUCTS
+  SPECIFIC_PRODUCTS
+  CATEGORIES
+}
+
+enum ShipmentStatus {
+  PENDING
+  SHIPPED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+enum NotificationType {
+  STOCK_ALERT
+  ORDER_STATUS
+  PROMOTION
+}
+
+// Models
+
+model User {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  name       String
+  password   String
+  mobile     String
+  image      String
+  role       Role     @default(CUSTOMER)
+  verifiedAt Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  cartItems     CartItem[]
+  orders        Order[]
+  reviews       Review[]
+  wishlist      Wishlist[]
+  notifications Notification[]
+
+  @@index([email, name, mobile, role])
+  @@map("user")
+}
+
+model Supplier {
+  id        String    @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([phone, name])
+  @@map("supplier")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+
+  @@index([name])
+  @@map("category")
+}
+
+model Warehouse {
+  id          String      @id @default(cuid())
+  name        String
+  address     String
+  inventories Inventory[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  Product     Product[]
+
+  @@index([name])
+  @@map("warehouse")
+}
+
+model Product {
+  id           String         @id @default(cuid())
+  sku          String         @unique
+  name         String
+  description  String?
+  image        String[]
+  status       Status         @default(DRAFT)
+  baseCost     Float // purchase cost from supplier
+  sellingPrice Float
+  category     Category       @relation(fields: [categoryId], references: [id])
+  categoryId   String
+  supplier     Supplier?      @relation(fields: [supplierId], references: [id])
+  supplierId   String?
+  inventory    Inventory?
+  inventoryId  String?        @unique
+  warehouse    Warehouse?     @relation(fields: [warehouseId], references: [id])
+  warehouseId  String?
+  reviews      Review[]
+  batches      ProductBatch[]
+  orderItems   OrderItem[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  CartItem     CartItem[]
+  Wishlist     Wishlist[]
+
+  @@index([sku, name, status])
+  @@map("product")
+}
+
+model ProductBatch {
+  id           String   @id @default(cuid())
+  product      Product  @relation(fields: [productId], references: [id])
+  productId    String
+  batchNumber  String
+  expiryDate   DateTime
+  quantity     Int
+  costPrice    Float
+  sellingPrice Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([batchNumber, expiryDate])
+  @@map("productBatch")
+}
+
+model Inventory {
+  id            String    @id @default(cuid())
+  product       Product   @relation(fields: [productId], references: [id])
+  productId     String    @unique
+  quantity      Int
+  alertQuantity Int       @default(5) // low stock alert threshold
+  shelfCode     String // e.g. A-01-05
+  rackCode      String // e.g. R-07
+  warehouse     Warehouse @relation(fields: [warehouseId], references: [id])
+  warehouseId   String
+  histories     History[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([quantity])
+  @@map("inventory")
+}
+
+model History {
+  id              String     @id @default(cuid())
+  inventory       Inventory  @relation(fields: [inventoryId], references: [id])
+  inventoryId     String
+  actionType      ActionType
+  quantityChanged Int
+  lastQuantity    Int
+  newQuantity     Int
+  note            String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([inventoryId])
+  @@map("history")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@map("cartItem")
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  user         User        @relation(fields: [userId], references: [id])
+  userId       String
+  orderItems   OrderItem[]
+  orderNumber  String?
+  payment      Payment?
+  shipment     Shipment?
+  status       OrderStatus @default(PENDING)
+  shippingCost Float
+  total        Float // sum of (OrderItems.unitPrice * quantity) + shippingCost - discounts
+  profit       Float // total profit on order
+  discount     Discount?   @relation(fields: [discountId], references: [id])
+  discountId   String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([orderNumber, userId, status])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  unitPrice Float // selling price at purchase time
+  baseCost  Float // base cost for profit calc
+  profit    Float // (unitPrice - baseCost) * quantity
+  createdAt DateTime @default(now())
+
+  @@index([orderId, productId])
+  @@map("orderItem")
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  order         Order         @relation(fields: [orderId], references: [id])
+  orderId       String        @unique
+  method        PaymentMethod
+  transactionId String
+  status        PaymentStatus
+  amount        Float
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+
+  @@index([orderId])
+  @@map("payment")
+}
+
+model Shipment {
+  id             String         @id @default(cuid())
+  order          Order          @relation(fields: [orderId], references: [id])
+  orderId        String         @unique
+  trackingNumber String?
+  carrier        String?
+  cost           Float          @default(0)
+  status         ShipmentStatus @default(PENDING)
+  shippedAt      DateTime?
+  deliveredAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([orderId])
+  @@map("shipment")
+}
+
+model Discount {
+  id         String   @id @default(cuid())
+  name       String
+  code       String?  @unique
+  ProductIds String[]
+
+  percentage Float        @default(0)
+  maxAmount  Float?
+  appliesTo  DiscountType
+  active     Boolean      @default(true)
+  startDate  DateTime
+  endDate    DateTime
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  orders     Order[]
+
+  @@index([code])
+  @@map("discount")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int // 1-5
+  comment   String?
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId, userId])
+  @@map("review")
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId, userId])
+  @@map("wishlist")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  user      User?            @relation(fields: [userId], references: [id])
+  userId    String?
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  type      NotificationType
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([userId])
+  @@map("notification")
+}
+
+model SalesSummary {
+  id          String   @id @default(cuid())
+  date        DateTime
+  totalSales  Float
+  totalOrders Int
+  totalProfit Float
+  createdAt   DateTime @default(now())
+
+  @@index([date])
+  @@map("salesSummary")
+}

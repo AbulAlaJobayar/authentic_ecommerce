@@ -1,0 +1,40 @@
+# Node.js specific
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Prisma and build artifacts
+.prisma/client
+generated/
+dist/
+build/
+*.tsbuildinfo
+
+# Development files
+.env.local
+.env.development
+.env.test
+.env*.local
+
+# Editor and IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker compose
+docker-compose*.yml
+
+# Documentation
+README.md
+*.pdf

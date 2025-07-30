@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\Abul Ala Jobayar\\Desktop\\authenticsurgical\\authentic_server\\logs\\winston\\successes\\.3a807f3bbc3599f2f84a3a098b6fd5cf8d7f567b-audit.json",
+    "files": [
+        {
+            "date": 1753867279978,
+            "name": "C:\\Users\\Abul Ala Jobayar\\Desktop\\authenticsurgical\\authentic_server\\logs\\winston\\successes\\Authentic Surgical-2025-07-30-15-success.log",
+            "hash": "074bbd67f6c60c0e058d2dde3bf49cadbf7d9d24b973d81da6dcd6872138313b"
+        }
+    ],
+    "hashType": "sha256"
+}
