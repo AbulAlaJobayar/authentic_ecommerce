@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: redirect the folder
-        run: cd authentic_client
+        run: echo pwd
 
       - name: copy the code
         uses: actions/checkout@v4
