@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
+import router from "./app/routes";
 
 const app = express();
 //middleware
@@ -34,8 +35,11 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
-app.get("/", (req, res) => {
+
+// test route
+app.get("/test", (req, res) => {
   res.send("Hello World!");
 });
-
+//main route
+app.use("/api/v1", router);
 export default app;

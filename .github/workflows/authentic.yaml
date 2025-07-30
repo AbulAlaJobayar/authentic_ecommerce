@@ -3,9 +3,26 @@ name: Ready and deploy
 on:
   push:
     branches:
-      - 'main'
-      - 'release/**'
+      - "main"
+      - "release/**"
 jobs:
+  auth_server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: redirect the folder
+        run: cd authentic_client
+
+      - name: copy the code
+        uses: actions/checkout@v4
+      - name: instal node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.15
+      - name: install dependency
+        run: npm i
+      - name: build code 
+        run: npm run build
+
   test_code:
     runs-on: ubuntu-latest
     steps:
