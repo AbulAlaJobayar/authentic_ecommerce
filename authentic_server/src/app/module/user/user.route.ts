@@ -5,9 +5,10 @@ import { userController } from './user.controller';
 
 const router = Router();
 router.post(
-  '/createUser',
+  '/',
   validateRequest(UserValidation.createUserSchemaValidation),
   userController.createUserIntoDB
 );
+router.get('/', userController.getUserFromDB);
 
 export const userRouter = router;
