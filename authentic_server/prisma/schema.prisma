@@ -73,11 +73,12 @@ enum NotificationType {
 
 model User {
   id         String   @id @default(cuid())
+  customId   String
   email      String   @unique
   name       String
   password   String
-  mobile     String
-  image      String
+  mobile     String @unique
+  image      String?
   role       Role     @default(CUSTOMER)
   verifiedAt Boolean  @default(false)
   createdAt  DateTime @default(now())
@@ -89,7 +90,7 @@ model User {
   wishlist      Wishlist[]
   notifications Notification[]
 
-  @@index([email, name, mobile, role])
+  @@index([email, name, mobile, role,customId])
   @@map("user")
 }
 
