@@ -25,6 +25,11 @@ jobs:
 
   test_code:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: authentic_server
+    needs:
+      auth_server
     steps:
       - name: copy the code
         uses: actions/checkout@v4
@@ -40,27 +45,27 @@ jobs:
       - name: run the test
         run: npm run test
 
-  build_code:
-    runs-on: ubuntu-latest
-    needs: test_code
-    steps:
-      - name: install node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.15
+  # build_code:
+  #   runs-on: ubuntu-latest
+  #   needs: test_code
+  #   steps:
+  #     - name: install node
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20.15
 
-      - name: copy code
-        uses: actions/checkout@v4
+  #     - name: copy code
+  #       uses: actions/checkout@v4
 
-      - name: install dependency
-        run: npm i --frozen-lockfile
+  #     - name: install dependency
+  #       run: npm i --frozen-lockfile
 
-      - name: build the codes
-        run: npm run build
+  #     - name: build the codes
+  #       run: npm run build
 
-  deploy-code:
-    runs-on: ubuntu-latest
-    needs: build_code
-    steps:
-      - name: deploy code
-        run: echo "hello word"
+  # deploy-code:
+  #   runs-on: ubuntu-latest
+  #   needs: build_code
+  #   steps:
+  #     - name: deploy code
+  #       run: echo "hello word"
