@@ -14,4 +14,10 @@ export default {
     jwtVerifySecret: process.env.JWT_VERIFY_SECRET,
     jwtVerifyExpire: process.env.JWT_VERIFY_EXPIRES_IN,
   },
+  aws: {
+    bucket: process.env.AWS_BUCKET_NAME,
+    accessKey: process.env.AWS_ACCESS_KEY_ID,
+    region: process.env.AWS_REGION,
+    secretAccess: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 };
