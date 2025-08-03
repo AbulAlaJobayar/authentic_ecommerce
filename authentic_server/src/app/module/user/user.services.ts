@@ -1,19 +1,26 @@
-import { jwt } from 'zod';
 import { User } from '../../../../generated/prisma';
 import config from '../../config';
 import hashPassword from '../../helper/hashPassword';
-import { jwtHelper } from '../../helper/jwtHetper';
+import { jwtHelper } from '../../helper/jwtHelper';
 import prisma from '../../shared/prisma';
 import { sendEmail } from '../../shared/sendEmail';
 import verificationEmailTemplate from '../../template/verificationEmail';
 import { generateCustomId } from './user.utils';
+import { imageUploader, MulterFile } from '../../shared/imageUpload';
+import { Request } from 'express';
 
-const createUserIntoDB = async (payload: User) => {
-  const password = (await hashPassword(payload.password as string)) as string;
-
-  const customId = (await generateCustomId(payload.role)) as string;
+const createUserIntoDB = async (req: Request) => {
+  const file = req.file as MulterFile;
+  if (req.file) {
+    const image = await imageUploader.uploadImageToS3(file);
+    req.body.image = image;
+  }
+  const password = (await hashPassword(req.body.password as string)) as string;
+  req.body.password = password;
+  const customId = (await generateCustomId(req.body.role)) as string;
+  req.body.customId = customId;
   const user = await prisma.user.create({
-    data: { ...payload, customId, password },
+    data: req.body,
     select: {
       id: true,
       name: true,
@@ -51,6 +58,7 @@ const createUserIntoDB = async (payload: User) => {
   return user;
 };
 const getAllUserFromDB = async () => {
+  // TODO ADD Pagination search sort field
   const result = await prisma.user.findMany({
     where: { isDeleted: false },
     select: {
@@ -68,8 +76,23 @@ const getAllUserFromDB = async () => {
   });
   return result;
 };
+const updateUserFromDB = async (req: Request) => {
+  const { id } = req.params;
+  const file = req.file as MulterFile;
+  if (req.file) {
+    const image = await imageUploader.uploadImageToS3(file);
+    req.body.image = image;
+  }
+
+  const result = await prisma.user.update({
+    where: { id: id },
+    data: req.body,
+  });
+  return result;
+};
 
 export const UserService = {
   createUserIntoDB,
   getAllUserFromDB,
+  updateUserFromDB,
 };

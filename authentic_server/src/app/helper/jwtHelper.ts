@@ -1,6 +1,6 @@
-import jwt, { Secret, SignOptions, JwtPayload } from "jsonwebtoken";
+import jwt, { Secret, SignOptions, JwtPayload } from 'jsonwebtoken';
 
-type ExpiresIn = SignOptions["expiresIn"]; // Correct type expected
+type ExpiresIn = SignOptions['expiresIn']; // Correct type expected
 
 const generateToken = (
   payload: string | object | Buffer,
@@ -10,10 +10,7 @@ const generateToken = (
   return jwt.sign(payload, secret, { expiresIn });
 };
 
-const verifyToken = (
-  token: string,
-  secret: Secret
-): string | JwtPayload => {
+const verifyToken = (token: string, secret: Secret): string | JwtPayload => {
   return jwt.verify(token, secret);
 };
 

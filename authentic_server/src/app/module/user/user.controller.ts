@@ -5,7 +5,7 @@ import sendResponse from '../../shared/sendResponse';
 
 const createUserIntoDB = catchAsync(async (req, res) => {
   console.log(req.file)
-  const result = await UserService.createUserIntoDB(req.body);
+  const result = await UserService.createUserIntoDB(req);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -23,8 +23,19 @@ const getUserFromDB = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const updateUserFromDB = catchAsync(async (req, res) => {
+  const result = await UserService.updateUserFromDB(req);
+  console.log(result)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message:  "User Updated successfully!",
+    data: result,
+  });
+});
 
 export const userController = {
   createUserIntoDB,
-  getUserFromDB
+  getUserFromDB,
+  updateUserFromDB
 };

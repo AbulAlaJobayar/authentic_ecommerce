@@ -1,45 +1,12 @@
-// import { Role } from '../../../../generated/prisma';
-// import prisma from '../../shared/prisma';
-
-// export const generateCustomId = async (role: Role) => {
-//   let currentId = (0).toString();
-//   const lastStudent = await prisma.user.findFirst({
-//     where: {
-//       role,
-//     },
-//     orderBy: {
-//       createdAt: 'desc',
-//     },
-//     select: {
-//       role: true,
-//       customId: true,
-//     },
-//   });
-//   // AC-0001
-//   console.log('last student', lastStudent);
-//   if (lastStudent?.role === Role.CUSTOMER) {
-//     currentId = lastStudent.customId.substring(6);
-//     const incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
-//     return `AC-${incrementId}`;
-//   } else if (lastStudent?.role === Role.STAFF) {
-//     currentId = lastStudent.customId.substring(6);
-//     const incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
-//     return `ST-${incrementId}`;
-//   }
-//     else if (lastStudent?.role === Role.ADMIN) {
-//     currentId = lastStudent.customId.substring(6);
-//     const incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
-//     return `AD-${incrementId}`;
-//   }
-// };
 import { Role } from '../../../../generated/prisma';
 import prisma from '../../shared/prisma';
 
 // Define prefix mapping for each role
 const ROLE_PREFIXES: Record<Role, string> = {
   [Role.CUSTOMER]: 'AC',
+  [Role.SUPER_ADMIN]: 'SU',
   [Role.STAFF]: 'ST',
-  [Role.ADMIN]: 'AD',
+  [Role.MANAGER]: 'MA',
   // Add other roles if needed
 };
 

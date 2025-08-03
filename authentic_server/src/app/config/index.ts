@@ -13,6 +13,10 @@ export default {
   jwt: {
     jwtVerifySecret: process.env.JWT_VERIFY_SECRET,
     jwtVerifyExpire: process.env.JWT_VERIFY_EXPIRES_IN,
+    jwtAccessSecret: process.env.JWT_ACCESS_EXPIRES_IN,
+    jwtAccessExpire: process.env.JWT_ACCESS_EXPIRES_IN,
+    jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
+    jwtRefreshExpire: process.env.JWT_REFRESH_EXPIRES_IN,
   },
   aws: {
     bucket: process.env.AWS_BUCKET_NAME,

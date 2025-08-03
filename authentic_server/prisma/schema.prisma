@@ -8,7 +8,8 @@ datasource db {
 }
 
 enum Role {
-  ADMIN
+  SUPER_ADMIN
+  MANAGER
   CUSTOMER
   STAFF
 }
@@ -68,6 +69,13 @@ enum NotificationType {
   ORDER_STATUS
   PROMOTION
 }
+enum accountStatus {
+ACTIVE
+IN_PROGRESS
+SUSPEND
+BLOCK
+
+}
 
 // Models
 
@@ -82,6 +90,7 @@ model User {
   role       Role     @default(CUSTOMER)
   verifiedAt Boolean  @default(false)
   isDeleted Boolean @default(false)
+  accountStatus accountStatus  @default(ACTIVE)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
