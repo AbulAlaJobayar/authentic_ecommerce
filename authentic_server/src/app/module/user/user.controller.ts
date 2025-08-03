@@ -4,6 +4,7 @@ import { UserService } from './user.services';
 import sendResponse from '../../shared/sendResponse';
 
 const createUserIntoDB = catchAsync(async (req, res) => {
+  console.log(req.file)
   const result = await UserService.createUserIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
