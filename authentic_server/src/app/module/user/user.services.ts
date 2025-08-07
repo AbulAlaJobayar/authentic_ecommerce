@@ -1,4 +1,4 @@
-import { User } from '../../../../generated/prisma';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import config from '../../config';
 import hashPassword from '../../helper/hashPassword';
 import { jwtHelper } from '../../helper/jwtHelper';
@@ -8,6 +8,7 @@ import verificationEmailTemplate from '../../template/verificationEmail';
 import { generateCustomId } from './user.utils';
 import { imageUploader, MulterFile } from '../../shared/imageUpload';
 import { Request } from 'express';
+import { Secret } from 'jsonwebtoken';
 
 const createUserIntoDB = async (req: Request) => {
   const file = req.file as MulterFile;
@@ -41,10 +42,11 @@ const createUserIntoDB = async (req: Request) => {
     id: user.id,
     email: user.email,
     customId: user.customId,
+    role:user.role
   };
   const verifyToken = jwtHelper.generateToken(
     tokenData,
-    config.jwt.jwtVerifySecret,
+    config.jwt.jwtVerifySecret as Secret,
     config.jwt.jwtVerifyExpire as any
   );
   const url = `${config.domainName}/verify?token=${verifyToken}`;
@@ -52,7 +54,7 @@ const createUserIntoDB = async (req: Request) => {
   sendEmail({
     to: user.email,
     subject: 'Verify your email',
-    html: verificationEmailTemplate(url),
+    html: verificationEmailTemplate(url,'Verify My Email'),
   });
 
   return user;
@@ -90,15 +92,16 @@ const updateUserFromDB = async (req: Request) => {
   return result;
 };
 const deleteUserFromDB = async (id: string) => {
-  const result = await prisma.user.update({
+  await prisma.user.update({
     where: { id: id },
     data: { isDeleted: true },
   });
+  return null;
 };
 
 export const UserService = {
   createUserIntoDB,
   getAllUserFromDB,
   updateUserFromDB,
-  deleteUserFromDB
+  deleteUserFromDB,
 };

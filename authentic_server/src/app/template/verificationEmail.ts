@@ -1,5 +1,6 @@
 const verificationEmailTemplate = (
   verificationLink: string,
+  title:string,
   companyName: string = 'Authentic Surgical'
 ) => {
   return `
@@ -133,7 +134,7 @@ const verificationEmailTemplate = (
     <p>
       Please confirm this email for your ${companyName} account. Once verified, you'll be able to start purchasing products!
     </p>
-  <a href="${verificationLink}" class="btn" style="color: #ffffff; font-weight: 800; text-decoration: none;">Verify My Email</a>
+  <a href="${verificationLink}" class="btn" style="color: #ffffff; font-weight: 800; text-decoration: none;">${title}</a>
     <div class="link">
       Or paste this link into your browser:<br>
       <a href="${verificationLink}">${verificationLink}</a>
