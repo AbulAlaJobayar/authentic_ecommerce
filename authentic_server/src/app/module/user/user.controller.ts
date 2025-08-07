@@ -4,32 +4,43 @@ import { UserService } from './user.services';
 import sendResponse from '../../shared/sendResponse';
 
 const createUserIntoDB = catchAsync(async (req, res) => {
-  console.log(req.file)
+  console.log(req.file);
   const result = await UserService.createUserIntoDB(req);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
-    message:  "Account created successfully!",
+    message: 'Account created successfully!',
     data: result,
   });
 });
 const getUserFromDB = catchAsync(async (req, res) => {
   const result = await UserService.getAllUserFromDB();
-  console.log(result)
+  console.log(result);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message:  "Account Retrieved successfully!",
+    message: 'Account Retrieved successfully!',
     data: result,
   });
 });
 const updateUserFromDB = catchAsync(async (req, res) => {
   const result = await UserService.updateUserFromDB(req);
-  console.log(result)
+  console.log(result);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message:  "User Updated successfully!",
+    message: 'User Updated successfully!',
+    data: result,
+  });
+});
+const deleteUserFromDB = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserService.deleteUserFromDB(id);
+  console.log(result);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User deleted successfully!',
     data: result,
   });
 });
@@ -37,5 +48,6 @@ const updateUserFromDB = catchAsync(async (req, res) => {
 export const userController = {
   createUserIntoDB,
   getUserFromDB,
-  updateUserFromDB
+  updateUserFromDB,
+  deleteUserFromDB,
 };

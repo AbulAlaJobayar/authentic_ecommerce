@@ -83,16 +83,22 @@ const updateUserFromDB = async (req: Request) => {
     const image = await imageUploader.uploadImageToS3(file);
     req.body.image = image;
   }
-
   const result = await prisma.user.update({
     where: { id: id },
     data: req.body,
   });
   return result;
 };
+const deleteUserFromDB = async (id: string) => {
+  const result = await prisma.user.update({
+    where: { id: id },
+    data: { isDeleted: true },
+  });
+};
 
 export const UserService = {
   createUserIntoDB,
   getAllUserFromDB,
   updateUserFromDB,
+  deleteUserFromDB
 };
