@@ -15,7 +15,7 @@ describe('Category', () => {
         .post(`${baseApi}`)
         .set('Authorization', superAdminToken)
         .send(createCategory)
-        .expect(200);
+        .expect(201);
     });
   });
   describe('get All Categories From DB', () => {
