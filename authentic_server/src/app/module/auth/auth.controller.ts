@@ -8,8 +8,7 @@ import { AppError } from '../../error/AppError';
 const loinUser = catchAsync(async (req, res) => {
   const result = await AuthServices.userLogin(req.body);
   const { accessToken, refreshToken, verifyAt } = result;
-
-  req.cookies('refreshToken', refreshToken, {
+  res.cookie('refreshToken', refreshToken, {
     secure: config.nodeEnv === 'production',
     httpOnly: true,
     sameSite: 'none',
@@ -40,7 +39,7 @@ const verifyUser = catchAsync(async (req, res) => {
   });
 });
 const sendEmailVerification = catchAsync(async (req, res) => {
-  const { id } = req.user;
+  const { id } = req.body;
   const result = await AuthServices.sendEmailVerification(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,

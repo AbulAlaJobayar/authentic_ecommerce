@@ -46,9 +46,12 @@ const createUserSchemaValidation = z.object({
     mobile: phoneNumberSchema,
     role: z
       .enum(Role)
-      .refine((val) => ['MANAGER', 'CUSTOMER', 'STAFF'].includes(val), {
-        message: 'Invalid role. Must be MANAGER, CUSTOMER, or STAFF.',
-      })
+      .refine(
+        (val) => ['SUPER_ADMIN', 'MANAGER', 'CUSTOMER', 'STAFF'].includes(val),
+        {
+          message: 'Invalid role. Must be MANAGER, CUSTOMER, or STAFF.',
+        }
+      )
       .optional(),
   }),
 });

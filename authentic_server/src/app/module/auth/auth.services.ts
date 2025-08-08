@@ -23,19 +23,14 @@ const userLogin = async (payload: { email: string; password: string }) => {
   if (user.isDeleted === true) {
     throw new AppError(httpStatus.FORBIDDEN, 'Account has been deleted');
   }
-  if (!user.verifiedAt) {
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      'Account not verified. Please verify your email'
-    );
-  }
   if (user.accountStatus !== 'ACTIVE') {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
       `Account is ${user.accountStatus.toLowerCase()}`
     );
   }
-  if (await comparPassword(payload.password, user.password)) {
+  
+  if (!await comparPassword(payload.password, user.password)) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'your password is incorrect');
   }
 
@@ -159,7 +154,7 @@ const changePassword = async (
       `Account is ${user.accountStatus.toLowerCase()}`
     );
   }
-  if (await comparPassword(payload.oldPassword, user.password)) {
+  if (!await comparPassword(payload.oldPassword, user.password)) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'your password is incorrect');
   }
 
