@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { Role } from '../../../../generated/prisma';
+import { accountStatus, Role } from '../../../../generated/prisma';
 
 const passwordSchema = z
   .string()
@@ -55,6 +55,34 @@ const createUserSchemaValidation = z.object({
       .optional(),
   }),
 });
+const updateValidationSchema = z.object({
+  body: z.object({
+    name: z
+      .string({
+        error: (issue) =>
+          issue.input === undefined ? 'Name is Required' : ' Not a string',
+      })
+      .trim()
+      .optional(),
+    customId: z.string().optional(),
+    mobile: phoneNumberSchema.optional(),
+    email: z
+      .email({
+        error: (issue) =>
+          issue.input === undefined
+            ? 'email is Required'
+            : ' Provide valid email',
+      })
+      .trim()
+      .optional(),
+    role: z.enum(Role).optional(),
+    verifiedAt: z.boolean().optional(),
+    isDeleted: z.boolean().optional(),
+    accountStatus: z.enum(accountStatus).optional(),
+  }),
+});
+
 export const UserValidation = {
   createUserSchemaValidation,
+  updateValidationSchema,
 };

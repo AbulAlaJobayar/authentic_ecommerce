@@ -1,8 +1,19 @@
 import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
 import prisma from '../../shared/prisma';
+import { Request } from 'express';
+import { imageUploader } from '../../shared/imageUpload';
 
-const createCategoryIntoDB = async (payload: { name: string }) => {
+const createCategoryIntoDB = async (req: Request) => {
+  let image = '';
+  if (req.file) {
+    const img = await imageUploader.uploadImageToS3(req.file);
+    image = img;
+  }
+  const payload = {
+    name: req.body.name,
+    image,
+  };
   const result = await prisma.category.create({ data: payload });
   return result;
 };

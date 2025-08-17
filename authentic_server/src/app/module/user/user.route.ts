@@ -15,11 +15,26 @@ router.post(
   validateRequest(UserValidation.createUserSchemaValidation),
   userController.createUserIntoDB
 );
-router.get('/', auth(USER_ROLE.SUPER_ADMIN), userController.getUserFromDB);
+router.get(
+  '/',
+  auth(USER_ROLE.SUPER_ADMIN, USER_ROLE.MANAGER),
+  userController.getUserFromDB
+);
+router.get(
+  '/me',
+  auth(
+    USER_ROLE.SUPER_ADMIN,
+    USER_ROLE.MANAGER,
+    USER_ROLE.CUSTOMER,
+    USER_ROLE.STAFF
+  ),
+  userController.getMeFromDB
+);
 router.patch(
   '/:id',
   imageUploader.upload.single('image'),
-  auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
+  auth(USER_ROLE.SUPER_ADMIN,USER_ROLE.MANAGER),
+  parseData(),
   userController.updateUserFromDB
 );
 router.delete(

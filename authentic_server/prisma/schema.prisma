@@ -123,6 +123,7 @@ model Supplier {
 model Category {
   id        String    @id @default(cuid())
   name      String    @unique
+  image     String?
   products  Product[]
   createdAt DateTime  @default(now())
   isDeleted Boolean   @default(false)
@@ -145,23 +146,23 @@ model Warehouse {
 }
 
 model Product {
-  id           String   @id @default(cuid())
-  sku          String   @unique
+  id           String      @id @default(cuid())
+  sku          String      @unique
   name         String
   description  String?
   image        String[]
-  status       Status   @default(DRAFT)
+  status       Status      @default(DRAFT)
   sellingPrice Float
-  category     Category @relation(fields: [categoryId], references: [id])
+  category     Category    @relation(fields: [categoryId], references: [id])
   categoryId   String
-  inventory  Inventory?
-  isDeleted  Boolean     @default(false)
-  reviews    Review[]
-  orderItems OrderItem[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  CartItem   CartItem[]
-  Wishlist   Wishlist[]
+  inventory    Inventory?
+  isDeleted    Boolean     @default(false)
+  reviews      Review[]
+  orderItems   OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  CartItem     CartItem[]
+  Wishlist     Wishlist[]
 
   @@index([sku, name, status])
   @@map("product")
@@ -196,7 +197,7 @@ model Inventory {
   product       Product        @relation(fields: [productId], references: [id])
   productId     String         @unique
   quantity      Int? //calculate total quantity by product batch
-  alertQuantity Int?            @default(5)
+  alertQuantity Int?           @default(5)
   isDeleted     Boolean        @default(false)
   histories     History[]
   createdAt     DateTime       @default(now())

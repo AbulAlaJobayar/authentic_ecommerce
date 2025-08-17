@@ -1,0 +1,35 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "F:\\authenticsurgical\\authentic_server\\logs\\winston\\errors\\.aa7e3867d3fe439777243534b208dcf715e31b5f-audit.json",
+    "files": [
+        {
+            "date": 1755333858270,
+            "name": "F:\\authenticsurgical\\authentic_server\\logs\\winston\\errors\\Authentic Surgical-2025-08-16-14-success.log",
+            "hash": "49dd1a3e586a6da4cb4c90667883f17cd51c9ea9d3576dcd12f6ae3407167b2e"
+        },
+        {
+            "date": 1755335244381,
+            "name": "F:\\authenticsurgical\\authentic_server\\logs\\winston\\errors\\Authentic Surgical-2025-08-16-15-success.log",
+            "hash": "f9669dd4c0efb7ad01a0e953293f87627281675b7b8a976d489aa8acdb04a5ca"
+        },
+        {
+            "date": 1755412891777,
+            "name": "F:\\authenticsurgical\\authentic_server\\logs\\winston\\errors\\Authentic Surgical-2025-08-17-12-success.log",
+            "hash": "aae8f34c44f678c2bdb2663bbf86278e4f86a6235b827b66f364cfb330b99477"
+        },
+        {
+            "date": 1755414213384,
+            "name": "F:\\authenticsurgical\\authentic_server\\logs\\winston\\errors\\Authentic Surgical-2025-08-17-13-success.log",
+            "hash": "93030a3ccd2cbfd3dc85f10f942731f7674a9852386bcb6a8fe614191df0fce5"
+        },
+        {
+            "date": 1755418974230,
+            "name": "F:\\authenticsurgical\\authentic_server\\logs\\winston\\errors\\Authentic Surgical-2025-08-17-14-success.log",
+            "hash": "896b0dee413a6840734e509daaf12ec8fd418328175d2c1443aa50abcd1a716c"
+        }
+    ],
+    "hashType": "sha256"
+}

@@ -9,6 +9,10 @@ import { generateCustomId } from './user.utils';
 import { imageUploader, MulterFile } from '../../shared/imageUpload';
 import { Request } from 'express';
 import { Secret } from 'jsonwebtoken';
+import { TUserFilterRequest } from './user.interface';
+import { TPaginationOption } from '../../interfaces/pagination';
+import { userSearchableFields } from './user.constant';
+import { paginationHelpers } from '../../helper/paginationHelper';
 
 const createUserIntoDB = async (req: Request) => {
   const file = req.file as MulterFile;
@@ -42,7 +46,7 @@ const createUserIntoDB = async (req: Request) => {
     id: user.id,
     email: user.email,
     customId: user.customId,
-    role:user.role
+    role: user.role,
   };
   const verifyToken = jwtHelper.generateToken(
     tokenData,
@@ -54,15 +58,101 @@ const createUserIntoDB = async (req: Request) => {
   sendEmail({
     to: user.email,
     subject: 'Verify your email',
-    html: verificationEmailTemplate(url,'Verify My Email'),
+    html: verificationEmailTemplate(url, 'Verify My Email'),
   });
 
   return user;
 };
-const getAllUserFromDB = async () => {
-  // TODO ADD Pagination search sort field
+
+const getAllUserFromDB = async (
+  filters: TUserFilterRequest,
+  option: TPaginationOption
+) => {
+  const { searchTerm, ...filterData } = filters;
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(option);
+
+  if (typeof filterData.isDeleted === 'string') {
+    if (filterData.isDeleted === 'true') {
+      filterData.isDeleted = true;
+    } else if (filterData.isDeleted === 'false') {
+      filterData.isDeleted = false;
+    }
+  }
+  if (typeof filterData.verifiedAt === 'string') {
+    if (filterData.verifiedAt === 'true') {
+      filterData.verifiedAt = true;
+    } else if (filterData.verifiedAt === 'false') {
+      filterData.verifiedAt = false;
+    }
+  }
+  const andConditions = [];
+  if (searchTerm) {
+    andConditions.push({
+      OR: userSearchableFields.map((field) => ({
+        [field]: {
+          contains: searchTerm,
+          mode: 'insensitive',
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
   const result = await prisma.user.findMany({
-    where: { isDeleted: false },
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      sortBy && sortOrder
+        ? { [sortBy]: sortOrder }
+        : {
+            createdAt: 'desc',
+          },
+    select: {
+      id: true,
+      customId: true,
+      name: true,
+      email: true,
+      mobile: true,
+      image: true,
+      role: true,
+      isDeleted: true,
+      accountStatus:true,
+      verifiedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  const total = await prisma.user.count({
+    where: whereConditions,
+  });
+  return {
+    meta: {
+      total,
+      page,
+      limit,
+    },
+    data: result,
+  };
+};
+const getMeFromDB = async (id: string) => {
+  const result = await prisma.user.findUnique({
+    where: {
+      id,
+    },
     select: {
       id: true,
       customId: true,
@@ -72,12 +162,14 @@ const getAllUserFromDB = async () => {
       image: true,
       role: true,
       verifiedAt: true,
+      accountStatus: true,
       createdAt: true,
       updatedAt: true,
     },
   });
   return result;
 };
+
 const updateUserFromDB = async (req: Request) => {
   const { id } = req.params;
   const file = req.file as MulterFile;
@@ -104,4 +196,5 @@ export const UserService = {
   getAllUserFromDB,
   updateUserFromDB,
   deleteUserFromDB,
+  getMeFromDB,
 };
