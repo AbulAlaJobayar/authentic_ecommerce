@@ -13,6 +13,7 @@ const supplier_controller_1 = require("./supplier.controller");
 const router = (0, express_1.Router)();
 router.post('/', (0, auth_1.default)(user_constant_1.USER_ROLE.MANAGER, user_constant_1.USER_ROLE.SUPER_ADMIN), (0, validateRequest_1.default)(supplier_validation_1.SupplierValidation.createSupplierSchemaIntoDB), supplier_controller_1.SupplierController.createUserIntoDB);
 router.get('/', (0, auth_1.default)(user_constant_1.USER_ROLE.MANAGER, user_constant_1.USER_ROLE.SUPER_ADMIN), supplier_controller_1.SupplierController.getAllSupplierFromDB);
+router.get('/:id', (0, auth_1.default)(user_constant_1.USER_ROLE.MANAGER, user_constant_1.USER_ROLE.SUPER_ADMIN), supplier_controller_1.SupplierController.getSingleSupplierFromDB);
 router.patch('/:id', (0, auth_1.default)(user_constant_1.USER_ROLE.MANAGER, user_constant_1.USER_ROLE.SUPER_ADMIN), (0, validateRequest_1.default)(supplier_validation_1.SupplierValidation.updateSupplierSchemaFromDB), supplier_controller_1.SupplierController.updateSupplierFromDB);
 router.delete('/:id', (0, auth_1.default)(user_constant_1.USER_ROLE.MANAGER, user_constant_1.USER_ROLE.SUPER_ADMIN), supplier_controller_1.SupplierController.deleteSupplierFromDB);
 exports.SupplierRouter = router;

@@ -1,7 +1,7 @@
 import z from 'zod';
 
-const createWarehouseSchema = z.object({
-  data: z.object({
+const createWarehouseValidationSchema = z.object({
+  body: z.object({
     name: z
       .string({
         error: (issue) =>
@@ -17,7 +17,11 @@ const createWarehouseSchema = z.object({
       .trim(),
   }),
 });
+const updateWarehouseValidation = z.object({
+  body: createWarehouseValidationSchema.shape.body.partial(),
+});
 
-export const WarehouseValidation={
-    createWarehouseSchema
-}
+export const WarehouseValidation = {
+  createWarehouseValidationSchema,
+  updateWarehouseValidation,
+};

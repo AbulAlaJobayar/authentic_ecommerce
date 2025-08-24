@@ -1,5 +1,6 @@
 import z from 'zod';
 
+
 const createCategorySchemaValidation = z.object({
   body: z.object({
     name: z
@@ -10,7 +11,8 @@ const createCategorySchemaValidation = z.object({
       .trim(),
   }),
 });
-
+const updateCategorySchemaValidation = createCategorySchemaValidation.partial();
 export const categoryValidation = {
   createCategorySchemaValidation,
+  updateCategorySchemaValidation
 };

@@ -24,6 +24,18 @@ const getAllWarehouseFromDB = async () => {
   });
   return result;
 };
+const getSingleWarehouse = async (id: string) => {
+  const result = await prisma.warehouse.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if(!result){
+    throw new AppError(httpStatus.NOT_FOUND,'Warehouse Not Found')
+  }
+  return result
+};
 
 const updateWarehouseFromDB = async (
   id: string,
@@ -58,6 +70,7 @@ const deleteWarehouseFromDB = async (id: string) => {
 export const WarehouseServices = {
   createWarehouseIntoDB,
   getAllWarehouseFromDB,
+  getSingleWarehouse,
   updateWarehouseFromDB,
   deleteWarehouseFromDB,
 };

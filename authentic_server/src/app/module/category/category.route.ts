@@ -21,11 +21,17 @@ router.get(
   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
   CategoryController.getCategoryFromDB
 );
+router.get(
+  '/:id',
+  auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
+  CategoryController.getSingleFromDB
+);
 router.patch(
   '/:id',
   imageUploader.upload.single('image'),
   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
   parseData(),
+  validateRequest(categoryValidation.updateCategorySchemaValidation),
   CategoryController.updateCategoryFromDB
 );
 router.delete(

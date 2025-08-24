@@ -26,10 +26,10 @@ const awsConfig = {
     secretKey: config_1.default.aws.secretAccess,
 };
 const s3 = new client_s3_1.S3Client({
-    region: awsConfig.region,
+    region: awsConfig.region || "us-east-1",
     credentials: {
-        accessKeyId: awsConfig.accessKey,
-        secretAccessKey: awsConfig.secretKey,
+        accessKeyId: awsConfig.accessKey || "123e2q4e5r4e",
+        secretAccessKey: awsConfig.secretKey || "1w4weee45d34t66",
     },
 });
 // Multer Storage Configuration

@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const app_1 = __importDefault(require("../src/app"));
-const user_1 = require("./user");
+const utils_1 = require("./utils");
 const baseApi = 'api/v1/supplier';
 const createSupplier = {
     name: 'test',
@@ -22,24 +22,49 @@ const createSupplier = {
     mobile: `+8801928210545`,
     address: 'dhaka bangladesh',
 };
-const id = 123456;
 describe('Supplier', () => {
+    let adminToken;
+    let id;
+    beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
+        adminToken = yield (0, utils_1.getAdminToken)();
+    }));
     describe('create supplier', () => {
         it('it should return a new Supplier', () => __awaiter(void 0, void 0, void 0, function* () {
-            yield (0, supertest_1.default)(app_1.default)
+            const res = yield (0, supertest_1.default)(app_1.default)
                 .post(baseApi)
                 .send(createSupplier)
-                .set('Authorization', user_1.superAdminToken)
+                .set('Authorization', adminToken)
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
                 .expect(201);
+            expect(res.body.data).toHaveProperty('statusCode', 201);
+            id = res.body.data.id;
         }));
     });
     describe('get All Suppliers', () => {
         it('it should return All supplier', () => __awaiter(void 0, void 0, void 0, function* () {
             yield (0, supertest_1.default)(app_1.default)
                 .get(`${baseApi}/${id}`)
-                .set('Authorization', user_1.superAdminToken)
+                .set('Authorization', adminToken)
+                .expect(200);
+        }));
+    });
+    describe('update Supplier', () => {
+        it('it should update Supplier info', () => __awaiter(void 0, void 0, void 0, function* () {
+            yield (0, supertest_1.default)(app_1.default)
+                .patch(`${baseApi}/${id}`)
+                .set('Authorization', adminToken)
+                .send({
+                name: `test${Math.floor(Math.random() * 10000)}`,
+            })
+                .expect(200);
+        }));
+    });
+    describe('delete Supplier', () => {
+        it('it should soft delete supplier from db', () => __awaiter(void 0, void 0, void 0, function* () {
+            yield (0, supertest_1.default)(app_1.default)
+                .delete(`${baseApi}/${id}`)
+                .set('Authorization', adminToken)
                 .expect(200);
         }));
     });

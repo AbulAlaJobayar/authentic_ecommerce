@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import  httpStatus  from 'http-status';
+import httpStatus from 'http-status';
 import { Supplier } from '../../../../generated/prisma';
 import { AppError } from '../../error/AppError';
 import prisma from '../../shared/prisma';
@@ -12,53 +12,64 @@ const createSupplierIntoDB = async (payload: any) => {
   return result;
 };
 
-// TODO add pagination
 const getAllSupplierFromDB = async () => {
   const result = await prisma.supplier.findMany({
-    where:{ isDeleted :false}
+    where: { isDeleted: false },
   });
   return result;
 };
-const updateSupplierFromDB = async (id: string, payload: Partial<Supplier>) => {
-  
-  const isSupplierExist=await prisma.supplier.findFirst({
-    where:{id}
-  })
-  if(!isSupplierExist){
-    throw new AppError(httpStatus.NOT_FOUND,"Supplier Not Found")
+const getSingleSupplierFromDB = async (id: string) => {
+  const result = await prisma.supplier.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Supplier not found');
   }
-  if(isSupplierExist?.isDeleted){
-    throw new AppError(httpStatus.NOT_FOUND,"Supplier is deleted")
+  return result
+};
+
+const updateSupplierFromDB = async (id: string, payload: Partial<Supplier>) => {
+  const isSupplierExist = await prisma.supplier.findFirst({
+    where: { id },
+  });
+  if (!isSupplierExist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Supplier Not Found');
+  }
+  if (isSupplierExist?.isDeleted) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Supplier is deleted');
   }
 
-    const result = await prisma.supplier.update({
+  const result = await prisma.supplier.update({
     where: { id: id },
     data: payload,
   });
   return result;
 };
 
-const deleteSupplierFromDB=async(id:string)=>{
- 
- const isSupplierExist=await prisma.supplier.findFirst({
-    where:{id}
-  })
-  if(!isSupplierExist){
-    throw new AppError(httpStatus.NOT_FOUND,"Supplier Not Found")
+const deleteSupplierFromDB = async (id: string) => {
+  const isSupplierExist = await prisma.supplier.findFirst({
+    where: { id },
+  });
+  if (!isSupplierExist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Supplier Not Found');
   }
-  if(isSupplierExist?.isDeleted){
-    throw new AppError(httpStatus.NOT_FOUND,"Supplier is Already deleted")
+  if (isSupplierExist?.isDeleted) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Supplier is Already deleted');
   }
-   await prisma.supplier.update({
-       where:{id},
-       data:{isDeleted :true}
-    })
-    return null
-}
+  await prisma.supplier.update({
+    where: { id },
+    data: { isDeleted: true },
+  });
+  return null;
+};
 
 export const SupplierServices = {
   createSupplierIntoDB,
   getAllSupplierFromDB,
+  getSingleSupplierFromDB,
   updateSupplierFromDB,
-  deleteSupplierFromDB
+  deleteSupplierFromDB,
 };

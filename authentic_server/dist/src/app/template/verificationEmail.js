@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const verificationEmailTemplate = (verificationLink, companyName = 'Authentic Surgical') => {
+const verificationEmailTemplate = (verificationLink, title, companyName = 'Authentic Surgical') => {
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -132,7 +132,7 @@ const verificationEmailTemplate = (verificationLink, companyName = 'Authentic Su
     <p>
       Please confirm this email for your ${companyName} account. Once verified, you'll be able to start purchasing products!
     </p>
-  <a href="${verificationLink}" class="btn" style="color: #ffffff; font-weight: 800; text-decoration: none;">Verify My Email</a>
+  <a href="${verificationLink}" class="btn" style="color: #ffffff; font-weight: 800; text-decoration: none;">${title}</a>
     <div class="link">
       Or paste this link into your browser:<br>
       <a href="${verificationLink}">${verificationLink}</a>

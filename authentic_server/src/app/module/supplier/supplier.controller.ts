@@ -21,6 +21,16 @@ const getAllSupplierFromDB = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getSingleSupplierFromDB = catchAsync(async (req, res) => {
+ const {id}=req.params
+  const result = await SupplierServices.getSingleSupplierFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Supplier Retrieved successfully!',
+    data: result,
+  });
+});
 
 const updateSupplierFromDB = catchAsync(async (req, res) => {
   const { id } = req.params;
@@ -45,6 +55,7 @@ const deleteSupplierFromDB = catchAsync(async (req, res) => {
 export const SupplierController = {
   createUserIntoDB,
   getAllSupplierFromDB,
+  getSingleSupplierFromDB,
   updateSupplierFromDB,
   deleteSupplierFromDB
 };

@@ -35,6 +35,16 @@ const getAllSupplierFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(v
         data: result,
     });
 }));
+const getSingleSupplierFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield supplier_services_1.SupplierServices.getSingleSupplierFromDB(id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'Supplier Retrieved successfully!',
+        data: result,
+    });
+}));
 const updateSupplierFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield supplier_services_1.SupplierServices.updateSupplierFromDB(id, req.body);
@@ -58,6 +68,7 @@ const deleteSupplierFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(v
 exports.SupplierController = {
     createUserIntoDB,
     getAllSupplierFromDB,
+    getSingleSupplierFromDB,
     updateSupplierFromDB,
     deleteSupplierFromDB
 };

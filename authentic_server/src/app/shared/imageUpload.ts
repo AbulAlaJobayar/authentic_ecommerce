@@ -25,10 +25,10 @@ const awsConfig = {
 };
 
 const s3 = new S3Client({
-  region: awsConfig.region,
+  region: awsConfig.region ||"us-east-1",
   credentials: {
-    accessKeyId: awsConfig.accessKey,
-    secretAccessKey: awsConfig.secretKey,
+    accessKeyId: awsConfig.accessKey||"123e2q4e5r4e",
+    secretAccessKey: awsConfig.secretKey ||"1w4weee45d34t66",
   },
 });
 

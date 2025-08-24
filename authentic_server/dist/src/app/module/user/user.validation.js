@@ -77,12 +77,37 @@ const createUserSchemaValidation = z.object({
         mobile: phoneNumberSchema,
         role: z
             .enum(prisma_1.Role)
-            .refine((val) => ['MANAGER', 'CUSTOMER', 'STAFF'].includes(val), {
+            .refine((val) => ['SUPER_ADMIN', 'MANAGER', 'CUSTOMER', 'STAFF'].includes(val), {
             message: 'Invalid role. Must be MANAGER, CUSTOMER, or STAFF.',
         })
             .optional(),
     }),
 });
+const updateValidationSchema = z.object({
+    body: z.object({
+        name: z
+            .string({
+            error: (issue) => issue.input === undefined ? 'Name is Required' : ' Not a string',
+        })
+            .trim()
+            .optional(),
+        customId: z.string().optional(),
+        mobile: phoneNumberSchema.optional(),
+        email: z
+            .email({
+            error: (issue) => issue.input === undefined
+                ? 'email is Required'
+                : ' Provide valid email',
+        })
+            .trim()
+            .optional(),
+        role: z.enum(prisma_1.Role).optional(),
+        verifiedAt: z.boolean().optional(),
+        isDeleted: z.boolean().optional(),
+        accountStatus: z.enum(prisma_1.accountStatus).optional(),
+    }),
+});
 exports.UserValidation = {
     createUserSchemaValidation,
+    updateValidationSchema,
 };

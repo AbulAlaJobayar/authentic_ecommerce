@@ -6,7 +6,7 @@ const baseApi = 'api/v1/user';
 const createUser = {
   name: 'test',
   email: `test${Math.floor(Math.random() * 10000)}@gmail.com`,
-  password: `Test${Math.floor(Math.random() * 10000)}@`,
+  password: `Test${Math.floor(Math.random() * 10000)}@#$`,
   role: 'SUPER_ADMIN',
   mobile: `+880192821${Math.floor(Math.random() * 10000)}`,
 };

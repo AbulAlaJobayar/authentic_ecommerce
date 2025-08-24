@@ -3,9 +3,9 @@ import validateRequest from '../../middleware/validateRequest';
 import { imageUploader } from '../../shared/imageUpload';
 import { USER_ROLE } from '../user/user.constant';
 import auth from '../../middleware/auth';
-import { productSchema } from './productValidation';
+import { productSchema } from './product.validation';
 import parseData from '../../middleware/parseData';
-import { ProductController } from './product.moduler';
+import { ProductController } from './product.controller';
 
 const router = Router();
 router.post(
@@ -16,11 +16,10 @@ router.post(
   validateRequest(productSchema.createProductSchema),
   ProductController.createProductIntoDB
 );
-// router.get(
-//   '/',
-//   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
-//   CategoryController.getCategoryFromDB
-// );
+router.get(
+  '/',
+  ProductController.getProductFromDB
+);
 // router.patch(
 //   '/:id',
 //   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),

@@ -17,6 +17,11 @@ router.get(
   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
   SupplierController.getAllSupplierFromDB
 );
+router.get(
+  '/:id',
+  auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
+  SupplierController.getSingleSupplierFromDB
+);
 router.patch(
   '/:id',
   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),

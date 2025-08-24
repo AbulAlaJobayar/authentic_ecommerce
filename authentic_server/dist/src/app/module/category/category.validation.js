@@ -14,6 +14,8 @@ const createCategorySchemaValidation = zod_1.default.object({
             .trim(),
     }),
 });
+const updateCategorySchemaValidation = createCategorySchemaValidation.partial();
 exports.categoryValidation = {
     createCategorySchemaValidation,
+    updateCategorySchemaValidation
 };

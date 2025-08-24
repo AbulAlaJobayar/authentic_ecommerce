@@ -16,7 +16,7 @@ const createWarehouseIntoDB = catchAsync(
   }
 );
 
-const getWarehouseIntoDB = catchAsync(async (req: Request, res: Response) => {
+const getWarehouseFromDB = catchAsync(async (req: Request, res: Response) => {
   const result = await WarehouseServices.getAllWarehouseFromDB();
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -25,7 +25,20 @@ const getWarehouseIntoDB = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-const updateWarehouseIntoDB = catchAsync(
+const getSingleWarehouseFromDB = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await WarehouseServices.getSingleWarehouse(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Warehouse Retrieved successfully!',
+      data: result,
+    });
+  }
+);
+
+const updateWarehouseFromDB = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await WarehouseServices.updateWarehouseFromDB(id, req.body);
@@ -37,7 +50,7 @@ const updateWarehouseIntoDB = catchAsync(
     });
   }
 );
-const deleteWarehouseIntoDB = catchAsync(
+const deleteWarehouseFromDB = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await WarehouseServices.deleteWarehouseFromDB(id);
@@ -52,7 +65,8 @@ const deleteWarehouseIntoDB = catchAsync(
 
 export const WarehouseController = {
   createWarehouseIntoDB,
-  getWarehouseIntoDB,
-  updateWarehouseIntoDB,
-  deleteWarehouseIntoDB,
+  getWarehouseFromDB,
+  getSingleWarehouseFromDB,
+  updateWarehouseFromDB,
+  deleteWarehouseFromDB,
 };

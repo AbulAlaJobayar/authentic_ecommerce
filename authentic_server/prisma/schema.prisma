@@ -199,26 +199,9 @@ model Inventory {
   quantity      Int? //calculate total quantity by product batch
   alertQuantity Int?           @default(5)
   isDeleted     Boolean        @default(false)
-  histories     History[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   ProductBatch  ProductBatch[]
-}
-
-model History {
-  id              String     @id @default(cuid())
-  inventory       Inventory  @relation(fields: [inventoryId], references: [id])
-  inventoryId     String
-  actionType      ActionType
-  quantityChanged Int
-  lastQuantity    Int
-  newQuantity     Int
-  note            String?
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-
-  @@index([inventoryId])
-  @@map("history")
 }
 
 model CartItem {

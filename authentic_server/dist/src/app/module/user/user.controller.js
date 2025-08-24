@@ -17,6 +17,8 @@ const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../shared/catchAsync"));
 const user_services_1 = require("./user.services");
 const sendResponse_1 = __importDefault(require("../../shared/sendResponse"));
+const pick_1 = __importDefault(require("../../shared/pick"));
+const user_constant_1 = require("./user.constant");
 const createUserIntoDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(req.file);
     const result = yield user_services_1.UserService.createUserIntoDB(req);
@@ -28,8 +30,21 @@ const createUserIntoDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     });
 }));
 const getUserFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_services_1.UserService.getAllUserFromDB();
+    const filters = (0, pick_1.default)(req.query, user_constant_1.userFiltarableableFields);
+    const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+    const result = yield user_services_1.UserService.getAllUserFromDB(filters, options);
     console.log(result);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'Account Retrieved successfully!',
+        meta: result.meta,
+        data: result.data,
+    });
+}));
+const getMeFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.user;
+    const result = yield user_services_1.UserService.getMeFromDB(id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -61,6 +76,7 @@ const deleteUserFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 
 exports.userController = {
     createUserIntoDB,
     getUserFromDB,
+    getMeFromDB,
     updateUserFromDB,
     deleteUserFromDB,
 };
