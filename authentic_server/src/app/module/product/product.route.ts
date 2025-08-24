@@ -16,10 +16,8 @@ router.post(
   validateRequest(productSchema.createProductSchema),
   ProductController.createProductIntoDB
 );
-router.get(
-  '/',
-  ProductController.getProductFromDB
-);
+router.get('/', ProductController.getProductFromDB);
+router.get('/:id', ProductController.getSingleProductFromDB);
 // router.patch(
 //   '/:id',
 //   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),

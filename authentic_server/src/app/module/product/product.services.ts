@@ -6,6 +6,7 @@ import { TProduct, TProductFilterRequest } from './product.interface';
 import { paginationHelpers } from '../../helper/paginationHelper';
 import { productSearchableFields } from './product.constant';
 import { logger } from '../../config/logger';
+import { Status } from '../../../../generated/prisma';
 
 const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
   try {
@@ -82,6 +83,8 @@ const getAllProductFromDB = async (
       })),
     });
   }
+  andConditions.push({ isDeleted: false });
+  andConditions.push({ status: Status.ACTIVE });
   const whereConditions =
     andConditions.length > 0 ? { AND: andConditions } : {};
   const result = await prisma.product.findMany({
@@ -96,21 +99,9 @@ const getAllProductFromDB = async (
           },
     select: {
       id: true,
-      sku: true,
       name: true,
-      description: true,
       image: true,
-      status: true,
       sellingPrice: true,
-      category: true,
-      inventory: true,
-      isDeleted: true,
-      reviews: true,
-      orderItems: true,
-      createdAt: true,
-      updatedAt: true,
-      CartItem: true,
-      Wishlist: true,
     },
   });
   const total = await prisma.product.count({
@@ -125,6 +116,22 @@ const getAllProductFromDB = async (
     data: result,
   };
 };
+const getSingleProductFromDB = async (id: string) => {
+  const result = await prisma.product.findUnique({
+    where: { id, isDeleted: false, status: Status.ACTIVE },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      description: true,
+      sku: true,
+      sellingPrice: true,
+      category: true,
+      reviews: true,
+    },
+  });
+  return result;
+};
 
 const updateProductFromDB = async (payload: string) => {
   console.log(payload);
@@ -133,4 +140,5 @@ export const ProductServices = {
   createProductIntoDB,
   getAllProductFromDB,
   updateProductFromDB,
+  getSingleProductFromDB,
 };

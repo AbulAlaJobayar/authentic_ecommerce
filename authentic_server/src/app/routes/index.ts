@@ -5,6 +5,7 @@ import { CategoryRouter } from '../module/category/category.route';
 import { WarehouseRouter } from '../module/warehouse/warehouse.route';
 import { AuthRoute } from '../module/auth/auth.route';
 import { ProductRouter } from '../module/product/product.route';
+import { InventoryRouter } from '../module/inventory/inventory.route';
 
 const router = Router();
 
@@ -32,6 +33,10 @@ const modulesRoute = [
   {
     path: '/product',
     route: ProductRouter,
+  },
+  {
+    path: '/inventory',
+    route: InventoryRouter,
   },
 ];
 
