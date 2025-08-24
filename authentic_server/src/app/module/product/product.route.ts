@@ -18,14 +18,4 @@ router.post(
 );
 router.get('/', ProductController.getProductFromDB);
 router.get('/:id', ProductController.getSingleProductFromDB);
-// router.patch(
-//   '/:id',
-//   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
-//   CategoryController.updateCategoryFromDB
-// );
-// router.delete(
-//   '/:id',
-//   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
-//   CategoryController.deleteCategoryFromDB
-// );
 export const ProductRouter = router;
