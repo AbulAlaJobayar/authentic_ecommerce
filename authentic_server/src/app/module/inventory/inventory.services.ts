@@ -21,7 +21,7 @@ const getAllInventoryFromDB = async (
 
   const andConditions: any[] = [];
 
-  // ✅ Search logic
+  // Search logic
   if (searchTerm) {
     andConditions.push({
       OR: [
@@ -39,7 +39,7 @@ const getAllInventoryFromDB = async (
     });
   }
 
-  // ✅ Filters logic
+  // Filters logic
   const inventoryFilters: any = {};
   const productFilters: any = {};
 
@@ -73,7 +73,7 @@ const getAllInventoryFromDB = async (
       })),
     });
   }
-
+ andConditions.push({isDeleted:false})
   const whereConditions =
     andConditions.length > 0 ? { AND: andConditions } : {};
 

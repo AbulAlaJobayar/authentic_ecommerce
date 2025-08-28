@@ -6,6 +6,7 @@ import { WarehouseRouter } from '../module/warehouse/warehouse.route';
 import { AuthRoute } from '../module/auth/auth.route';
 import { ProductRouter } from '../module/product/product.route';
 import { InventoryRouter } from '../module/inventory/inventory.route';
+import { ProductBatchRouter } from '../module/batch/batch.route';
 
 const router = Router();
 
@@ -37,6 +38,10 @@ const modulesRoute = [
   {
     path: '/inventory',
     route: InventoryRouter,
+  },
+  {
+    path: '/batch',
+    route: ProductBatchRouter,
   },
 ];
 
