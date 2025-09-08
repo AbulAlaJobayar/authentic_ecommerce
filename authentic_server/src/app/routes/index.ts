@@ -7,6 +7,7 @@ import { AuthRoute } from '../module/auth/auth.route';
 import { ProductRouter } from '../module/product/product.route';
 import { InventoryRouter } from '../module/inventory/inventory.route';
 import { ProductBatchRouter } from '../module/batch/batch.route';
+import { CartRouter } from '../module/cart/cart.route';
 
 const router = Router();
 
@@ -42,6 +43,10 @@ const modulesRoute = [
   {
     path: '/batch',
     route: ProductBatchRouter,
+  },
+  {
+    path: '/cart',
+    route: CartRouter,
   },
 ];
 

@@ -2,51 +2,71 @@ import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
 import prisma from '../../shared/prisma';
 import { TCreateProductBatch } from './batch.interface';
+import { errorLogger } from '../../config/logger';
 
 const createProductBatchIntoDB = async (payload: TCreateProductBatch) => {
-  const isInventoryExist = await prisma.inventory.findUnique({
-    where: {
-      id: payload.inventoryId,
-    },
-  });
-  if (!isInventoryExist) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Inventory Not Found');
-  }
-  if (isInventoryExist.isDeleted) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Inventory is Deleted');
-  }
-  const isSupplierExist = await prisma.supplier.findUnique({
-    where: { id: payload.supplierId },
-  });
-  if (!isSupplierExist) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Supplier Not Found');
-  }
-  if (isSupplierExist.isDeleted) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Inventory is Deleted');
-  }
-  const isWarehouseExist = await prisma.supplier.findUnique({
-    where: { id: payload.warehouseId },
-  });
-  if (!isWarehouseExist) {
-    throw new AppError(httpStatus.NOT_FOUND, 'warehouse Not Found');
-  }
-  if (isWarehouseExist.isDeleted) {
-    throw new AppError(httpStatus.NOT_FOUND, 'warehouse is Deleted');
-  }
-  //   create new Product Batch
-  const batch = await prisma.productBatch.create({
-    data: payload,
-  });
-  await prisma.inventory.update({
-    where: { id: batch.inventoryId },
-    data: {
-      quantity: {
-        increment: batch.quantity,
-      },
-    },
-  });
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      const isInventoryExist = await tx.inventory.findUnique({
+        where: {
+          id: payload.inventoryId,
+        },
+      });
+      if (!isInventoryExist) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Inventory Not Found');
+      }
+      if (isInventoryExist.isDeleted) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Inventory is Deleted');
+      }
+      const isSupplierExist = await tx.supplier.findUnique({
+        where: { id: payload.supplierId },
+      });
+      if (!isSupplierExist) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Supplier Not Found');
+      }
+      if (isSupplierExist.isDeleted) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Inventory is Deleted');
+      }
+      const isWarehouseExist = await tx.warehouse.findUnique({
+        where: { id: payload.warehouseId },
+      });
+      if (!isWarehouseExist) {
+        throw new AppError(httpStatus.NOT_FOUND, 'warehouse Not Found');
+      }
+      if (isWarehouseExist.isDeleted) {
+        throw new AppError(httpStatus.NOT_FOUND, 'warehouse is Deleted');
+      }
+      //   create new Product Batch
+      const batch = await tx.productBatch.create({
+        data: payload,
+      });
+      const inventory = await tx.inventory.update({
+        where: { id: batch.inventoryId },
+        data: {
+          quantity: {
+            increment: batch.quantity,
+          },
+        },
+      });
 
-  return batch;
+      //update product price if the new batch price is higher than the existing price
+      const product = await tx.product.findUnique({
+        where: { id: inventory.productId },
+      });
+      if (product?.sellingPrice && batch.sellingPrice > product?.sellingPrice) {
+        await tx.product.update({
+          where: { id: product.id },
+          data: { sellingPrice: batch.sellingPrice },
+        });
+      }
+
+      return batch;
+    });
+    return result;
+  } catch (error) {
+    console.log(error);
+    errorLogger.error('Failed to create product batch', error);
+  }
 };
 
 const getAllProductBatchFromDB = async () => {
@@ -69,7 +89,7 @@ const getSingleProductBatchFromDB = async (id: string) => {
 };
 
 const updateProductBatchFromDB = async (
-  id:string,
+  id: string,
   payload: Partial<TCreateProductBatch>
 ) => {
   // inventory Is Exist
@@ -111,7 +131,7 @@ const updateProductBatchFromDB = async (
     quantityDifference = payload.quantity - existingBatch.quantity;
   }
   const batch = await prisma.productBatch.update({
-    where: { id:existingBatch.id},
+    where: { id: existingBatch.id },
     data: payload,
   });
   if (!batch) {
