@@ -27,6 +27,16 @@ router.get(
   ),
   CartController.getMyCartFromDB
 );
+router.get(
+  '/:id',
+  auth(
+    USER_ROLE.SUPER_ADMIN,
+    USER_ROLE.MANAGER,
+    USER_ROLE.CUSTOMER,
+    USER_ROLE.STAFF
+  ),
+  CartController.getSingleCartFromDB
+);
 router.patch(
   '/:id',
   auth(

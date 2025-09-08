@@ -25,6 +25,18 @@ const getMyCartFromDB = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getSingleCartFromDB = catchAsync(async (req: Request, res: Response) => {
+  const { id: userId } = req.user;
+  const { id } = req.params;
+
+  const result = await CartServices.getSingleCartFromDB(id, userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Cart fetched successfully!',
+    data: result,
+  });
+});
 const updateMyCartFromDB = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { id: userId } = req.user;
@@ -37,9 +49,9 @@ const updateMyCartFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const deleteCartFromDB = catchAsync(async (req: Request, res: Response) => {
-  const {id}=req.params;
-  const {id:userId}=req.user;
- const result = await CartServices.deleteMyCartFromDB(id,userId);
+  const { id } = req.params;
+  const { id: userId } = req.user;
+  const result = await CartServices.deleteMyCartFromDB(id, userId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -50,6 +62,7 @@ const deleteCartFromDB = catchAsync(async (req: Request, res: Response) => {
 export const CartController = {
   createCartIntoDB,
   getMyCartFromDB,
+  getSingleCartFromDB,
   updateMyCartFromDB,
   deleteCartFromDB,
 };

@@ -19,6 +19,15 @@ const createCartIntoDB = async (userId: string, payload: TCart) => {
   return createCart;
 };
 
+const getSingleCartFromDB = async (id: string, userId: string) => {
+  const result = await prisma.cartItem.findFirst({
+    where: { id, userId, isDeleted: false },
+  });
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Cart item not found');
+  }
+  return result;
+};
 const getMyCartFromDB = async (id: string) => {
   const result = await prisma.cartItem.findMany({
     where: { userId: id, isDeleted: false },
@@ -106,6 +115,7 @@ const deleteMyCartFromDB = async (id: string, userId: string) => {
 
 export const CartServices = {
   createCartIntoDB,
+  getSingleCartFromDB,
   getMyCartFromDB,
   updateMyCartFromDB,
   deleteMyCartFromDB,
