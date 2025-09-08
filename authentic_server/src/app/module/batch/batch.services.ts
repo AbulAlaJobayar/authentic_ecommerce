@@ -3,8 +3,12 @@ import { AppError } from '../../error/AppError';
 import prisma from '../../shared/prisma';
 import { TCreateProductBatch } from './batch.interface';
 import { errorLogger } from '../../config/logger';
+import moment from 'moment';
 
 const createProductBatchIntoDB = async (payload: TCreateProductBatch) => {
+  payload.expiryDate = moment(payload.expiryDate, 'YYYY-MM-DD')
+    .toDate()
+    .toISOString();
   try {
     const result = await prisma.$transaction(async (tx) => {
       const isInventoryExist = await tx.inventory.findUnique({
@@ -59,25 +63,71 @@ const createProductBatchIntoDB = async (payload: TCreateProductBatch) => {
           data: { sellingPrice: batch.sellingPrice },
         });
       }
-
       return batch;
     });
     return result;
   } catch (error) {
     console.log(error);
     errorLogger.error('Failed to create product batch', error);
+    throw error;
   }
 };
 
 const getAllProductBatchFromDB = async () => {
   const batch = await prisma.productBatch.findMany({
     where: { isDeleted: false },
+    select: {
+      id: true,
+      batchNumber: true,
+      expiryDate: true,
+      quantity: true,
+      buyingPrice: true,
+      costPrice: true,
+      sellingPrice: true,
+      shelfCode: true,
+      rackCode: true,
+      inventoryId: true,
+      supplierId: true,
+      warehouseId: true,
+      inventory: {
+        select: {
+          product: true,
+        },
+      },
+      supplier: true,
+      warehouse: true,
+      createdAt: true,
+      updatedAt:true
+    },
   });
   return batch;
 };
 const getSingleProductBatchFromDB = async (id: string) => {
   const batch = await prisma.productBatch.findUnique({
-    where: { id },
+    where: { id },select: {
+      id: true,
+      batchNumber: true,
+      expiryDate: true,
+      quantity: true,
+      buyingPrice: true,
+      isDeleted:true,
+      costPrice: true,
+      sellingPrice: true,
+      shelfCode: true,
+      rackCode: true,
+      inventoryId: true,
+      supplierId: true,
+      warehouseId: true,
+      inventory: {
+        select: {
+          product: true,
+        },
+      },
+      supplier: true,
+      warehouse: true,
+      createdAt: true,
+      updatedAt:true
+    },
   });
   if (!batch) {
     throw new AppError(httpStatus.NOT_FOUND, 'Product Batch Not Found');

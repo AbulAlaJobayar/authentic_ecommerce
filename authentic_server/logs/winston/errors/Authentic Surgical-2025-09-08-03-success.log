@@ -1,0 +1,403 @@
+Mon Sep 08 2025 3:6:30 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.update()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:112:49
+
+  109 if (quantity && quantity > 0) {
+  110   total = quantity * cartItem.product.sellingPrice;
+  111 }
+→ 112 const updatedCartItem = await tx.cartItem.update({
+        where: {
+          id: "cmfax1ivh0001swzsdn3td44f"
+        },
+        data: {
+          quantity: {
+            quantity: 2,
+            ~~~~~~~~
+      ?     set?: Int,
+      ?     increment?: Int,
+      ?     decrement?: Int,
+      ?     multiply?: Int,
+      ?     divide?: Int
+          },
+          total: null,
+          updatedAt: new Date("2025-09-08T10:06:30.230Z")
+        },
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          total: true,
+          updatedAt: true
+        }
+      })
+
+Unknown argument `quantity`. Available options are marked with ?.
+Mon Sep 08 2025 3:10:10 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.update()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:112:49
+
+  109 if (quantity && quantity > 0) {
+  110   total = quantity * cartItem.product.sellingPrice;
+  111 }
+→ 112 const updatedCartItem = await tx.cartItem.update({
+        where: {
+          id: "cmfax1ivh0001swzsdn3td44f"
+        },
+        data: {
+          quantity: {
+            quantity: 2,
+            ~~~~~~~~
+      ?     set?: Int,
+      ?     increment?: Int,
+      ?     decrement?: Int,
+      ?     multiply?: Int,
+      ?     divide?: Int
+          },
+          total: null,
+          updatedAt: new Date("2025-09-08T10:10:10.055Z")
+        },
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          total: true,
+          updatedAt: true
+        }
+      })
+
+Unknown argument `quantity`. Available options are marked with ?.
+Mon Sep 08 2025 3:14:56 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.update()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:113:49
+
+  110 if (quantity && quantity > 0) {
+  111   total = quantity * cartItem.product.sellingPrice;
+  112 }
+→ 113 const updatedCartItem = await tx.cartItem.update({
+        where: {
+          id: "cmfax1ivh0001swzsdn3td44f"
+        },
+        data: {
+          quantity: {
+            quantity: 2,
+            ~~~~~~~~
+      ?     set?: Int,
+      ?     increment?: Int,
+      ?     decrement?: Int,
+      ?     multiply?: Int,
+      ?     divide?: Int
+          },
+          total: null,
+          updatedAt: new Date("2025-09-08T10:14:56.081Z")
+        },
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          total: true,
+          updatedAt: true
+        }
+      })
+
+Unknown argument `quantity`. Available options are marked with ?.
+Mon Sep 08 2025 3:26:4 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.update()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:113:49
+
+  110 if (quantity && quantity > 0) {
+  111   total = quantity * cartItem.product.sellingPrice;
+  112 }
+→ 113 const updatedCartItem = await tx.cartItem.update({
+        where: {
+          id: "cmfax1ivh0001swzsdn3td44f"
+        },
+        data: {
+          quantity: {
+            set: {
+              quantity: 2
+            }
+            ~~~~~~~~~~~~~
+          },
+          total: {
+            set: null
+          },
+          updatedAt: new Date("2025-09-08T10:26:04.717Z")
+        },
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          total: true,
+          updatedAt: true
+        }
+      })
+
+Argument `set`: Invalid value provided. Expected Int, provided Object.
+Mon Sep 08 2025 3:27:50 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.update()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:113:49
+
+  110 if (quantity && quantity > 0) {
+  111   total = quantity * cartItem.product.sellingPrice;
+  112 }
+→ 113 const updatedCartItem = await tx.cartItem.update({
+        where: {
+          id: "cmfax1ivh0001swzsdn3td44f"
+        },
+        data: {
+          quantity: {
+            set: {
+              quantity: 2
+            }
+            ~~~~~~~~~~~~~
+          },
+          total: null,
+          updatedAt: new Date("2025-09-08T10:27:50.880Z")
+        },
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          total: true,
+          updatedAt: true
+        }
+      })
+
+Argument `set`: Invalid value provided. Expected Int, provided Object.
+Mon Sep 08 2025 3:30:22 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.update()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:183:49
+
+  180 const total = quantity * cartItem.product.sellingPrice;
+  181 
+  182      
+→ 183 const updatedCartItem = await tx.cartItem.update({
+        where: {
+          id: "cmfax1ivh0001swzsdn3td44f"
+        },
+        data: {
+          quantity: {
+            set: {
+              quantity: 2
+            }
+            ~~~~~~~~~~~~~
+          },
+          total: {
+            set: NaN
+          },
+          updatedAt: new Date("2025-09-08T10:30:21.970Z")
+        },
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          total: true,
+          updatedAt: true
+        }
+      })
+
+Argument `set`: Invalid value provided. Expected Int, provided Object.
+Mon Sep 08 2025 3:32:40 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.update()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:188:49
+
+  185 const total = quantity * cartItem.product.sellingPrice;
+  186 
+  187      
+→ 188 const updatedCartItem = await tx.cartItem.update({
+        where: {
+          id: "cmfax1ivh0001swzsdn3td44f"
+        },
+        data: {
+          quantity: {
+            set: {
+              quantity: 2
+            }
+            ~~~~~~~~~~~~~
+          },
+          total: {
+            set: NaN
+          },
+          updatedAt: new Date("2025-09-08T10:32:40.526Z")
+        },
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          total: true,
+          updatedAt: true
+        }
+      })
+
+Argument `set`: Invalid value provided. Expected Int, provided Object.
+Mon Sep 08 2025 3:33:24 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.update()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:189:49
+
+  186 const total = quantity * cartItem.product.sellingPrice;
+  187 
+  188      
+→ 189 const updatedCartItem = await tx.cartItem.update({
+        where: {
+          id: "cmfax1ivh0001swzsdn3td44f"
+        },
+        data: {
+          quantity: {
+            set: {
+              quantity: 2
+            }
+            ~~~~~~~~~~~~~
+          },
+          total: {
+            set: NaN
+          },
+          updatedAt: new Date("2025-09-08T10:33:24.814Z")
+        },
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          total: true,
+          updatedAt: true
+        }
+      })
+
+Argument `set`: Invalid value provided. Expected Int, provided Object.
+Mon Sep 08 2025 3:34:0 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.update()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:189:49
+
+  186 const total = quantity * cartItem.product.sellingPrice;
+  187 
+  188      
+→ 189 const updatedCartItem = await tx.cartItem.update({
+        where: {
+          id: "cmfaxyw3z0001sw7kgz346spy"
+        },
+        data: {
+          quantity: {
+            set: {
+              quantity: 2
+            }
+            ~~~~~~~~~~~~~
+          },
+          total: {
+            set: NaN
+          },
+          updatedAt: new Date("2025-09-08T10:34:00.397Z")
+        },
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          total: true,
+          updatedAt: true
+        }
+      })
+
+Argument `set`: Invalid value provided. Expected Int, provided Object.
+Mon Sep 08 2025 3:39:51 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.findUnique()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:152:42
+
+  149 try {
+  150   const result = await prisma.$transaction(async (tx) => {
+  151     // Verify cart item exists, is not deleted, and belongs to the user
+→ 152     const cartItem = await tx.cartItem.findUnique(
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })
+Mon Sep 08 2025 3:43:48 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.findUnique()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:81:42
+
+  78 // Update cart item within a transaction
+  79 const result = await prisma.$transaction(async (tx) => {
+  80   // Verify cart item exists, is not deleted, and belongs to the user
+→ 81   const cartItem = await tx.cartItem.findUnique(
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })
+Mon Sep 08 2025 3:44:55 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.findUnique()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:81:42
+
+  78 // Update cart item within a transaction
+  79 const result = await prisma.$transaction(async (tx) => {
+  80   // Verify cart item exists, is not deleted, and belongs to the user
+→ 81   const cartItem = await tx.cartItem.findUnique(
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })
+Mon Sep 08 2025 3:46:13 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.findUnique()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:81:42
+
+  78 // Update cart item within a transaction
+  79 const result = await prisma.$transaction(async (tx) => {
+  80   // Verify cart item exists, is not deleted, and belongs to the user
+→ 81   const cartItem = await tx.cartItem.findUnique(
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })
+Mon Sep 08 2025 3:48:10 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.update()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:114:49
+
+  111   total = quantity * cartItem.product.sellingPrice;
+  112 }
+  113 console.log(total);
+→ 114 const updatedCartItem = await tx.cartItem.update({
+        where: {
+          id: "cmfaxyw3z0001sw7kgz346spy"
+        },
+        data: {
+          quantity: {
+            quantity: 2,
+            ~~~~~~~~
+      ?     set?: Int,
+      ?     increment?: Int,
+      ?     decrement?: Int,
+      ?     multiply?: Int,
+      ?     divide?: Int
+          },
+          total: 2200,
+          updatedAt: new Date("2025-09-08T10:48:10.347Z")
+        },
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          total: true,
+          updatedAt: true
+        }
+      })
+
+Unknown argument `quantity`. Available options are marked with ?.
+Mon Sep 08 2025 3:57:36 [Authentic Surgical] error: Failed to update cart item 
+Invalid `tx.cartItem.update()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\cart\cart.services.ts:114:49
+
+  111   total = quantity * cartItem.product.sellingPrice;
+  112 }
+  113     
+→ 114 const updatedCartItem = await tx.cartItem.update({
+        where: {
+          id: "cmfaxyw3z0001sw7kgz346spy"
+        },
+        data: {
+          quantity: {
+            increment: {
+              quantity: 2
+            }
+            ~~~~~~~~~~~~~
+          },
+          total: 2200,
+          updatedAt: new Date("2025-09-08T10:57:36.912Z")
+        },
+        select: {
+          id: true,
+          productId: true,
+          quantity: true,
+          total: true,
+          updatedAt: true
+        }
+      })
+
+Argument `increment`: Invalid value provided. Expected Int, provided Object.

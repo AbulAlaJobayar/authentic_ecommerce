@@ -1,0 +1,81 @@
+Mon Sep 08 2025 4:8:41 [Authentic Surgical] error: Failed to update cart item Cart item not found or does not belong to user
+Mon Sep 08 2025 4:12:0 [Authentic Surgical] error: Failed to update cart item Cart item not found or does not belong to user
+Mon Sep 08 2025 4:13:9 [Authentic Surgical] error: Failed to update cart item Cart item not found or does not belong to user
+Mon Sep 08 2025 4:13:36 [Authentic Surgical] error: Failed to update cart item Cart item not found or does not belong to user
+Mon Sep 08 2025 4:14:50 [Authentic Surgical] error: Failed to update cart item Cart item not found or does not belong to user
+Mon Sep 08 2025 4:16:20 [Authentic Surgical] error: Failed to update cart item Cart item not found or does not belong to user
+Mon Sep 08 2025 4:44:34 [Authentic Surgical] error: Failed to create product batch 
+Invalid `tx.productBatch.create()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\batch\batch.services.ts:40:43
+
+  37   throw new AppError(httpStatus.NOT_FOUND, 'warehouse is Deleted');
+  38 }
+  39 //   create new Product Batch
+→ 40 const batch = await tx.productBatch.create({
+       data: {
+         batchNumber: "BATCH-2023-09",
+         expiryDate: "2025-12-31",
+                     ~~~~~~~~~~~~
+         quantity: 100,
+         buyingPrice: 10.5,
+         costPrice: 8,
+         sellingPrice: 15,
+         shelfCode: "S-01A",
+         rackCode: "R-01",
+         supplierId: "cmeol75tv0001sw0gzmio5nvl",
+         inventoryId: "cmepehckk0003sw4g1a1dkbxg",
+         warehouseId: "cmepcejeb0001swakfrjgwxg2"
+       }
+     })
+
+Invalid value for argument `expiryDate`: premature end of input. Expected ISO-8601 DateTime.
+Mon Sep 08 2025 4:46:14 [Authentic Surgical] error: Failed to create product batch 
+Invalid `tx.productBatch.create()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\batch\batch.services.ts:40:43
+
+  37   throw new AppError(httpStatus.NOT_FOUND, 'warehouse is Deleted');
+  38 }
+  39 //   create new Product Batch
+→ 40 const batch = await tx.productBatch.create({
+       data: {
+         batchNumber: "BATCH-2023-09",
+         expiryDate: "2025-12-31",
+                     ~~~~~~~~~~~~
+         quantity: 100,
+         buyingPrice: 10.5,
+         costPrice: 8,
+         sellingPrice: 15,
+         shelfCode: "S-01A",
+         rackCode: "R-01",
+         supplierId: "cmeol75tv0001sw0gzmio5nvl",
+         inventoryId: "cmepehckk0003sw4g1a1dkbxg",
+         warehouseId: "cmepcejeb0001swakfrjgwxg2"
+       }
+     })
+
+Invalid value for argument `expiryDate`: premature end of input. Expected ISO-8601 DateTime.
+Mon Sep 08 2025 4:58:42 [Authentic Surgical] error: Failed to create product batch 
+Invalid `tx.productBatch.create()` invocation in
+F:\authenticsurgical\authentic_server\src\app\module\batch\batch.services.ts:40:43
+
+  37   throw new AppError(httpStatus.NOT_FOUND, 'warehouse is Deleted');
+  38 }
+  39 //   create new Product Batch
+→ 40 const batch = await tx.productBatch.create({
+       data: {
+         batchNumber: "BATCH-2023-09",
+         expiryDate: "2025-12-31",
+                     ~~~~~~~~~~~~
+         quantity: 100,
+         buyingPrice: 10.5,
+         costPrice: 8,
+         sellingPrice: 15,
+         shelfCode: "S-01A",
+         rackCode: "R-01",
+         supplierId: "cmeol75tv0001sw0gzmio5nvl",
+         inventoryId: "cmepehckk0003sw4g1a1dkbxg",
+         warehouseId: "cmepcejeb0001swakfrjgwxg2"
+       }
+     })
+
+Invalid value for argument `expiryDate`: premature end of input. Expected ISO-8601 DateTime.
