@@ -8,6 +8,7 @@ import { ProductRouter } from '../module/product/product.route';
 import { InventoryRouter } from '../module/inventory/inventory.route';
 import { ProductBatchRouter } from '../module/batch/batch.route';
 import { CartRouter } from '../module/cart/cart.route';
+import { OrderRoutes } from '../module/order/order.route';
 
 const router = Router();
 
@@ -47,6 +48,10 @@ const modulesRoute = [
   {
     path: '/cart',
     route: CartRouter,
+  },
+  {
+    path: '/order',
+    route: OrderRoutes,
   },
 ];
 

@@ -223,16 +223,15 @@ model Order {
   id           String      @id @default(cuid())
   user         User        @relation(fields: [userId], references: [id])
   userId       String
-  orderItems   OrderItem[]
   orderNumber  String?
-  payment      Payment?
-  shipment     Shipment?
-  status       OrderStatus @default(PENDING)
   shippingCost Float
   total        Float // sum of (OrderItems.unitPrice * quantity) + shippingCost - discounts
-  profit       Float // total profit on order
+  payment      Payment?
+  status       OrderStatus @default(PENDING)
+  shipment     Shipment?
   discount     Discount?   @relation(fields: [discountId], references: [id])
   discountId   String?
+  orderItems   OrderItem[]
   isDeleted    Boolean     @default(false)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
@@ -247,10 +246,9 @@ model OrderItem {
   product   Product  @relation(fields: [productId], references: [id])
   productId String
   quantity  Int
-  isDeleted Boolean  @default(false)
   unitPrice Float // selling price at purchase time
-  baseCost  Float // base cost for profit calc
-  profit    Float // (unitPrice - baseCost) * quantity
+  totalPrice Float // unitPrice * quantity
+  isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@index([orderId, productId])
