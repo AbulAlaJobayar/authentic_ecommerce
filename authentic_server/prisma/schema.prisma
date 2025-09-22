@@ -215,6 +215,7 @@ model CartItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
+
   @@index([productId])
   @@map("cartItem")
 }
@@ -240,16 +241,16 @@ model Order {
 }
 
 model OrderItem {
-  id        String   @id @default(cuid())
-  order     Order    @relation(fields: [orderId], references: [id])
-  orderId   String
-  product   Product  @relation(fields: [productId], references: [id])
-  productId String
-  quantity  Int
-  unitPrice Float // selling price at purchase time
+  id         String   @id @default(cuid())
+  order      Order    @relation(fields: [orderId], references: [id])
+  orderId    String
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  String
+  quantity   Int
+  unitPrice  Float // selling price at purchase time
   totalPrice Float // unitPrice * quantity
-  isDeleted Boolean  @default(false)
-  createdAt DateTime @default(now())
+  isDeleted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
 
   @@index([orderId, productId])
   @@map("orderItem")
@@ -278,6 +279,8 @@ model Shipment {
   trackingNumber String?
   carrier        String?
   cost           Float          @default(0)
+  from           String
+  to             String
   status         ShipmentStatus @default(PENDING)
   shippedAt      DateTime?
   deliveredAt    DateTime?
@@ -285,7 +288,7 @@ model Shipment {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  @@index([orderId])
+  @@index([orderId,trackingNumber,carrier,to])
   @@map("shipment")
 }
 

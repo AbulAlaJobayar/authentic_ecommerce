@@ -2,13 +2,22 @@ import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
 import prisma from '../../shared/prisma';
 import { Request } from 'express';
-import { TCreateOrder } from './order.interface';
+import { TCreateOrder, TOrderFilterRequest } from './order.interface';
 import { generateOrderNumber } from '../../utils/orderNumber';
+import { TPaginationOption } from '../../interfaces/pagination';
+import { paginationHelpers } from '../../helper/paginationHelper';
+import { orderSearchableFields } from './order.constant';
 
 const createOrderIntoDB = async (req: Request) => {
   const userId = req.user.id;
   const payload: TCreateOrder = req.body;
   try {
+    const user = await prisma.user.findFirst({
+      where: { id: userId, isDeleted: false },
+    });
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
     const order = await prisma.$transaction(async (tx) => {
       // Fetch products
       const products = await tx.product.findMany({
@@ -87,9 +96,6 @@ const createOrderIntoDB = async (req: Request) => {
             create: orderItemsData,
           },
         },
-        include: {
-          orderItems: true,
-        },
       });
 
       return createdOrder;
@@ -97,10 +103,182 @@ const createOrderIntoDB = async (req: Request) => {
     return order;
   } catch (error) {
     console.log(error);
-    throw error
+    throw error;
   }
+};
+const getAllOrderFromDB = async (
+  filters: TOrderFilterRequest,
+  option: TPaginationOption
+) => {
+  const { searchTerm, ...filterData } = filters;
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(option);
+  const andConditions = [];
+  if (searchTerm) {
+    andConditions.push({
+      OR: orderSearchableFields.map((field) => ({
+        [field]: {
+          contains: searchTerm,
+          mode: 'insensitive',
+        },
+      })),
+    });
+  }
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as Record<string, string | undefined>)[key],
+        },
+      })),
+    });
+  }
+  andConditions.push({ isDeleted: false });
+
+  const whereConditions =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.order.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      sortBy && sortOrder
+        ? { [sortBy]: sortOrder }
+        : {
+            createdAt: 'desc',
+          },
+    select: {
+      id: true,
+      user: true,
+      userId: true,
+      orderNumber: true,
+      shippingCost: true,
+      total: true,
+      payment: true,
+      status: true,
+      shipment: true,
+      discount: true,
+      discountId: true,
+      orderItems: true,
+      isDeleted: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  const total = await prisma.product.count({
+    where: whereConditions,
+  });
+  return {
+    meta: {
+      total,
+      page,
+      limit,
+    },
+    data: result,
+  };
+};
+const getOrderByUserIdFromDB = async (
+  userId: string,
+  filters: TOrderFilterRequest,
+  option: TPaginationOption
+) => {
+  const { searchTerm, ...filterData } = filters;
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(option);
+  const andConditions = [];
+  if (searchTerm) {
+    andConditions.push({
+      OR: orderSearchableFields.map((field) => ({
+        [field]: {
+          contains: searchTerm,
+          mode: 'insensitive',
+        },
+      })),
+    });
+  }
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as Record<string, string | undefined>)[key],
+        },
+      })),
+    });
+  }
+  andConditions.push({
+    isDeleted: false,
+    userId: userId,
+    payment: { isNot: null },
+    shipment: { isNot: null },
+  });
+
+  const whereConditions =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.order.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      sortBy && sortOrder
+        ? { [sortBy]: sortOrder }
+        : {
+            createdAt: 'desc',
+          },
+    select: {
+      id: true,
+      user: true,
+      userId: true,
+      orderNumber: true,
+      shippingCost: true,
+      total: true,
+      payment: true,
+      status: true,
+      shipment: true,
+      discount: true,
+      discountId: true,
+      orderItems: true,
+      isDeleted: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  const total = await prisma.product.count({
+    where: whereConditions,
+  });
+  return {
+    meta: {
+      total,
+      page,
+      limit,
+    },
+    data: result,
+  };
+};
+const getSingleOrderFromDB = async ( orderId: string) => {
+  const result = await prisma.order.findFirst({
+    where: {
+      id: orderId,
+      isDeleted: false,
+      payment: { isNot: null },
+      shipment: { isNot: null },
+    },
+  });
+  return result;
+};
+const deleteOrderFromDB = async (id: string) => {
+  const result = await prisma.order.update({
+    where: { id },
+    data: { isDeleted: true },
+  });
+  return result;
 };
 
 export const OrderServices = {
   createOrderIntoDB,
+  getAllOrderFromDB,
+  getOrderByUserIdFromDB,
+  getSingleOrderFromDB,
+  deleteOrderFromDB,
 };
