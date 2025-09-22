@@ -17,4 +17,39 @@ router.post(
   validateRequest(OrderValidation.createOrderIntoDB),
   OrderController.createOrderIntoDB
 );
+router.get(
+  '/orders',
+  auth(USER_ROLE.SUPER_ADMIN, USER_ROLE.MANAGER),
+  OrderController.getAllOrderFromDB
+);
+router.get(
+  '/',
+  auth(
+    USER_ROLE.CUSTOMER,
+    USER_ROLE.MANAGER,
+    USER_ROLE.STAFF,
+    USER_ROLE.SUPER_ADMIN
+  ),
+  OrderController.getOrderByUserIdFromDB
+);
+router.get(
+  '/:id',
+  auth(
+    USER_ROLE.CUSTOMER,
+    USER_ROLE.MANAGER,
+    USER_ROLE.STAFF,
+    USER_ROLE.SUPER_ADMIN
+  ),
+  OrderController.getSingleOrderFromDB
+);
+router.delete(
+  '/:id',
+  auth(
+    USER_ROLE.CUSTOMER,
+    USER_ROLE.MANAGER,
+    USER_ROLE.STAFF,
+    USER_ROLE.SUPER_ADMIN
+  ),
+  OrderController.deleteOrderFromDB
+);
 export const OrderRoutes = router;

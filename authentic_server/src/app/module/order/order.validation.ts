@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PaymentMethod, PaymentStatus } from '../../../../generated/prisma';
+
 const createOrderIntoDB = z.object({
   body: z.object({
     items: z.array(
@@ -10,11 +10,9 @@ const createOrderIntoDB = z.object({
     ),
     shippingCost: z.number().nonnegative(),
     discountId: z.string().optional(),
-    payment: z.object({
-      method: z.enum(PaymentMethod),
-      transactionId: z.string(),
-      paymentStatus: z.enum(PaymentStatus),
-      amount: z.number().nonnegative(),
+    shipment: z.object({
+      origin: z.string(),
+      destination: z.string(),
     }),
   }),
 });

@@ -97,6 +97,15 @@ const createOrderIntoDB = async (req: Request) => {
           },
         },
       });
+      // create shipment
+      await tx.shipment.create({
+        data: {
+          orderId: createdOrder.id,
+          origin: payload.shipment.origin,
+          destination: payload.shipment.destination,
+          cost: payload.shippingCost,
+        },
+      });
 
       return createdOrder;
     });
@@ -256,7 +265,7 @@ const getOrderByUserIdFromDB = async (
     data: result,
   };
 };
-const getSingleOrderFromDB = async ( orderId: string) => {
+const getSingleOrderFromDB = async (orderId: string) => {
   const result = await prisma.order.findFirst({
     where: {
       id: orderId,

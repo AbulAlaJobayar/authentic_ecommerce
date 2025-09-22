@@ -2,18 +2,17 @@ type Items = {
   productId: string;
   quantity: number;
 };
-type Payment = {
-  method: string;
-  transactionId: string;
-  paymentStatus: string;
-  amount: number;
+
+type TShipment = {
+  origin: string;
+  destination: string;
 };
 
 export type TCreateOrder = {
   items: Items[];
   shippingCost: number;
   discountId?: string;
-  payment: Payment;
+  shipment: TShipment;
 };
 export type TOrderFilterRequest = {
   searchTerm?: string | undefined;
