@@ -175,7 +175,7 @@ const getAllOrderFromDB = async (
       updatedAt: true,
     },
   });
-  const total = await prisma.product.count({
+  const total = await prisma.order.count({
     where: whereConditions,
   });
   return {
@@ -253,7 +253,7 @@ const getOrderByUserIdFromDB = async (
       updatedAt: true,
     },
   });
-  const total = await prisma.product.count({
+  const total = await prisma.order.count({
     where: whereConditions,
   });
   return {
