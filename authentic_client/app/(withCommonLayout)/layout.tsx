@@ -4,10 +4,13 @@ import React from "react";
 
 const CommonLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="container mx-auto">
-      <Navbar />
-      <Container>{children}</Container>
-    </div>
+    <>
+      <div className="">
+        <Navbar />
+
+        <Container>{children}</Container>
+      </div>
+    </>
   );
 };
 

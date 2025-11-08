@@ -11,7 +11,11 @@ import { Search, ExternalLink } from "lucide-react";
 const DEBOUNCE_MS = 200;
 
 const productsData = [
-  { id: 1, name: "Authentic Leather Wallet", image: "/images/products/wallet.jpg" },
+  {
+    id: 1,
+    name: "Authentic Leather Wallet",
+    image: "/images/products/wallet.jpg",
+  },
   { id: 2, name: "Classic Men's Belt", image: "/images/products/wallet.jpg" },
   { id: 3, name: "Stylish Handbag", image: "/images/products/wallet.jpg" },
   { id: 4, name: "Brown Leather Shoes", image: "/images/products/wallet.jpg" },
@@ -49,7 +53,10 @@ const SearchProduct = () => {
 
   // Click outside to close dropdown
   const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+    if (
+      containerRef.current &&
+      !containerRef.current.contains(event.target as Node)
+    ) {
       setOpen(false);
     }
   }, []);
@@ -75,7 +82,7 @@ const SearchProduct = () => {
           placeholder="Search products..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-10 text-sm sm:text-base dark:bg-slate-900 dark:text-slate-200 border-border w-full py-2 sm:py-3"
+          className="pl-10 text-sm sm:text-base dark:bg-black dark:text-slate-200 border-2 border-black w-full py-2 sm:py-3"
         />
       </div>
 
