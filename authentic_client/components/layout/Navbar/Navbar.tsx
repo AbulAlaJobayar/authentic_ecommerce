@@ -23,7 +23,6 @@ import {
   DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -56,7 +55,7 @@ const items = [
 ];
 
 const Navbar = () => {
-  const isScrolled = useScrollDetection(1);
+  const isScrolled = useScrollDetection(0.1);
   const [openItem, setOpenItem] = useState<string | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -66,76 +65,14 @@ const Navbar = () => {
   const user = true;
   return (
     <>
-      <motion.nav
-        initial={{ y: 0 }}
-        animate={{ y: isScrolled ? -80 : 0, opacity: isScrolled ? 0 : 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="fixed top-0 left-0 w-full z-50 bg-white shadow-md hidden md:block"
-      >
-        <div className="border-b py-1">
-          <Container>
-            <div className=" flex items-center py-3  justify-between">
-              {/* website logo */}
-              <div className=" ">Authentic Surgical</div>
-              {/* product search */}
-              <div className=" max-w-3/5 w-full">
-                <SearchProduct />
-              </div>
-              {/* user actions: cart, profile, etc. */}
-              {/* <div className="flex items-center gap-6"> */}
-              <div className="flex items-center gap-3">
-                {user ? (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Avatar>
-                        <AvatarImage src="https://github.com/shadcn.png" />
-                        <AvatarFallback>CN</AvatarFallback>
-                      </Avatar>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Add to library</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ) : (
-                  <>
-                    <Avatar className="hidden md:block">
-                      <AvatarImage src="https://github.com/shadcn.png" />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p>Sign In</p>
-                      <p className="hidden md:block">Your Account</p>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              <div className="relative">
-                <Badge
-                  className="absolute bottom-4 left-4 h-5 min-w-5 rounded-full px-1 font-mono tabular-nums"
-                  variant="destructive"
-                >
-                  99
-                </Badge>
-                <ShoppingBag />
-              </div>
-              {/* </div> */}
-            </div>
-          </Container>
-        </div>
-        <div className="py-1">
-          <Container>
-            <SubNavbar />
-          </Container>
-        </div>
-      </motion.nav>
-      {isScrolled && (
+     
+      {isScrolled ? (
         <>
           <motion.nav
             initial={{ y: -80 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="drop-shadow-md hidden md:block bg-white sticky top-0 z-50"
+            className="sticky top-0 left-0 w-full z-50 bg-white shadow-md hidden md:block"
           >
             <div className="border-b py-1">
               <Container>
@@ -190,9 +127,74 @@ const Navbar = () => {
             </div>
           </motion.nav>
         </>
-      )}
+      ):(<>
+       <motion.nav
+        initial={{ y: 0 }}
+        animate={{ y: isScrolled ? -80 : 0, opacity: isScrolled ? 0 : 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="sticky top-0 left-0 w-full z-50 bg-white shadow-md hidden md:block"
+      >
+        <div className="border-b py-1">
+          <Container>
+            <div className=" flex items-center py-3  justify-between">
+              {/* website logo */}
+              <div className=" ">Authentic Surgical</div>
+              {/* product search */}
+              <div className=" max-w-3/5 w-full">
+                <SearchProduct />
+              </div>
+              {/* user actions: cart, profile, etc. */}
+          
+              <div className="flex items-center gap-3">
+                {user ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Avatar>
+                        <AvatarImage src="https://github.com/shadcn.png" />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Add to library</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <>
+                    <Avatar className="hidden md:block">
+                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p>Sign In</p>
+                      <p className="hidden md:block">Your Account</p>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="relative">
+                <Badge
+                  className="absolute bottom-4 left-4 h-5 min-w-5 rounded-full px-1 font-mono tabular-nums"
+                  variant="destructive"
+                >
+                  99
+                </Badge>
+                <ShoppingBag />
+              </div>
+              {/* </div> */}
+            </div>
+          </Container>
+        </div>
+        <div className="py-1">
+          <Container>
+            <SubNavbar />
+          </Container>
+        </div>
+      </motion.nav>
+      
+      </>)}
       {/* small Screen */}
-      <nav className="md:hidden bg-white shadow-md fixed top-0 left-0 w-full z-50">
+      <nav className="sticky md:hidden bg-white shadow-md  top-0 left-0 w-full z-50">
         <div className="border-b py-1">
           <Container>
             <div className="flex items-center justify-between py-4">
@@ -314,12 +316,9 @@ const Navbar = () => {
                 <ShoppingBag />
               </div>
             </div>
-
-            
           </Container>
           {isSearchOpen && <SearchProduct />}
         </div>
-        
       </nav>
     </>
   );
