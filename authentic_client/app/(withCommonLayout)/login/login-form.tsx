@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,8 @@ import ATSFrom from "@/components/shared/Form/ATSForm";
 import ATSInput from "@/components/shared/Form/ATSInput";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import userLogin from "@/app/services/action/userLogin";
+import { toast } from "sonner";
 const passwordSchema = z
   .string()
   .min(8, "Must be at least 8 characters long")
@@ -39,8 +42,28 @@ const defaultValues: Partial<FormValues> = {
   password: "",
 };
 const LoginForm = ({ className, ...props }: React.ComponentProps<"div">) => {
-  const handleSubmit = (data: FormValues) => {
-    console.log(data);
+  const handleSubmit = async (data: FormValues) => {
+   console.log(data)
+    try {
+      const res = await userLogin(data);
+      if (res.success) {
+        toast.success("Login successful!", {
+          description: res.message,
+          duration: 5000,
+        });
+      } else {
+        toast.error("Login failed try again", {
+          description: res.message,
+          duration: 5000,
+        });
+      }
+    } catch (error: any) {
+      console.log(error)
+      toast.error("Login failed", {
+        description: error?.message || "An error occurred during login",
+        duration: 5000,
+      });
+    }
   };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
