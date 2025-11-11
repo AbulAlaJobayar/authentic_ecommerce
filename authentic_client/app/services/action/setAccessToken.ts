@@ -1,7 +1,7 @@
 "use server";
 import { authKey } from "@/app/constant/authKey";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 
 interface SetAccessTokenOptions {
   redirect?: string;
@@ -21,6 +21,6 @@ export const setAccessToken = async (
   });
 
   if (options?.redirect) {
-    redirect(options.redirect);
+    redirect(options.redirect,RedirectType.push);
   }
 };

@@ -5,10 +5,9 @@ import React from "react";
 const CommonLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
-      <div className="">
+      <div>
         <Navbar />
-
-        <Container className="">{children}</Container>
+        <Container>{children}</Container>
       </div>
     </>
   );

@@ -43,10 +43,12 @@ const defaultValues: Partial<FormValues> = {
 };
 const LoginForm = ({ className, ...props }: React.ComponentProps<"div">) => {
   const handleSubmit = async (data: FormValues) => {
-   console.log(data)
+    console.log(data);
     try {
       const res = await userLogin(data);
-      if (res.success) {
+
+      if (res.data.accessToken) {
+        console.log(res.data.accessToken);
         toast.success("Login successful!", {
           description: res.message,
           duration: 5000,
@@ -58,11 +60,7 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"div">) => {
         });
       }
     } catch (error: any) {
-      console.log(error)
-      toast.error("Login failed", {
-        description: error?.message || "An error occurred during login",
-        duration: 5000,
-      });
+      console.log(error);
     }
   };
   return (
@@ -118,7 +116,7 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"div">) => {
               </Button>
 
               <FieldDescription className="text-center">
-                Don&apos;t have an account? <a href="#">Sign up</a>
+                Don&apos;t have an account? <Link href="/signup">Sign up</Link>
               </FieldDescription>
             </FieldGroup>
           </ATSFrom>
