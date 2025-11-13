@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,13 +16,8 @@ import ATSInput from "@/components/shared/Form/ATSInput";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ATSPhoneInput from "@/components/shared/Form/ATSPhoneInput";
-import imageUploader from "@/app/helper/imageUploder";
-// import dynamic from "next/dynamic";
+import ATSImageInput from "@/components/shared/Form/ATSImageInput";
 
-// const ATSPhoneInput = dynamic(
-//   () => import("@/components/shared/Form/ATSPhoneInput"),
-//   { ssr: false }
-// );
 const passwordSchema = z
   .string()
   .min(8, "Must be at least 8 characters long")
@@ -61,14 +56,13 @@ const defaultValue = {
 
 const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
 
-
-  const handleSubmit = async(data: TFormValues) => {
+  const handleSubmit = async (data: TFormValues) => {
+    console.log(data)
     try {
-      const image =await imageUploader(data.image)
-      console.log("image",image)
+
     } catch (error) {
       console.log(error)
-      
+
     }
     console.log('hello word', data);
   };
@@ -101,6 +95,7 @@ const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
                       required
                     />
                   </Field>
+
                 </Field>
               </Field>
               <Field>
@@ -111,12 +106,14 @@ const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="email">Image</FieldLabel>
-                    <ATSInput
+                    <ATSImageInput name="image" id="image" required />
+                    {/* <ATSInput
                       id="image"
                       type="file"
                       name="image"
                       required
-                    />
+                    /> */}
+
                   </Field>
                 </Field>
               </Field>
