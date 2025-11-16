@@ -9,7 +9,7 @@ import {
   TUpdateProductRequest,
 } from './inventory.interface';
 import { AppError } from '../../error/AppError';
-import { logger } from '../../config/logger';
+// import { logger } from '../../config/logger';
 
 const getAllInventoryFromDB = async (
   filters: TInventoryFilterRequest,
@@ -298,7 +298,7 @@ const deleteInventoryFromDB = async (id: string) => {
     });
     return result;
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
     console.log(error);
   }
 };

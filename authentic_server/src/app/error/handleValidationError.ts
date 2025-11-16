@@ -1,18 +1,23 @@
-import { PrismaClientValidationError } from '@prisma/client/runtime/library';
-import { TErrorSources } from '../interface/error';
+import { PrismaClientValidationError } from "@prisma/client/runtime/library";
+import { IGenericErrorResponse } from "../interface/common";
 
-const handleValidationError = (err: PrismaClientValidationError) => {
-  // handle the error here
-  const errorSources: TErrorSources = [
-    {
-      path: '',
-      message: err.message,
-    },
-  ];
+const handleValidationError = (
+  error: PrismaClientValidationError
+): IGenericErrorResponse => {
+ 
+  const errorMessage = error.message.split('\n').slice(-1)[0];
+  
+  const errors = [{
+    path: "",
+    message: errorMessage,
+  }];
+  
+  const statusCode = 400;
   return {
-    statusCode: 400,
+    statusCode,
     message: 'Validation Error',
-    errorSources,
+    errorMessages: errors,
   };
 };
-export default handleValidationError 
+
+export default handleValidationError;

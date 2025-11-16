@@ -10,6 +10,7 @@ export type TUserFilterRequest = {
   mobile?: string | undefined;
   role?: string | undefined;
   verifiedAt?: boolean | undefined;
+  otp?: string | undefined;
   isDeleted?: boolean | undefined;
   accountStatus?: string | undefined;
 };

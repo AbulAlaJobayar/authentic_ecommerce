@@ -1,80 +1,93 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+
+import { ZodError } from 'zod';
+import config from '../config';
+import { IGenericErrorMessage } from '../interface/error';
 import {
   PrismaClientKnownRequestError,
   PrismaClientValidationError,
 } from '@prisma/client/runtime/library';
-import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
-import { TErrorSources } from '../interface/error';
-import config from '../config';
-import { ZodError } from 'zod';
-import handleZodError from '../error/handleZodError';
 import handleValidationError from '../error/handleValidationError';
+import handleZodError from '../error/handleZodError';
 import handleClientError from '../error/handleClientError';
 import { AppError } from '../error/AppError';
-import { logger } from '../config/logger';
 
 const globalErrorHandler: ErrorRequestHandler = (
-  err: any,
+  error,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   config.nodeEnv === 'development'
-    ? console.log(`🐱‍🏍 globalErrorHandler ~~`, { err })
-    : logger.error(`🐱‍🏍 globalErrorHandler ~~`, err);
+    ? console.log(`🐱‍🏍 globalErrorHandler ~~`, { error })
+    : ' Logger';
+  // console.log(`🐱‍🏍 globalErrorHandler ~~ Error type:`, error.constructor.name);
+  // console.log(
+  //   `🐱‍🏍 Is PrismaClientKnownRequestError:`,
+  //   error instanceof PrismaClientKnownRequestError
+  // );
+  // console.log(
+  //   `🐱‍🏍 Is PrismaClientValidationError:`,
+  //   error instanceof PrismaClientValidationError
+  // );
+  // console.log(`🐱‍🏍 Error code:`, error.code);
+  // console.log(`🐱‍🏍 Error meta:`, error.meta);
 
-  //   setting  default response
   let statusCode = 500;
-  let message = 'something went wrong';
-  let errorSources: TErrorSources = [
-    {
-      path: '',
-      message: 'Something went wrong',
-    },
-  ];
-  if (err instanceof ZodError) {
-    const zodError = handleZodError(err);
-    statusCode = zodError.statusCode;
-    message = zodError.message;
-    errorSources = zodError.errorSources;
-  } else if (err instanceof PrismaClientValidationError) {
-    const validationError = handleValidationError(err);
-    statusCode = validationError.statusCode;
-    message = validationError.message;
-    errorSources = validationError.errorSources;
-  } else if (err instanceof PrismaClientKnownRequestError) {
-    const clientError = handleClientError(err);
-    statusCode = clientError.statusCode;
-    message = clientError.message;
-    errorSources = clientError.errorSources;
-  } else if (err instanceof AppError) {
-    statusCode = err.statusCode;
-    message = err.message;
-    errorSources = [
-      {
-        path: '',
-        message: err?.message,
-      },
-    ];
-  } else if (err instanceof Error) {
-    message = err.message;
-    errorSources = [
-      {
-        path: '',
-        message: err?.message,
-      },
-    ];
+  let message = 'Something went wrong !';
+  let errorMessages: IGenericErrorMessage[] = [];
+
+  if (error instanceof PrismaClientValidationError) {
+    console.log('Handling PrismaClientValidationError');
+    const simplifiedError = handleValidationError(error);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorMessages = simplifiedError.errorMessages;
+  } else if (error instanceof ZodError) {
+    console.log(' Handling ZodError');
+    const simplifiedError = handleZodError(error);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorMessages = simplifiedError.errorMessages;
+  } else if (error.code && error.constructor.name === 'PrismaClientKnownRequestError') {
+    console.log('Handling PrismaClientKnownRequestError', error.code);
+    const simplifiedError = handleClientError(error);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorMessages = simplifiedError.errorMessages;
+  } else if (error instanceof AppError) {
+    console.log('Handling AppError');
+    statusCode = error?.statusCode;
+    message = error.message;
+    errorMessages = error?.message
+      ? [
+          {
+            path: '',
+            message: error?.message,
+          },
+        ]
+      : [];
+  } else if (error instanceof Error) {
+     console.log('Handling generic Error');
+    message = error?.message;
+    errorMessages = error?.message
+      ? [
+          {
+            path: '',
+            message: error?.message,
+          },
+        ]
+      : [];
   }
 
-  //   ultimate Return
-  return res.status(statusCode).json({
+  res.status(statusCode).json({
     success: false,
     message,
-    errorSources,
-    err,
-    stack: config.nodeEnv === 'development' ? err?.stack : null,
+    errorMessages,
+    stack: config.nodeEnv !== 'production' ? error?.stack : undefined,
   });
 };
+
 export default globalErrorHandler;

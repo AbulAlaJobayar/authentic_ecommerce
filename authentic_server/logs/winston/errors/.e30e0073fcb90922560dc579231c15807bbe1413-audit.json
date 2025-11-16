@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "F:\\projects\\authentic_ecommerce\\authentic_server\\logs\\winston\\errors\\.e30e0073fcb90922560dc579231c15807bbe1413-audit.json",
+    "files": [
+        {
+            "date": 1762693892582,
+            "name": "F:\\projects\\authentic_ecommerce\\authentic_server\\logs\\winston\\errors\\Authentic Surgical-2025-11-09-19-success.log",
+            "hash": "35e26f45641f0a8d5a16f93803ae452d13ba4458dd1a09541a23dc6e1276efa1"
+        }
+    ],
+    "hashType": "sha256"
+}

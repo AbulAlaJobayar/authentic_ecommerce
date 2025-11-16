@@ -58,6 +58,8 @@ const userLogin = async (payload: { email: string; password: string }) => {
     verifyAt: user.verifiedAt,
   };
 };
+
+
 const verifyUser = async (token: string) => {
   const decoded = jwtHelper.verifyToken(
     token,
@@ -127,6 +129,9 @@ const sendEmailVerification = async (id: string) => {
   });
   return null;
 };
+
+
+
 
 const changePassword = async (
   userData: JwtPayload,

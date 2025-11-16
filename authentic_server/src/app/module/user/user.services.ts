@@ -24,8 +24,13 @@ const createUserIntoDB = async (req: Request) => {
   req.body.password = password;
   const customId = (await generateCustomId(req.body.role)) as string;
   req.body.customId = customId;
+
+  // generate Otp and save DB
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  // const hashOtp = (await hashPassword(otp.toString() as string)) as string;
+
   const user = await prisma.user.create({
-    data: req.body,
+    data: { ...req.body, otp },
     select: {
       id: true,
       name: true,
@@ -34,6 +39,7 @@ const createUserIntoDB = async (req: Request) => {
       mobile: true,
       image: true,
       role: true,
+      otp: true,
       verifiedAt: true,
       createdAt: true,
       updatedAt: true,
@@ -58,7 +64,7 @@ const createUserIntoDB = async (req: Request) => {
   sendEmail({
     to: user.email,
     subject: 'Verify your email',
-    html: verificationEmailTemplate(url, 'Verify My Email'),
+    html: verificationEmailTemplate(url, 'Verify My Email', user.otp as string),
   });
 
   return user;
@@ -107,7 +113,6 @@ const getAllUserFromDB = async (
       })),
     });
   }
-  
 
   const whereConditions =
     andConditions.length > 0 ? { AND: andConditions } : {};
@@ -131,7 +136,7 @@ const getAllUserFromDB = async (
       image: true,
       role: true,
       isDeleted: true,
-      accountStatus:true,
+      accountStatus: true,
       verifiedAt: true,
       createdAt: true,
       updatedAt: true,

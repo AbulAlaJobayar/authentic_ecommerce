@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
 import prisma from '../../shared/prisma';
 import { TCart } from './cart.interface';
-import { errorLogger } from '../../config/logger';
+// import { errorLogger } from '../../config/logger';
 
 const createCartIntoDB = async (userId: string, payload: TCart) => {
   try {
@@ -43,7 +43,8 @@ const createCartIntoDB = async (userId: string, payload: TCart) => {
     });
     return result;
   } catch (error) {
-    errorLogger.error('Failed to create cart item', error);
+    console.log(error)
+   // errorLogger.error('Failed to create cart item', error);
   }
 };
 

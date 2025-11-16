@@ -5,7 +5,7 @@ import { TPaginationOption } from '../../interfaces/pagination';
 import { TProduct, TProductFilterRequest } from './product.interface';
 import { paginationHelpers } from '../../helper/paginationHelper';
 import { productSearchableFields } from './product.constant';
-import { logger } from '../../config/logger';
+// import { logger } from '../../config/logger';
 import { Status } from '../../../../generated/prisma';
 
 const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
@@ -52,7 +52,7 @@ const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
     return result;
   } catch (err) {
     console.log(err);
-    logger.error(err);
+    // logger.error(err);
   }
 };
 

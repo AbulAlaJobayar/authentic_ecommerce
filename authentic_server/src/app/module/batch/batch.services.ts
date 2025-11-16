@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
 import prisma from '../../shared/prisma';
 import { TCreateProductBatch } from './batch.interface';
-import { errorLogger } from '../../config/logger';
+// import { errorLogger } from '../../config/logger';
 import moment from 'moment';
 
 const createProductBatchIntoDB = async (payload: TCreateProductBatch) => {
@@ -68,7 +68,7 @@ const createProductBatchIntoDB = async (payload: TCreateProductBatch) => {
     return result;
   } catch (error) {
     console.log(error);
-    errorLogger.error('Failed to create product batch', error);
+   // errorLogger.error('Failed to create product batch', error);
     throw error;
   }
 };

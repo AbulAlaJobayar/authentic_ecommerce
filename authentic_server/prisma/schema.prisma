@@ -89,6 +89,7 @@ model User {
   mobile        String        @unique
   image         String?
   role          Role          @default(CUSTOMER)
+  otp           String?
   verifiedAt    Boolean       @default(false)
   isDeleted     Boolean       @default(false)
   accountStatus accountStatus @default(ACTIVE)
@@ -288,7 +289,7 @@ model Shipment {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  @@index([orderId, trackingNumber,carrier,destination])
+  @@index([orderId, trackingNumber, carrier, destination])
   @@map("shipment")
 }
 
