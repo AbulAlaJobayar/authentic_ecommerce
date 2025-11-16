@@ -17,6 +17,8 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ATSPhoneInput from "@/components/shared/Form/ATSPhoneInput";
 import ATSImageInput from "@/components/shared/Form/ATSImageInput";
+import userSignup from "@/app/services/action/userSignup";
+import { toast } from "sonner";
 
 const passwordSchema = z
   .string()
@@ -57,14 +59,26 @@ const defaultValue = {
 const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
 
   const handleSubmit = async (data: TFormValues) => {
-    console.log(data)
+
     try {
+      const res = await userSignup(data)
+      if (res.data) {
+        toast.success("SignUp successful please check your Email!", {
+          description: res.message,
+          duration: 5000,
+        });
+      } else {
+        toast.error("SignUp failed try again", {
+          description: res.message,
+          duration: 5000,
+        });
+      }
+
 
     } catch (error) {
       console.log(error)
 
     }
-    console.log('hello word', data);
   };
 
   return (
