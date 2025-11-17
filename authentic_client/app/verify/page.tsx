@@ -1,4 +1,4 @@
-import { OTPForm } from "@/components/otp-form";
+import { OTPForm } from "@/app/verify/otp-form";
 const Verify = () => {
     return (
         <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">

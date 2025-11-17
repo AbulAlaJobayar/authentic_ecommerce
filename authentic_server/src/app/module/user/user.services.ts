@@ -13,24 +13,22 @@ import { TUserFilterRequest } from './user.interface';
 import { TPaginationOption } from '../../interfaces/pagination';
 import { userSearchableFields } from './user.constant';
 import { paginationHelpers } from '../../helper/paginationHelper';
+import generateOTP from '../../shared/generateOTP';
 
 const createUserIntoDB = async (req: Request) => {
-  const file = req.file as MulterFile;
-  if (req.file) {
-    const image = await imageUploader.uploadImageToS3(file);
-    req.body.image = image;
-  }
+  // const file = req.file as MulterFile;
+  // if (req.file) {
+  //   const image = await imageUploader.uploadImageToS3(file);
+  //   req.body.image = image;
+  // }
   const password = (await hashPassword(req.body.password as string)) as string;
   req.body.password = password;
   const customId = (await generateCustomId(req.body.role)) as string;
   req.body.customId = customId;
-
-  // generate Otp and save DB
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  // const hashOtp = (await hashPassword(otp.toString() as string)) as string;
-
+  const { otp, hashOtp } = await generateOTP();
+  req.body.otp = hashOtp;
   const user = await prisma.user.create({
-    data: { ...req.body, otp },
+    data: { ...req.body },
     select: {
       id: true,
       name: true,
@@ -64,10 +62,10 @@ const createUserIntoDB = async (req: Request) => {
   sendEmail({
     to: user.email,
     subject: 'Verify your email',
-    html: verificationEmailTemplate(url, 'Verify My Email', user.otp as string),
+    html: verificationEmailTemplate(url, 'Verify My Email', otp as string),
   });
 
-  return user;
+  return {data:user, token:verifyToken};
 };
 
 const getAllUserFromDB = async (

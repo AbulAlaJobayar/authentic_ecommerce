@@ -1,5 +1,5 @@
-import { sendEmail } from './../../shared/sendEmail';
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { sendEmail } from './../../shared/sendEmail';
 import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
 import prisma from '../../shared/prisma';
@@ -9,6 +9,7 @@ import config from '../../config';
 import { JwtPayload, Secret } from 'jsonwebtoken';
 import verificationEmailTemplate from '../../template/verificationEmail';
 import hashPassword from '../../helper/hashPassword';
+import generateOTP from '../../shared/generateOTP';
 
 const userLogin = async (payload: { email: string; password: string }) => {
   const user = await prisma.user.findFirst({
@@ -29,8 +30,8 @@ const userLogin = async (payload: { email: string; password: string }) => {
       `Account is ${user.accountStatus.toLowerCase()}`
     );
   }
-  
-  if (!await comparPassword(payload.password, user.password)) {
+
+  if (!(await comparPassword(payload.password, user.password))) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'your password is incorrect');
   }
 
@@ -59,12 +60,17 @@ const userLogin = async (payload: { email: string; password: string }) => {
   };
 };
 
-
-const verifyUser = async (token: string) => {
+const verifyUser = async (token: string, otp: string) => {
   const decoded = jwtHelper.verifyToken(
     token,
     config.jwt.jwtVerifySecret as Secret
   );
+  if (!decoded) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'Verification token is invalid or expired'
+    );
+  }
   const { id } = decoded as JwtPayload;
   const user = await prisma.user.findUnique({
     where: { id },
@@ -82,15 +88,40 @@ const verifyUser = async (token: string) => {
       `Account is ${user.accountStatus.toLowerCase()}`
     );
   }
+  // Check if OTP exists
+  if (!user.otp) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'No OTP found. Please request a new one.'
+    );
+  }
+  const isOtpValid = comparPassword(otp, user.otp as string);
+  if (!isOtpValid) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Invalid OTP. Please request a new one.'
+    );
+  }
 
   await prisma.user.update({
     where: { id: user.id },
-    data: { verifiedAt: true },
+    data: { verifiedAt: true, otp: null },
   });
   return null;
 };
 
-const sendEmailVerification = async (id: string) => {
+const sendEmailVerification = async (token: string) => {
+  const decoded = jwtHelper.verifyToken(
+    token,
+    config.jwt.jwtVerifySecret as Secret
+  );
+  if (!decoded) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'Verification token is invalid or expired'
+    );
+  }
+  const { id } = decoded as JwtPayload;
   const user = await prisma.user.findUnique({
     where: { id },
   });
@@ -107,6 +138,13 @@ const sendEmailVerification = async (id: string) => {
       `Account is ${user.accountStatus.toLowerCase()}`
     );
   }
+  const { otp, hashOtp } = await generateOTP();
+  // update OTP for generate OTP
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { otp: hashOtp },
+  });
+
   //localhost:3000/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
 
   const tokenData = {
@@ -125,13 +163,10 @@ const sendEmailVerification = async (id: string) => {
   sendEmail({
     to: user.email,
     subject: 'Verify your email',
-    html: verificationEmailTemplate(url, 'Verify My Email'),
+    html: verificationEmailTemplate(url, 'Verify My Email', otp),
   });
   return null;
 };
-
-
-
 
 const changePassword = async (
   userData: JwtPayload,
@@ -159,7 +194,7 @@ const changePassword = async (
       `Account is ${user.accountStatus.toLowerCase()}`
     );
   }
-  if (!await comparPassword(payload.oldPassword, user.password)) {
+  if (!(await comparPassword(payload.oldPassword, user.password))) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'your password is incorrect');
   }
 

@@ -2,16 +2,16 @@ import { Router } from 'express';
 import validateRequest from '../../middleware/validateRequest';
 import { UserValidation } from './user.validation';
 import { userController } from './user.controller';
-import { imageUploader } from '../../shared/imageUpload';
-import parseData from '../../middleware/parseData';
+// import { imageUploader } from '../../shared/imageUpload';
+// import parseData from '../../middleware/parseData';
 import auth from '../../middleware/auth';
 import { USER_ROLE } from './user.constant';
 
 const router = Router();
 router.post(
   '/',
-  imageUploader.upload.single('image'),
-  parseData(),
+  // imageUploader.upload.single('image'),
+  // parseData(),
   validateRequest(UserValidation.createUserSchemaValidation),
   userController.createUserIntoDB
 );
@@ -32,9 +32,9 @@ router.get(
 );
 router.patch(
   '/:id',
-  imageUploader.upload.single('image'),
+  // imageUploader.upload.single('image'),
   auth(USER_ROLE.SUPER_ADMIN,USER_ROLE.MANAGER),
-  parseData(),
+  // parseData(),
   userController.updateUserFromDB
 );
 router.delete(

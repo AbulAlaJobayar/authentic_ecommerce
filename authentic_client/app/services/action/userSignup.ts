@@ -12,6 +12,8 @@ const userSignup = async (data: UserCreateData) => {
       credentials: "include",
       cache: "no-cache",
     });
+
+    console.log({ res });
     if (!res.ok) {
       const errorResponse = await res.json();
       throw new Error(
@@ -25,8 +27,8 @@ const userSignup = async (data: UserCreateData) => {
     }
 
     // Handle unverified user - this will throw NEXT_REDIRECT
-    if (!user.data.verifiedAt) {
-      redirect("/verify", RedirectType.push);
+    if (!user.data.result.verifiedAt) {
+      redirect(`/verify?token=${user.data.token}`, RedirectType.push);
     }
 
     return user;

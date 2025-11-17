@@ -42,6 +42,7 @@ const createUserSchemaValidation = z.object({
             : ' Provide valid email',
       })
       .trim(),
+    image: z.string(),
     password: passwordSchema,
     mobile: phoneNumberSchema,
     role: z
