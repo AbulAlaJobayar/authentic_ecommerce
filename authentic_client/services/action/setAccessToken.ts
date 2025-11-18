@@ -1,5 +1,5 @@
 "use server";
-import { authKey } from "@/app/constant/authKey";
+import { authKey } from "@/constant/authKey";
 import { cookies } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
 

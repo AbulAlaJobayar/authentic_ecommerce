@@ -65,7 +65,7 @@ const Navbar = () => {
   const user = true;
   return (
     <>
-     
+
       {isScrolled ? (
         <>
           <motion.nav
@@ -127,71 +127,71 @@ const Navbar = () => {
             </div>
           </motion.nav>
         </>
-      ):(<>
-       <motion.nav
-        initial={{ y: 0 }}
-        animate={{ y: isScrolled ? -80 : 0, opacity: isScrolled ? 0 : 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="sticky top-0 left-0 w-full z-50 bg-white shadow-md hidden md:block"
-      >
-        <div className="border-b py-1">
-          <Container>
-            <div className=" flex items-center py-3  justify-between">
-              {/* website logo */}
-              <div className=" ">Authentic Surgical</div>
-              {/* product search */}
-              <div className=" max-w-3/5 w-full">
-                <SearchProduct />
-              </div>
-              {/* user actions: cart, profile, etc. */}
-          
-              <div className="flex items-center gap-3">
-                {user ? (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Avatar>
+      ) : (<>
+        <motion.nav
+          initial={{ y: 0 }}
+          animate={{ y: isScrolled ? -80 : 0, opacity: isScrolled ? 0 : 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="sticky top-0 left-0 w-full z-50 bg-white shadow-md hidden md:block"
+        >
+          <div className="border-b py-1">
+            <Container>
+              <div className=" flex items-center py-3  justify-between">
+                {/* website logo */}
+                <div className=" ">Authentic Surgical</div>
+                {/* product search */}
+                <div className=" max-w-3/5 w-full">
+                  <SearchProduct />
+                </div>
+                {/* user actions: cart, profile, etc. */}
+
+                <div className="flex items-center gap-3">
+                  {user ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Avatar>
+                          <AvatarImage src="https://github.com/shadcn.png" />
+                          <AvatarFallback>CN</AvatarFallback>
+                        </Avatar>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Add to library</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <>
+                      <Avatar className="hidden md:block">
                         <AvatarImage src="https://github.com/shadcn.png" />
                         <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Add to library</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ) : (
-                  <>
-                    <Avatar className="hidden md:block">
-                      <AvatarImage src="https://github.com/shadcn.png" />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p>Sign In</p>
-                      <p className="hidden md:block">Your Account</p>
-                    </div>
-                  </>
-                )}
-              </div>
+                      <div>
+                        <p>Sign In</p>
+                        <p className="hidden md:block">Your Account</p>
+                      </div>
+                    </>
+                  )}
+                </div>
 
-              <div className="relative">
-                <Badge
-                  className="absolute bottom-4 left-4 h-5 min-w-5 rounded-full px-1 font-mono tabular-nums"
-                  variant="destructive"
-                >
-                  99
-                </Badge>
-                <ShoppingBag />
+                <div className="relative">
+                  <Badge
+                    className="absolute bottom-4 left-4 h-5 min-w-5 rounded-full px-1 font-mono tabular-nums"
+                    variant="destructive"
+                  >
+                    99
+                  </Badge>
+                  <ShoppingBag />
+                </div>
+                {/* </div> */}
               </div>
-              {/* </div> */}
-            </div>
-          </Container>
-        </div>
-        <div className="py-1">
-          <Container>
-            <SubNavbar />
-          </Container>
-        </div>
-      </motion.nav>
-      
+            </Container>
+          </div>
+          <div className="py-1">
+            <Container>
+              <SubNavbar />
+            </Container>
+          </div>
+        </motion.nav>
+
       </>)}
       {/* small Screen */}
       <nav className="sticky md:hidden bg-white shadow-md  top-0 left-0 w-full z-50">

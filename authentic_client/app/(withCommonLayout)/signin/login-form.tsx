@@ -15,7 +15,7 @@ import ATSFrom from "@/components/shared/Form/ATSForm";
 import ATSInput from "@/components/shared/Form/ATSInput";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import userLogin from "@/app/services/action/userLogin";
+import userLogin from "@/services/action/userLogin";
 import { toast } from "sonner";
 const passwordSchema = z
   .string()

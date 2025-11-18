@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import ATSFrom from "@/components/shared/Form/ATSForm"
 import { Button } from "@/components/ui/button"
@@ -20,41 +19,28 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
+import { useSearchParams } from "next/navigation"
 import { useState } from "react"
+import verifyOtp from "../../services/action/verifyOtp"
 
 export function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
   const [otp, setOtp] = useState("")
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") || "";
 
-  const handleSubmit = (data: any) => {
-    console.log("OTP submitted:", otp)
-    console.log("Form data:", data)
-
-    // Your OTP verification logic here
-    verifyOtp(otp)
-  }
-
-  const verifyOtp = async (otpCode: string) => {
+  const handleSubmit = async () => {
     try {
-      const response = await fetch('/api/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ otp: otpCode }),
-      })
+      const result = await verifyOtp(token, otp)
+      console.log({ result })
 
-      if (response.ok) {
-        const result = await response.json()
-        console.log('OTP verified successfully:', result)
-        // Handle success (redirect, show message, etc.)
-      } else {
-        console.error('OTP verification failed')
-        // Handle error
-      }
     } catch (error) {
-      console.error('Error verifying OTP:', error)
+      console.log({ error })
     }
+
+
   }
+
+
 
   return (
     <Card {...props}>

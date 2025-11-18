@@ -17,8 +17,10 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ATSPhoneInput from "@/components/shared/Form/ATSPhoneInput";
 import ATSImageInput from "@/components/shared/Form/ATSImageInput";
-import userSignup from "@/app/services/action/userSignup";
+import userSignup from "@/services/action/userSignup";
 import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { setLogin } from "@/redix/features/login/loginSlice";
 
 const passwordSchema = z
   .string()
@@ -57,27 +59,28 @@ const defaultValue = {
 }
 
 const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
-
+  const dispatch = useDispatch()
   const handleSubmit = async (data: TFormValues) => {
-
     try {
       const res = await userSignup(data)
+      const loginData = {
+        email: data.email,
+        password: data.password
+      }
       if (res.data) {
         toast.success("SignUp successful please check your Email!", {
           description: res.message,
           duration: 5000,
         });
+        dispatch(setLogin(loginData))
       } else {
         toast.error("SignUp failed try again", {
           description: res.message,
           duration: 5000,
         });
       }
-
-
     } catch (error) {
       console.log(error)
-
     }
   };
 

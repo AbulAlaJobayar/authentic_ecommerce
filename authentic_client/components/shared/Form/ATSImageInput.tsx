@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { Controller, useFormContext } from "react-hook-form";
 import React from "react";
-import imageUploader from "@/app/helper/imageUploder";
+import imageUploader from "@/helper/imageUploder";
 
 type ATSInputProps = {
     size?: number | string;
