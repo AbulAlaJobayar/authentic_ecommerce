@@ -23,6 +23,9 @@ import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { setLogin } from "@/redux/features/login/loginSlice";
 import { useRouter } from "next/navigation";
+import userLogin from "@/services/action/userLogin";
+import sendEmailToVerify from "@/services/action/sendEmailToverify";
+import { storeUserInfo } from "@/services/action/authServices";
 
 const passwordSchema = z
   .string()
@@ -65,25 +68,46 @@ const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
   const router = useRouter();
   const handleSubmit = async (data: TFormValues) => {
     try {
+      // 1. SIGNUP
       const res = await userSignup(data)
-      const loginData = {
-        email: data.email,
-        password: data.password
+      if (!res?.data) {
+        toast.error("SignUp failed, try again", { description: res?.message });
+        return;
       }
-      if (res.data) {
-        toast.success("SignUp successful please check your Email!", {
-          description: res.message,
-          duration: 5000,
+      console.log({ res })
+
+      // 2. Login after signup
+      const login = await userLogin({
+        email: data.email,
+        password: data.password,
+      });
+      console.log({ login })
+      if (!login?.data) {
+        toast.error("Login failed after signup");
+        return;
+      }
+      // NOT VERIFIED → Send verification email
+      if (!login.data.verifyAt) {
+        dispatch(setLogin({ email: data.email, password: data.password }));
+        const emailVerify = await sendEmailToVerify({
+          token: login.data.accessToken,
         });
-        dispatch(setLogin(loginData))
-        if (!res.data.result.verifiedAt) {
-          router.push(`/verify?token=${res.data.token}`);
+        if (emailVerify?.success) {
+          toast.success("SignUp successful! Please verify your email.");
+          router.push(`/verify?token=${emailVerify.data}`);
+        } else {
+          toast.error("Failed to send verification email");
         }
-      } else {
-        toast.error("SignUp failed try again", {
-          description: res.message,
-          duration: 5000,
-        });
+        return;
+      }
+
+      // 5. If Token and verify true → login OK
+      if (login.data.accessToken && login.data.verifyAt) {
+        console.log(login.data.accessToken, login.data.verifyAt)
+        storeUserInfo(login.data.accessToken);
+        toast.success("Login successful!", { description: res.message });
+        router.push("/dashboard");
+        return;
       }
     } catch (error: any) {
       toast.error("SignUp failed try again", {
@@ -134,12 +158,7 @@ const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
                   <Field>
                     <FieldLabel htmlFor="email">Image</FieldLabel>
                     <ATSImageInput name="image" id="image" required />
-                    {/* <ATSInput
-                      id="image"
-                      type="file"
-                      name="image"
-                      required
-                    /> */}
+
 
                   </Field>
                 </Field>
@@ -154,6 +173,9 @@ const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
                     type="password"
                     required
                   />
+                  <FieldDescription className="mt-1 text-xs">
+                    Password must be at least 8 characters with uppercase, lowercase, number, and special character.
+                  </FieldDescription>
                 </Field>
               </Field>
               <Field>

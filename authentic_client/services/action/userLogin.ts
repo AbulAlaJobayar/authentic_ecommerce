@@ -1,6 +1,5 @@
 "use server";
 import { setAccessToken } from "./setAccessToken";
-
 type TLoginInfo = {
   email: string;
   password: string;
@@ -28,25 +27,25 @@ const userLogin = async (data: TLoginInfo) => {
     }
 
     const user = await res.json();
-    
+
     if (!user.success) {
       throw new Error("Invalid response from the server.");
     }
     // Handle successful login with access token - this will throw NEXT_REDIRECT
     if (user.data.accessToken) {
-      await setAccessToken(user.data.accessToken, { redirect: "/dashboard" });
+      await setAccessToken(user.data.accessToken);
     }
 
     return user;
   } catch (error: unknown) {
     // Check if this is a NEXT_REDIRECT error - if so, re-throw it
-    if (typeof error === 'object' && error !== null && 'digest' in error) {
+    if (typeof error === "object" && error !== null && "digest" in error) {
       const redirectError = error as { digest: string };
-      if (redirectError.digest?.includes('NEXT_REDIRECT')) {
+      if (redirectError.digest?.includes("NEXT_REDIRECT")) {
         throw error; // Re-throw the original redirect error
       }
     }
-    
+
     console.error("Error during user login:", error);
     throw new Error(
       error instanceof Error ? error.message : "An unexpected error occurred."
