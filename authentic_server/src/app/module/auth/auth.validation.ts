@@ -32,7 +32,7 @@ const loginValidation = z.object({
 });
 const sendEmailValidation = z.object({
   body: z.object({
-    id: z.string().trim().min(1, { message: 'User ID is required' }),
+    token: z.string().trim(),
   }),
 });
 const changePasswordValidationSchema = z.object({

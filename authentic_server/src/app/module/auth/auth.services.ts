@@ -52,7 +52,6 @@ const userLogin = async (payload: { email: string; password: string }) => {
     config.jwt.jwtRefreshSecret as Secret,
     config.jwt.jwtRefreshExpire as any
   );
-
   return {
     accessToken,
     refreshToken,
@@ -111,9 +110,10 @@ const verifyUser = async (token: string, otp: string) => {
 };
 
 const sendEmailVerification = async (token: string) => {
+  // 1 Decode Token
   const decoded = jwtHelper.verifyToken(
     token,
-    config.jwt.jwtVerifySecret as Secret
+    config.jwt.jwtAccessSecret as Secret
   );
   if (!decoded) {
     throw new AppError(
@@ -122,6 +122,8 @@ const sendEmailVerification = async (token: string) => {
     );
   }
   const { id } = decoded as JwtPayload;
+
+  // 2 Find User
   const user = await prisma.user.findUnique({
     where: { id },
   });
@@ -138,20 +140,18 @@ const sendEmailVerification = async (token: string) => {
       `Account is ${user.accountStatus.toLowerCase()}`
     );
   }
+  // 3 Generate OTP
   const { otp, hashOtp } = await generateOTP();
-  // update OTP for generate OTP
+
   await prisma.user.update({
     where: { id: user.id },
     data: { otp: hashOtp },
   });
 
   //localhost:3000/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
-
+  // 5 Generate fresh verify token
   const tokenData = {
     id: user.id,
-    email: user.email,
-    customId: user.customId,
-    role: user.role,
   };
   const verifyToken = jwtHelper.generateToken(
     tokenData,
@@ -160,12 +160,13 @@ const sendEmailVerification = async (token: string) => {
   );
   const url = `${config.domainName}/verify?token=${verifyToken}`;
 
-  sendEmail({
+  // 5 Send Email
+  await sendEmail({
     to: user.email,
     subject: 'Verify your email',
     html: verificationEmailTemplate(url, 'Verify My Email', otp),
   });
-  return null;
+  return verifyToken;
 };
 
 const changePassword = async (

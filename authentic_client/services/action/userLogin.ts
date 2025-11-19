@@ -1,5 +1,4 @@
 "use server";
-import { redirect, RedirectType } from "next/navigation";
 import { setAccessToken } from "./setAccessToken";
 
 type TLoginInfo = {
@@ -33,12 +32,6 @@ const userLogin = async (data: TLoginInfo) => {
     if (!user.success) {
       throw new Error("Invalid response from the server.");
     }
-
-    // Handle unverified user - this will throw NEXT_REDIRECT
-    if (!user.data.verifyAt) {
-      redirect("/verify", RedirectType.push);
-    }
-
     // Handle successful login with access token - this will throw NEXT_REDIRECT
     if (user.data.accessToken) {
       await setAccessToken(user.data.accessToken, { redirect: "/dashboard" });

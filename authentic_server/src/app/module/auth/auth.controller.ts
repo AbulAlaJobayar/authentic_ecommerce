@@ -7,7 +7,7 @@ import { AppError } from '../../error/AppError';
 
 const loinUser = catchAsync(async (req, res) => {
   const result = await AuthServices.userLogin(req.body);
-  const { accessToken, refreshToken, verifyAt } = result;
+  const { accessToken, refreshToken, verifyAt} = result;
   res.cookie('refreshToken', refreshToken, {
     secure: config.nodeEnv === 'production',
     httpOnly: true,
@@ -21,13 +21,14 @@ const loinUser = catchAsync(async (req, res) => {
     message: 'User Logged In successfully!',
     data: {
       accessToken,
-      verifyAt,
+      verifyAt
     },
   });
 });
 const verifyUser = catchAsync(async (req, res) => {
   const { token, otp } = req.body;
   const result = await AuthServices.verifyUser(token, otp);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -36,8 +37,8 @@ const verifyUser = catchAsync(async (req, res) => {
   });
 });
 const sendEmailVerification = catchAsync(async (req, res) => {
-  const { id } = req.body;
-  const result = await AuthServices.sendEmailVerification(id);
+  const { token } = req.body;
+  const result = await AuthServices.sendEmailVerification(token);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

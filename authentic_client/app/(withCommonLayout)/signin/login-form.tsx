@@ -17,21 +17,13 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import userLogin from "@/services/action/userLogin";
 import { toast } from "sonner";
-const passwordSchema = z
-  .string()
-  .min(8, "Must be at least 8 characters long")
-  .refine((val) => /[A-Z]/.test(val), {
-    message: "Must contain at least one uppercase letter",
-  })
-  .refine((val) => /[a-z]/.test(val), {
-    message: "Must contain at least one lowercase letter",
-  })
-  .refine((val) => /\d/.test(val), {
-    message: "Must contain at least one number",
-  })
-  .refine((val) => /[@$!%*?&]/.test(val), {
-    message: "Must contain at least one special character (@$!%*?&)",
-  });
+import { useDispatch } from "react-redux";
+import { setLogin } from "@/redux/features/login/loginSlice";
+import { useRouter } from "next/navigation";
+import sendEmailToVerify from "@/services/action/sendEmailToverify";
+import { storeUserInfo } from "@/services/action/authServices";
+import { passwordSchema } from "./signinValidation";
+
 const formSchema = z.object({
   email: z.email(),
   password: passwordSchema,
@@ -42,17 +34,26 @@ const defaultValues: Partial<FormValues> = {
   password: "",
 };
 const LoginForm = ({ className, ...props }: React.ComponentProps<"div">) => {
+  const dispatch = useDispatch()
+  const router = useRouter()
   const handleSubmit = async (data: FormValues) => {
-    console.log(data);
     try {
       const res = await userLogin(data);
-
-      if (res.data.accessToken) {
-        console.log(res.data.accessToken);
-        toast.success("Login successful!", {
-          description: res.message,
-          duration: 5000,
-        });
+      if (res.data) {
+        if (!res.data.verifyAt) {
+          dispatch(setLogin(data))
+          const emailVerify = await sendEmailToVerify({ token: res.data.accessToken })
+          router.push(`/verify?token=${emailVerify.data}`)
+          return;
+        }
+        if (res.data.accessToken) {
+          storeUserInfo(res.data.accessToken)
+          toast.success("Login successful!", {
+            description: res.message,
+            duration: 5000,
+          });
+          router.push("/dashboard")
+        }
       } else {
         toast.error("Login failed try again", {
           description: res.message,
@@ -60,7 +61,7 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"div">) => {
         });
       }
     } catch (error: any) {
-      console.log(error);
+      toast.error(error?.message || "Something went wrong");
     }
   };
   return (
@@ -131,8 +132,8 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"div">) => {
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our <Link href="#">Terms of Service</Link>
+        and <Link href="#">Privacy Policy</Link>.
       </FieldDescription>
     </div>
   );

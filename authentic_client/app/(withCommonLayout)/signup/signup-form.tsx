@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,8 @@ import ATSImageInput from "@/components/shared/Form/ATSImageInput";
 import userSignup from "@/services/action/userSignup";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
-import { setLogin } from "@/redix/features/login/loginSlice";
+import { setLogin } from "@/redux/features/login/loginSlice";
+import { useRouter } from "next/navigation";
 
 const passwordSchema = z
   .string()
@@ -60,6 +62,7 @@ const defaultValue = {
 
 const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
   const dispatch = useDispatch()
+  const router = useRouter();
   const handleSubmit = async (data: TFormValues) => {
     try {
       const res = await userSignup(data)
@@ -73,13 +76,20 @@ const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
           duration: 5000,
         });
         dispatch(setLogin(loginData))
+        if (!res.data.result.verifiedAt) {
+          router.push(`/verify?token=${res.data.token}`);
+        }
       } else {
         toast.error("SignUp failed try again", {
           description: res.message,
           duration: 5000,
         });
       }
-    } catch (error) {
+    } catch (error: any) {
+      toast.error("SignUp failed try again", {
+        description: error?.message,
+        duration: 5000,
+      });
       console.log(error)
     }
   };

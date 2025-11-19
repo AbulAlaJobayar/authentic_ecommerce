@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import ATSFrom from "@/components/shared/Form/ATSForm"
 import { Button } from "@/components/ui/button"
@@ -19,28 +20,55 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import verifyOtp from "../../services/action/verifyOtp"
+import userLogin from "@/services/action/userLogin"
+import { useDispatch, useSelector } from "react-redux"
+import { resetLogin } from "@/redux/features/login/loginSlice"
+import { toast } from "sonner"
+import { storeUserInfo } from "@/services/action/authServices"
+
 
 export function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
   const [otp, setOtp] = useState("")
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
+  const { email, password } = useSelector((state: any) => state.loginInfo)
+  const router = useRouter()
+  const dispatch = useDispatch()
 
   const handleSubmit = async () => {
     try {
+      // 1 verified user
       const result = await verifyOtp(token, otp)
-      console.log({ result })
+      if (result.success) {
 
-    } catch (error) {
-      console.log({ error })
+        // 2 user login
+        const res = await userLogin({ email, password })
+        if (res.data) {
+          if (res.data.accessToken) {
+            storeUserInfo(res.data.accessToken)
+            toast.success("Login successful!", {
+              description: res.message,
+              duration: 5000,
+            });
+
+            dispatch(resetLogin())
+            router.push("/")
+          }
+        } else {
+          dispatch(resetLogin())
+          toast.error("Login failed try again", {
+            description: res.message,
+            duration: 5000,
+          });
+        }
+      }
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
     }
-
-
   }
-
-
 
   return (
     <Card {...props}>
