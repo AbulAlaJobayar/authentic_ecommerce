@@ -20,6 +20,7 @@ import ATSFrom from "@/components/shared/Form/ATSForm"
 import ATSInput from "@/components/shared/Form/ATSInput"
 import { zodResolver } from "@hookform/resolvers/zod"
 import z from "zod"
+import forgotPassword from "@/services/action/forgotPassword"
 const emailValidation = z.object({
     email: z.email()
 })
@@ -33,8 +34,19 @@ const IdentifyForm = ({
     className,
     ...props
 }: React.ComponentProps<"div">) => {
-    const handleSubmit = (data: TVerify) => {
+    const handleSubmit = async (data: TVerify) => {
         console.log(data)
+        try {
+            const res = await forgotPassword(data.email)
+            if (res?.success) {
+                // Toast or UI update
+                console.log("OTP sent ✔️");
+                // Example: toast
+                // toast.success(response.message || "OTP sent to your email!");
+            }
+        } catch (error) {
+
+        }
     }
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
