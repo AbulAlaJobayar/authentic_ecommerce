@@ -39,7 +39,8 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"div">) => {
   const handleSubmit = async (data: FormValues) => {
     try {
       const res = await userLogin(data);
-      if (res.data) {
+      console.log(res)
+      if (res?.data) {
         if (!res.data.verifyAt) {
           dispatch(setLogin(data))
           const emailVerify = await sendEmailToVerify({ token: res.data.accessToken })
@@ -95,7 +96,7 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"div">) => {
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                   <Link
-                    href="#"
+                    href="/signin/identify"
                     className="ml-auto text-sm underline-offset-2 hover:underline"
                   >
                     Forgot your password?
