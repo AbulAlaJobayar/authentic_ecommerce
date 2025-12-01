@@ -7,12 +7,12 @@ import { userFiltarableableFields } from './user.constant';
 import { Request, Response } from 'express';
 
 const createUserIntoDB = catchAsync(async (req, res) => {
-  const { data: result, token } = await UserService.createUserIntoDB(req);
+  const { data: result } = await UserService.createUserIntoDB(req);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
     message: 'Account created successfully!',
-    data: { result, token },
+    data:result
   });
 });
 const getUserFromDB = catchAsync(async (req, res) => {

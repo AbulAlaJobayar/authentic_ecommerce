@@ -250,12 +250,15 @@ const refreshToken = async (token: string) => {
   return accessToken;
 };
 
-const forgotPassword = async (id: string) => {
-  const user = await prisma.user.findUnique({
-    where: { id },
+const forgotPassword = async (email: string) => {
+  const user = await prisma.user.findFirst({
+    where: { email },
   });
   if (!user) {
-    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'Invalid email please provide valid Email'
+    );
   }
 
   if (user.isDeleted === true) {
@@ -297,7 +300,7 @@ const forgotPassword = async (id: string) => {
 };
 
 const resetPassword = async (
-  payload: { newPassword: string },
+  payload: {newPassword: string },
   token: string
 ) => {
   const decoded = jwtHelper.verifyToken(

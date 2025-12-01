@@ -69,8 +69,8 @@ const refreshToken = catchAsync(async (req, res) => {
   });
 });
 const forgotPassword = catchAsync(async (req, res) => {
-  const { id } = req.body;
-  const result = await AuthServices.forgotPassword(id);
+  const { email} = req.body;
+  const result = await AuthServices.forgotPassword(email);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

@@ -48,7 +48,7 @@ const refreshTokenValidationSchema = z.object({
 });
 const forgetPasswordValidationSchema = z.object({
   body: z.object({
-    id: z.string().trim(),
+    email: z.email().trim(),
   }),
 });
 const resetPasswordValidationSchema = z.object({

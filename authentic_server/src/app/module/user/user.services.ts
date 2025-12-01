@@ -1,19 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import config from '../../config';
 import hashPassword from '../../helper/hashPassword';
-import { jwtHelper } from '../../helper/jwtHelper';
 import prisma from '../../shared/prisma';
-import { sendEmail } from '../../shared/sendEmail';
-import verificationEmailTemplate from '../../template/verificationEmail';
 import { generateCustomId } from './user.utils';
 import { imageUploader, MulterFile } from '../../shared/imageUpload';
 import { Request } from 'express';
-import { Secret } from 'jsonwebtoken';
 import { TUserFilterRequest } from './user.interface';
 import { TPaginationOption } from '../../interfaces/pagination';
 import { userSearchableFields } from './user.constant';
 import { paginationHelpers } from '../../helper/paginationHelper';
-import generateOTP from '../../shared/generateOTP';
 
 const createUserIntoDB = async (req: Request) => {
   // const file = req.file as MulterFile;
@@ -25,8 +19,6 @@ const createUserIntoDB = async (req: Request) => {
   req.body.password = password;
   const customId = (await generateCustomId(req.body.role)) as string;
   req.body.customId = customId;
-  const { otp, hashOtp } = await generateOTP();
-  req.body.otp = hashOtp;
   const user = await prisma.user.create({
     data: { ...req.body },
     select: {
@@ -44,28 +36,28 @@ const createUserIntoDB = async (req: Request) => {
     },
   });
 
-  //localhost:3000/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
+  // //localhost:3000/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
 
-  const tokenData = {
-    id: user.id,
-    email: user.email,
-    customId: user.customId,
-    role: user.role,
-  };
-  const verifyToken = jwtHelper.generateToken(
-    tokenData,
-    config.jwt.jwtVerifySecret as Secret,
-    config.jwt.jwtVerifyExpire as any
-  );
-  const url = `${config.domainName}/verify?token=${verifyToken}`;
+  // const tokenData = {
+  //   id: user.id,
+  //   email: user.email,
+  //   customId: user.customId,
+  //   role: user.role,
+  // };
+  // const verifyToken = jwtHelper.generateToken(
+  //   tokenData,
+  //   config.jwt.jwtVerifySecret as Secret,
+  //   config.jwt.jwtVerifyExpire as any
+  // );
+  // const url = `${config.domainName}/verify?token=${verifyToken}`;
 
-  sendEmail({
-    to: user.email,
-    subject: 'Verify your email',
-    html: verificationEmailTemplate(url, 'Verify My Email', otp as string),
-  });
+  // sendEmail({
+  //   to: user.email,
+  //   subject: 'Verify your email',
+  //   html: verificationEmailTemplate(url, 'Verify My Email', otp as string),
+  // });
 
-  return {data:user, token:verifyToken};
+  return {data:user};
 };
 
 const getAllUserFromDB = async (

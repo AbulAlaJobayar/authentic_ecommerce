@@ -38,7 +38,7 @@ const verificationEmailTemplate = (
     .logo {
       font-size: 24px;
       font-weight: 700;
-      color: #10b981;
+      color: #0A84FF;
       margin-bottom: 24px;
       display: inline-block;
     }
@@ -59,7 +59,7 @@ const verificationEmailTemplate = (
     
     /* Button */
     .btn {
-      background-color: #10b981;
+      background-color: #0A84FF;
       color: #ffffff;
       padding: 16px 32px;
       border-radius: 8px;
@@ -72,7 +72,7 @@ const verificationEmailTemplate = (
     }
     
     .btn:hover {
-      background-color: #059669;
+      background-color: #0A84FI;
       transform: translateY(-1px);
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
