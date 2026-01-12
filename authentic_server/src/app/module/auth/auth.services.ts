@@ -257,7 +257,7 @@ const forgotPassword = async (email: string) => {
   if (!user) {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      'Invalid email please provide valid Email'
+      'Invalid Email Please Provide Valid Email'
     );
   }
 
@@ -296,11 +296,11 @@ const forgotPassword = async (email: string) => {
     subject: 'Reset your Password',
     html: verificationEmailTemplate(url, 'Reset your Password in 10 minutes'),
   });
-  return null;
+  return url;
 };
 
 const resetPassword = async (
-  payload: {newPassword: string },
+  payload: { newPassword: string },
   token: string
 ) => {
   const decoded = jwtHelper.verifyToken(

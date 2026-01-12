@@ -7,7 +7,7 @@ import { AppError } from '../../error/AppError';
 
 const loinUser = catchAsync(async (req, res) => {
   const result = await AuthServices.userLogin(req.body);
-  const { accessToken, refreshToken, verifyAt} = result;
+  const { accessToken, refreshToken, verifyAt } = result;
   res.cookie('refreshToken', refreshToken, {
     secure: config.nodeEnv === 'production',
     httpOnly: true,
@@ -21,7 +21,7 @@ const loinUser = catchAsync(async (req, res) => {
     message: 'User Logged In successfully!',
     data: {
       accessToken,
-      verifyAt
+      verifyAt,
     },
   });
 });
@@ -69,22 +69,22 @@ const refreshToken = catchAsync(async (req, res) => {
   });
 });
 const forgotPassword = catchAsync(async (req, res) => {
-  const { email} = req.body;
+  const { email } = req.body;
   const result = await AuthServices.forgotPassword(email);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Access token is retrieved successfully!',
+    message: 'Code sent successfully please check your email!',
     data: result,
   });
 });
 const resetPassword = catchAsync(async (req, res) => {
-  const token = req.headers.authorization;
+  const { token } = req.query;
   if (!token) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Something went wrong !');
   }
 
-  const result = await AuthServices.resetPassword(req.body, token);
+  const result = await AuthServices.resetPassword(req.body, token as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
