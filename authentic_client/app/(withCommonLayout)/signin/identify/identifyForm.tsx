@@ -26,6 +26,7 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { getFromLocalStorage, removeFromLocalStorage, setToLocalStorage } from "@/utils/localStorages"
 import { countdown } from "@/constant/authKey"
+import { useRouter } from "next/navigation"
 const emailValidation = z.object({
     email: z.email()
 })
@@ -40,10 +41,11 @@ const IdentifyForm = ({
     className,
     ...props
 }: React.ComponentProps<"div">) => {
+    const router = useRouter()
     const [timeLeft, setTimeLeft] = useState(0); // seconds
     const [isRunning, setIsRunning] = useState(false);
     const [buttonDisabled, setButtonDisabled] = useState(false);
-
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const startCountdown = () => {
         const endTime = Date.now() + 5 * 60 * 1000; // 5 min in ms
         setToLocalStorage(countdown, String(endTime))
@@ -104,17 +106,24 @@ const IdentifyForm = ({
 
     // FORM SUBMIT
     const handleSubmit = async (data: TVerify) => {
-        // startcountDown
-
+        // start countDown
+        console.log("submit ", data)
         try {
             const res = await forgotPassword(data.email)
+            console.log("res from reset ", res)
             if (res?.success) {
                 // Toast or UI update
                 // startcountDown
                 startCountdown()
                 toast.success(res?.message || "OTP sent to your email!");
+                if (res?.data) {
+                    router.push(res?.data)
+                    // window.location.href=res.data
+                }
             }
         } catch (error) {
+            const err = error as Error
+            setErrorMessage(err.message)
             console.log(error)
         }
     }
@@ -139,6 +148,17 @@ const IdentifyForm = ({
                         <CardTitle className="mb-2">Forgot Password?</CardTitle>
                         <CardDescription>
                             Enter your email to receive a reset link
+                        </CardDescription>
+                        <CardDescription>
+                            {errorMessage && <motion.div
+                                animate={{ x: [0, -10, 10, -10, 10, 0] }}
+                                transition={{
+                                    duration: 0.4,
+                                    repeat: Infinity,
+                                    repeatDelay: 4,
+                                    ease: "easeInOut"
+                                }}
+                                className="text-red-500 my-2 capitalize ">{errorMessage}</motion.div>}
                         </CardDescription>
                     </div>
                     <ATSFrom onSubmit={handleSubmit} defaultValues={defaultValue} resolver={zodResolver(emailValidation)}>

@@ -74,7 +74,6 @@ const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
         toast.error("SignUp failed, try again", { description: res?.message });
         return;
       }
-      console.log({ res })
 
       // 2. Login after signup
       const login = await userLogin({

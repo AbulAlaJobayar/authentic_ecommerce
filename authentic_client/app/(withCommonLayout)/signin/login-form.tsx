@@ -112,7 +112,7 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"div">) => {
               <Button
                 type="submit"
                 variant={"default"}
-                className="bg-gray-950 hover:bg-gray-800 "
+                
               >
                 Login
               </Button>
