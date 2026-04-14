@@ -1,15 +1,16 @@
 "use client";
 
-import { Sidebar, SidebarContent, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarRail } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem} from "@/components/ui/sidebar";
+import { userRole } from "@/types";
+import { drawerItems } from "@/utils/drawerItems";
 import Link from "next/link";
-// import { drawerItem } from "@/utils/drawerItems";
-import { useEffect, useState } from "react";
-//import { getUserInfo } from "@/service/action/authServices";
-// import { userRole } from "@/types";
-// import SideBarItems from "./SideBarItems";
+import { useState } from "react";
+import SideBarItems from "./SideBarItems";
 
 const SidebarPage = () => {
-  const [userRole, setUserRole] = useState("");
+  // TODO: add user role and render sidebar item based on user role
+  const [userRole, setUserRole] = useState<userRole | null>("SUPER_ADMIN");
+  // const 
   // useEffect(() => {
   //   const { role } = getUserInfo() as { role: userRole };
   //   setUserRole(role);
@@ -36,16 +37,15 @@ const SidebarPage = () => {
       <SidebarContent >
         <SidebarGroup>
           <SidebarMenu>
-            <p>
-              create product
-            </p>
-            {/* {drawerItem(userRole as userRole).map((item, index) => (
-              <SideBarItems key={index} item={item} /> */}
-            {/* ))} */}
+            {
+              drawerItems(userRole as userRole).map((item,index)=>(
+                <SideBarItems key={index} item={item} />
+              ))
+            }
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarRail />
+      {/* <SidebarRail /> */}
     </Sidebar>
   );
 };

@@ -124,10 +124,11 @@
   --sidebar-foreground: #1E293B;
   --sidebar-primary: #0A84FF;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #E2E8F0;
+  --sidebar-accent: #4C60DA;
   --sidebar-accent-foreground: #1E293B;
   --sidebar-border: #E2E8F0;
   --sidebar-ring: #93C5FD;
+  --sidebar-accent-text:#E2E8F0;
 }
 
 /* .dark {

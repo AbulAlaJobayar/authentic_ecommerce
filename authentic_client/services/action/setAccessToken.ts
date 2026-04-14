@@ -10,7 +10,7 @@ interface SetAccessTokenOptions {
 
 export const setAccessToken = async (
   token: string,
-  options?: SetAccessTokenOptions
+  options?: SetAccessTokenOptions,
 ) => {
   (await cookies()).set(authKey, token, {
     httpOnly: true, //  prevents JS access (protects against XSS)
@@ -21,6 +21,6 @@ export const setAccessToken = async (
   });
 
   if (options?.redirect) {
-    redirect(options.redirect,RedirectType.push);
+    redirect(options.redirect, RedirectType.push);
   }
 };

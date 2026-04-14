@@ -112,7 +112,7 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<"div">) => {
               <Button
                 type="submit"
                 variant={"default"}
-                
+
               >
                 Login
               </Button>

@@ -1,0 +1,6 @@
+export const UserRole = {
+  SUPER_ADMIN: "SUPER_ADMIN",
+  MANAGER: "MANAGER",
+  CUSTOMER: "CUSTOMER",
+  STAFF: "STAFF",
+};

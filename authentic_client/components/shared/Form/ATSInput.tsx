@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Controller, useFormContext } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import {motion} from "motion/react"
+import { motion } from "motion/react"
 
 type ATSInputProps = {
   size?: number | string;
@@ -14,7 +14,7 @@ type ATSInputProps = {
   defaultValue?: string;
   id?: string;
   icon?: React.ReactNode;
-  placeholder?:string;
+  placeholder?: string;
 };
 
 const ATSInput = ({
@@ -49,21 +49,21 @@ const ATSInput = ({
               </div>
             </label>
           )}
-          <motion.div 
-            whileTap={{ scale: 0.98,}}
+          <motion.div
+            whileTap={{ scale: 0.98, }}
             transition={{ type: "spring", stiffness: 100 }}
           >
-          
-          <Input
-            {...field}
-            type={type}
-            required={required}
-            name={name}
-            placeholder={placeholder}
-            className={cn(className, error && "border-red-500 dark:text-white")}
-            id={id || name}
-            aria-label={label || name}
-          />
+
+            <Input
+              {...field}
+              type={type}
+              required={required}
+              name={name}
+              placeholder={placeholder}
+              className={cn(className, error && "border-red-500 dark:text-white")}
+              id={id || name}
+              aria-label={label || name}
+            />
           </motion.div>
           {error && (
             <motion.p
