@@ -9,3 +9,23 @@ export interface DrawerItem {
   icon?: LucideIcon;
   child?: DrawerItem[];
 }
+export type TATSDataProps = {
+  image?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  role?: string;
+  accountStatus?: string;
+  status?: string;
+  description?: string;
+  sealing?: string;
+  category?: string;
+  isDelete?: boolean;
+  review?: string;
+};
+
+export type TATSHeadProps<T> = {
+  key: keyof T;
+  label: string;
+};
