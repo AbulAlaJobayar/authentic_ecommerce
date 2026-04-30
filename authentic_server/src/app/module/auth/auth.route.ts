@@ -9,13 +9,13 @@ const router = Router();
 router.post(
   '/login',
   validateRequest(AuthValidation.loginValidation),
-  AuthController.loinUser
+  AuthController.loinUser,
 );
 router.post('/verify-email', AuthController.verifyUser);
 router.post(
   '/send-email',
   validateRequest(AuthValidation.sendEmailValidation),
-  AuthController.sendEmailVerification
+  AuthController.sendEmailVerification,
 );
 router.post(
   '/change-password',
@@ -23,26 +23,26 @@ router.post(
     USER_ROLE.SUPER_ADMIN,
     USER_ROLE.MANAGER,
     USER_ROLE.STAFF,
-    USER_ROLE.CUSTOMER
+    USER_ROLE.CUSTOMER,
   ),
   validateRequest(AuthValidation.changePasswordValidationSchema),
-  AuthController.changePassword
+  AuthController.changePassword,
 );
 router.post(
   '/refresh-token',
-  validateRequest(AuthValidation.refreshTokenValidationSchema),
-  AuthController.refreshToken
+  // validateRequest(AuthValidation.refreshTokenValidationSchema),
+  AuthController.refreshToken,
 );
 router.post(
   '/forget-password',
   validateRequest(AuthValidation.forgetPasswordValidationSchema),
-  AuthController.forgotPassword
+  AuthController.forgotPassword,
 );
 
 router.post(
   '/reset-password',
   validateRequest(AuthValidation.resetPasswordValidationSchema),
-  AuthController.resetPassword
+  AuthController.resetPassword,
 );
 
 export const AuthRoute = router;

@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
-import prisma from '../../shared/prisma';
 import { TCart } from './cart.interface';
+import { prisma } from '../../shared/prisma';
 // import { errorLogger } from '../../config/logger';
 
 const createCartIntoDB = async (userId: string, payload: TCart) => {
@@ -43,8 +43,8 @@ const createCartIntoDB = async (userId: string, payload: TCart) => {
     });
     return result;
   } catch (error) {
-    console.log(error)
-   // errorLogger.error('Failed to create cart item', error);
+    console.log(error);
+    // errorLogger.error('Failed to create cart item', error);
   }
 };
 
@@ -66,12 +66,12 @@ const getMyCartFromDB = async (id: string) => {
 const updateMyCartFromDB = async (
   id: string,
   userId: string,
-  payload: { quantity: number }
+  payload: { quantity: number },
 ) => {
   if (payload.quantity <= 0) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'Quantity must be greater than 0'
+      'Quantity must be greater than 0',
     );
   }
   // Verify cart item exists, is not deleted, and belongs to the user
@@ -98,7 +98,7 @@ const updateMyCartFromDB = async (
   if (!cartItem) {
     throw new AppError(
       httpStatus.NOT_FOUND,
-      'Cart item not found or does not belong to user'
+      'Cart item not found or does not belong to user',
     );
   }
   // Update cart item

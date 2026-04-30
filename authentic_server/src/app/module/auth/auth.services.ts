@@ -2,7 +2,6 @@
 import { sendEmail } from './../../shared/sendEmail';
 import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
-import prisma from '../../shared/prisma';
 import comparPassword from '../../helper/comparPassword';
 import { jwtHelper } from '../../helper/jwtHelper';
 import config from '../../config';
@@ -10,6 +9,7 @@ import { JwtPayload, Secret } from 'jsonwebtoken';
 import verificationEmailTemplate from '../../template/verificationEmail';
 import hashPassword from '../../helper/hashPassword';
 import generateOTP from '../../shared/generateOTP';
+import { prisma } from '../../shared/prisma';
 
 const userLogin = async (payload: { email: string; password: string }) => {
   const user = await prisma.user.findFirst({
@@ -27,7 +27,7 @@ const userLogin = async (payload: { email: string; password: string }) => {
   if (user.accountStatus !== 'ACTIVE') {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      `Account is ${user.accountStatus.toLowerCase()}`
+      `Account is ${user.accountStatus.toLowerCase()}`,
     );
   }
 
@@ -45,12 +45,12 @@ const userLogin = async (payload: { email: string; password: string }) => {
   const accessToken = jwtHelper.generateToken(
     data,
     config.jwt.jwtAccessSecret as Secret,
-    config.jwt.jwtAccessExpire as any
+    config.jwt.jwtAccessExpire as any,
   );
   const refreshToken = jwtHelper.generateToken(
     data,
     config.jwt.jwtRefreshSecret as Secret,
-    config.jwt.jwtRefreshExpire as any
+    config.jwt.jwtRefreshExpire as any,
   );
   return {
     accessToken,
@@ -62,12 +62,12 @@ const userLogin = async (payload: { email: string; password: string }) => {
 const verifyUser = async (token: string, otp: string) => {
   const decoded = jwtHelper.verifyToken(
     token,
-    config.jwt.jwtVerifySecret as Secret
+    config.jwt.jwtVerifySecret as Secret,
   );
   if (!decoded) {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      'Verification token is invalid or expired'
+      'Verification token is invalid or expired',
     );
   }
   const { id } = decoded as JwtPayload;
@@ -84,21 +84,21 @@ const verifyUser = async (token: string, otp: string) => {
   if (user.accountStatus !== 'ACTIVE') {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      `Account is ${user.accountStatus.toLowerCase()}`
+      `Account is ${user.accountStatus.toLowerCase()}`,
     );
   }
   // Check if OTP exists
   if (!user.otp) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'No OTP found. Please request a new one.'
+      'No OTP found. Please request a new one.',
     );
   }
   const isOtpValid = comparPassword(otp, user.otp as string);
   if (!isOtpValid) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'Invalid OTP. Please request a new one.'
+      'Invalid OTP. Please request a new one.',
     );
   }
 
@@ -113,12 +113,12 @@ const sendEmailVerification = async (token: string) => {
   // 1 Decode Token
   const decoded = jwtHelper.verifyToken(
     token,
-    config.jwt.jwtAccessSecret as Secret
+    config.jwt.jwtAccessSecret as Secret,
   );
   if (!decoded) {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      'Verification token is invalid or expired'
+      'Verification token is invalid or expired',
     );
   }
   const { id } = decoded as JwtPayload;
@@ -137,7 +137,7 @@ const sendEmailVerification = async (token: string) => {
   if (user.accountStatus !== 'ACTIVE') {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      `Account is ${user.accountStatus.toLowerCase()}`
+      `Account is ${user.accountStatus.toLowerCase()}`,
     );
   }
   // 3 Generate OTP
@@ -156,7 +156,7 @@ const sendEmailVerification = async (token: string) => {
   const verifyToken = jwtHelper.generateToken(
     tokenData,
     config.jwt.jwtVerifySecret as Secret,
-    config.jwt.jwtVerifyExpire as any
+    config.jwt.jwtVerifyExpire as any,
   );
   const url = `${config.domainName}/verify?token=${verifyToken}`;
 
@@ -171,7 +171,7 @@ const sendEmailVerification = async (token: string) => {
 
 const changePassword = async (
   userData: JwtPayload,
-  payload: { oldPassword: string; newPassword: string }
+  payload: { oldPassword: string; newPassword: string },
 ) => {
   const user = await prisma.user.findUnique({
     where: { id: userData.id },
@@ -186,13 +186,13 @@ const changePassword = async (
   if (!user.verifiedAt) {
     throw new AppError(
       httpStatus.FORBIDDEN,
-      'Account not verified. Please verify your email'
+      'Account not verified. Please verify your email',
     );
   }
   if (user.accountStatus !== 'ACTIVE') {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      `Account is ${user.accountStatus.toLowerCase()}`
+      `Account is ${user.accountStatus.toLowerCase()}`,
     );
   }
   if (!(await comparPassword(payload.oldPassword, user.password))) {
@@ -210,7 +210,7 @@ const changePassword = async (
 const refreshToken = async (token: string) => {
   const decoded = jwtHelper.verifyToken(
     token,
-    config.jwt.jwtRefreshSecret as Secret
+    config.jwt.jwtRefreshSecret as Secret,
   );
   const { id } = decoded as JwtPayload;
   const user = await prisma.user.findUnique({
@@ -226,13 +226,13 @@ const refreshToken = async (token: string) => {
   if (!user.verifiedAt) {
     throw new AppError(
       httpStatus.FORBIDDEN,
-      'Account not verified. Please verify your email'
+      'Account not verified. Please verify your email',
     );
   }
   if (user.accountStatus !== 'ACTIVE') {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      `Account is ${user.accountStatus.toLowerCase()}`
+      `Account is ${user.accountStatus.toLowerCase()}`,
     );
   }
   // generate token
@@ -245,9 +245,9 @@ const refreshToken = async (token: string) => {
   const accessToken = jwtHelper.generateToken(
     data,
     config.jwt.jwtAccessSecret as Secret,
-    config.jwt.jwtAccessExpire as any
+    config.jwt.jwtAccessExpire as any,
   );
-  return accessToken;
+  return { accessToken };
 };
 
 const forgotPassword = async (email: string) => {
@@ -257,7 +257,7 @@ const forgotPassword = async (email: string) => {
   if (!user) {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      'Invalid Email Please Provide Valid Email'
+      'Invalid Email Please Provide Valid Email',
     );
   }
 
@@ -267,13 +267,13 @@ const forgotPassword = async (email: string) => {
   if (user.accountStatus !== 'ACTIVE') {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      `Account is ${user.accountStatus.toLowerCase()}`
+      `Account is ${user.accountStatus.toLowerCase()}`,
     );
   }
   if (!user.verifiedAt) {
     throw new AppError(
       httpStatus.FORBIDDEN,
-      'Account not verified. Please verify your email'
+      'Account not verified. Please verify your email',
     );
   }
   //localhost:3000/reset?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
@@ -287,7 +287,7 @@ const forgotPassword = async (email: string) => {
   const verifyToken = jwtHelper.generateToken(
     tokenData,
     config.jwt.jwtAccessSecret as Secret,
-    '10m'
+    '10m',
   );
   const url = `${config.domainName}/reset?token=${verifyToken}`;
 
@@ -301,11 +301,11 @@ const forgotPassword = async (email: string) => {
 
 const resetPassword = async (
   payload: { newPassword: string },
-  token: string
+  token: string,
 ) => {
   const decoded = jwtHelper.verifyToken(
     token,
-    config.jwt.jwtAccessSecret as Secret
+    config.jwt.jwtAccessSecret as Secret,
   );
   const { id } = decoded as JwtPayload;
   const user = await prisma.user.findUnique({
@@ -321,13 +321,13 @@ const resetPassword = async (
   if (!user.verifiedAt) {
     throw new AppError(
       httpStatus.FORBIDDEN,
-      'Account not verified. Please verify your email'
+      'Account not verified. Please verify your email',
     );
   }
   if (user.accountStatus !== 'ACTIVE') {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
-      `Account is ${user.accountStatus.toLowerCase()}`
+      `Account is ${user.accountStatus.toLowerCase()}`,
     );
   }
   const newPassword = await hashPassword(payload.newPassword);

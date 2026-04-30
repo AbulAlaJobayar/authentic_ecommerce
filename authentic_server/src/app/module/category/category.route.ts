@@ -10,21 +10,21 @@ import parseData from '../../middleware/parseData';
 const router = Router();
 router.post(
   '/',
-  imageUploader.upload.single('image'),
+  // imageUploader.upload.single('image'),
   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
-  parseData(),
+  // parseData(),
   validateRequest(categoryValidation.createCategorySchemaValidation),
-  CategoryController.createCategoryIntoDB
+  CategoryController.createCategoryIntoDB,
 );
 router.get(
   '/',
   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
-  CategoryController.getCategoryFromDB
+  CategoryController.getCategoryFromDB,
 );
 router.get(
   '/:id',
   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
-  CategoryController.getSingleFromDB
+  CategoryController.getSingleFromDB,
 );
 router.patch(
   '/:id',
@@ -32,11 +32,11 @@ router.patch(
   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
   parseData(),
   validateRequest(categoryValidation.updateCategorySchemaValidation),
-  CategoryController.updateCategoryFromDB
+  CategoryController.updateCategoryFromDB,
 );
 router.delete(
   '/:id',
   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
-  CategoryController.deleteCategoryFromDB
+  CategoryController.deleteCategoryFromDB,
 );
 export const CategoryRouter = router;

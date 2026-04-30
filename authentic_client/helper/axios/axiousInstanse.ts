@@ -1,21 +1,19 @@
-import { getNewAccessToken } from '../../services/action/authServices';
-
-
 import { authKey } from "@/constant/authKey";
+import { getNewAccessToken } from "@/services/action/authServices";
+import { setAccessToken } from "@/services/action/setAccessToken";
 import { getFromLocalStorage, setToLocalStorage } from "@/utils/localStorages";
 import axios from "axios";
-import { setAccessToken } from "@/services/action/setAccessToken";
 
 const instance = axios.create({});
 instance.defaults.headers.post["Content-Type"] = "application/json";
-instance.defaults.headers["accept"] = "application/json";
-instance.defaults.timeout = 6000;
+instance.defaults.headers["Accept"] = "application/json";
+instance.defaults.timeout = 60000;
 // add request interceptors
 instance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
     const accessToken = getFromLocalStorage(authKey);
-    console.log(accessToken, "my token");
+    console.log("accessUpdate", { accessToken });
     if (accessToken) {
       config.headers.Authorization = accessToken;
     }
@@ -27,10 +25,18 @@ instance.interceptors.request.use(
   },
 );
 
-// add response instance
-
+// Add a response interceptor
 instance.interceptors.response.use(
   function (response) {
+    // Any status code that lie within the range of 2xx cause this function to trigger
+    // Do something with response data
+
+    // const responseObject: TResponseSuccessType = {
+    //     data: response?.data?.data,
+    //     meta: response?.data?.meta,
+    //   };
+    // return responseObject;
+    console.log(response, "config from axios instance response");
     return response;
   },
   async function (error) {
@@ -40,7 +46,7 @@ instance.interceptors.response.use(
       config.sent = true;
       const response = await getNewAccessToken();
       console.log("from instance response", { response });
-      const accessToken = response.data.data;
+      const { accessToken } = response.data.data;
       config.headers["Authorization"] = accessToken;
       setToLocalStorage(authKey, accessToken);
       await setAccessToken(accessToken);

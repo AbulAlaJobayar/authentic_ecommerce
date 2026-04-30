@@ -59,7 +59,7 @@ const defaultValue = {
   name: "",
   email: "",
   mobile: "",
-  image: "",
+  image: "img",
   password: "",
 }
 
@@ -67,6 +67,7 @@ const SignupForm = ({ className, ...props }: React.ComponentProps<"div">) => {
   const dispatch = useDispatch()
   const router = useRouter();
   const handleSubmit = async (data: TFormValues) => {
+    data.image = "img";
     try {
       // 1. SIGNUP
       const res = await userSignup(data)

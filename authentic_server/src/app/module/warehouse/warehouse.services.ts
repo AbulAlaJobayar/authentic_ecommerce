@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import { Warehouse } from '../../../../generated/prisma';
 import { AppError } from '../../error/AppError';
-import prisma from '../../shared/prisma';
+import { prisma } from '../../shared/prisma';
 
 const createWarehouseIntoDB = async (payload: Warehouse) => {
   const isWarehouseExist = await prisma.warehouse.findFirst({
@@ -10,7 +10,7 @@ const createWarehouseIntoDB = async (payload: Warehouse) => {
   if (isWarehouseExist) {
     throw new AppError(
       httpStatus.CONFLICT,
-      'Warehouse with this name already exists'
+      'Warehouse with this name already exists',
     );
   }
   const result = await prisma.warehouse.create({
@@ -31,15 +31,15 @@ const getSingleWarehouse = async (id: string) => {
       isDeleted: false,
     },
   });
-  if(!result){
-    throw new AppError(httpStatus.NOT_FOUND,'Warehouse Not Found')
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Warehouse Not Found');
   }
-  return result
+  return result;
 };
 
 const updateWarehouseFromDB = async (
   id: string,
-  payload: Partial<{ payload: { name: string; address: string } }>
+  payload: Partial<{ payload: { name: string; address: string } }>,
 ) => {
   const warehouseIsExist = await prisma.warehouse.findUnique({
     where: { id, isDeleted: false },

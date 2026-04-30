@@ -1,9 +1,9 @@
 import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
-import prisma from '../../shared/prisma';
 import { TCreateProductBatch } from './batch.interface';
 // import { errorLogger } from '../../config/logger';
 import moment from 'moment';
+import { prisma } from '../../shared/prisma';
 
 const createProductBatchIntoDB = async (payload: TCreateProductBatch) => {
   payload.expiryDate = moment(payload.expiryDate, 'YYYY-MM-DD')
@@ -68,7 +68,7 @@ const createProductBatchIntoDB = async (payload: TCreateProductBatch) => {
     return result;
   } catch (error) {
     console.log(error);
-   // errorLogger.error('Failed to create product batch', error);
+    // errorLogger.error('Failed to create product batch', error);
     throw error;
   }
 };
@@ -97,20 +97,21 @@ const getAllProductBatchFromDB = async () => {
       supplier: true,
       warehouse: true,
       createdAt: true,
-      updatedAt:true
+      updatedAt: true,
     },
   });
   return batch;
 };
 const getSingleProductBatchFromDB = async (id: string) => {
   const batch = await prisma.productBatch.findUnique({
-    where: { id },select: {
+    where: { id },
+    select: {
       id: true,
       batchNumber: true,
       expiryDate: true,
       quantity: true,
       buyingPrice: true,
-      isDeleted:true,
+      isDeleted: true,
       costPrice: true,
       sellingPrice: true,
       shelfCode: true,
@@ -126,7 +127,7 @@ const getSingleProductBatchFromDB = async (id: string) => {
       supplier: true,
       warehouse: true,
       createdAt: true,
-      updatedAt:true
+      updatedAt: true,
     },
   });
   if (!batch) {
@@ -140,7 +141,7 @@ const getSingleProductBatchFromDB = async (id: string) => {
 
 const updateProductBatchFromDB = async (
   id: string,
-  payload: Partial<TCreateProductBatch>
+  payload: Partial<TCreateProductBatch>,
 ) => {
   // inventory Is Exist
   if (payload.inventoryId) {

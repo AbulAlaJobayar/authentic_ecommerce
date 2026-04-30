@@ -2,7 +2,7 @@
 import httpStatus from 'http-status';
 import { Supplier } from '../../../../generated/prisma';
 import { AppError } from '../../error/AppError';
-import prisma from '../../shared/prisma';
+import { prisma } from '../../shared/prisma';
 
 // TODO: define Type for payload
 const createSupplierIntoDB = async (payload: any) => {
@@ -28,7 +28,7 @@ const getSingleSupplierFromDB = async (id: string) => {
   if (!result) {
     throw new AppError(httpStatus.NOT_FOUND, 'Supplier not found');
   }
-  return result
+  return result;
 };
 
 const updateSupplierFromDB = async (id: string, payload: Partial<Supplier>) => {

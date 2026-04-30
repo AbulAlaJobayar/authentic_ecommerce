@@ -4,6 +4,7 @@ import catchAsync from '../../shared/catchAsync';
 import sendResponse from '../../shared/sendResponse';
 import { AuthServices } from './auth.services';
 import { AppError } from '../../error/AppError';
+import { Request, Response } from 'express';
 
 const loinUser = catchAsync(async (req, res) => {
   const result = await AuthServices.userLogin(req.body);
@@ -11,7 +12,7 @@ const loinUser = catchAsync(async (req, res) => {
   res.cookie('refreshToken', refreshToken, {
     secure: config.nodeEnv === 'production',
     httpOnly: true,
-    sameSite: 'none',
+    sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
     maxAge: 1000 * 60 * 60 * 24 * 365,
   });
 
@@ -56,7 +57,8 @@ const changePassword = catchAsync(async (req, res) => {
   });
 });
 const refreshToken = catchAsync(async (req, res) => {
-  const token = req.cookies.refreshToken;
+  const { refreshToken } = req.cookies;
+  const token = refreshToken;
   if (!token) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'No refresh token provided');
   }
@@ -68,7 +70,7 @@ const refreshToken = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const forgotPassword = catchAsync(async (req, res) => {
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
   const { email } = req.body;
   const result = await AuthServices.forgotPassword(email);
   sendResponse(res, {

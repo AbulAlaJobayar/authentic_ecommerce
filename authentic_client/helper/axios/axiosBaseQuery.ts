@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BaseQueryFn } from "@reduxjs/toolkit/query";
 import type { AxiosRequestConfig, AxiosError } from "axios";
-import { instance as axiosInstance } from "./axiousinstanse";
+import { instance as axiosInstance } from "./axiousInstanse";
+
 // import { IMeta } from "@/types";
 
 export const axiosBaseQuery =
@@ -23,7 +24,7 @@ export const axiosBaseQuery =
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async ({ url, method, data, params, headers, ContentType }) => {
     try {
-      const result = await axiosInstance({
+      const result = await axiosInstance ({
         url: baseUrl + url,
         method,
         data,

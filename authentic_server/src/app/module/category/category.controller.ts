@@ -4,6 +4,7 @@ import sendResponse from '../../shared/sendResponse';
 import { CategoryServices } from './category.services';
 
 const createCategoryIntoDB = catchAsync(async (req, res) => {
+  console.log(req, 'create category');
   const result = await CategoryServices.createCategoryIntoDB(req);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -23,7 +24,7 @@ const getCategoryFromDB = catchAsync(async (req, res) => {
 });
 const getSingleFromDB = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await CategoryServices.getSingleCategory(id);
+  const result = await CategoryServices.getSingleCategory(id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -33,7 +34,10 @@ const getSingleFromDB = catchAsync(async (req, res) => {
 });
 const updateCategoryFromDB = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await CategoryServices.updateCategoryFromDB(id, req.body);
+  const result = await CategoryServices.updateCategoryFromDB(
+    id as string,
+    req.body,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -43,7 +47,7 @@ const updateCategoryFromDB = catchAsync(async (req, res) => {
 });
 const deleteCategoryFromDB = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await CategoryServices.deleteCategoryFromDB(id);
+  const result = await CategoryServices.deleteCategoryFromDB(id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

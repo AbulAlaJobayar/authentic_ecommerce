@@ -1,12 +1,12 @@
 import { authKey } from "@/constant/authKey";
 import { getFromLocalStorage, setToLocalStorage } from "@/utils/localStorages";
-
+import { instance as axiosInstance } from "@/helper/axios/axiousInstanse";
 export const storeUserInfo = (token: string) => {
   return setToLocalStorage(authKey, token);
 };
 export const getNewAccessToken = async () => {
   return await axiosInstance({
-    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/refresh-token`,
+    url: `${process.env.NEXT_PUBLIC_DATABASE_URL}/auth/refresh-token`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     withCredentials: true,

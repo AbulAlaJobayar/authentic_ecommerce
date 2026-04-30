@@ -1,11 +1,7 @@
-"use server";
+import { FieldValues } from "react-hook-form";
 import { setAccessToken } from "./setAccessToken";
-type TLoginInfo = {
-  email: string;
-  password: string;
-};
 
-const userLogin = async (data: TLoginInfo) => {
+const userLogin = async (data: FieldValues) => {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_DATABASE_URL}/auth/login`,
@@ -16,39 +12,36 @@ const userLogin = async (data: TLoginInfo) => {
         },
         body: JSON.stringify(data),
         credentials: "include",
-      }
+      },
     );
 
+    // Handle non-OK responses
     if (!res.ok) {
       const errorResponse = await res.json();
       throw new Error(
-        errorResponse.message || "Login failed. Please try again."
+        errorResponse.message || "Login failed. Please try again.",
       );
     }
 
-    const user = await res.json();
+    const userInfo = await res.json();
 
-    if (!user.success) {
+    // Ensure the response has the expected structure
+    if (!userInfo.data) {
       throw new Error("Invalid response from the server.");
     }
-    // Handle successful login with access token - this will throw NEXT_REDIRECT
-    if (user.data.accessToken) {
-      await setAccessToken(user.data.accessToken);
-    }
 
-    return user;
-  } catch (error: unknown) {
-    // Check if this is a NEXT_REDIRECT error - if so, re-throw it
-    if (typeof error === "object" && error !== null && "digest" in error) {
-      const redirectError = error as { digest: string };
-      if (redirectError.digest?.includes("NEXT_REDIRECT")) {
-        throw error; // Re-throw the original redirect error
-      }
+    // Handle case where user is already logged in
+    console.log("token from user file", userInfo.data.accessToken);
+    // Store the access token and redirect
+    if (userInfo.data.accessToken) {
+      setAccessToken(userInfo.data.accessToken);
     }
-
+    console.log("userinfo", userInfo);
+    return userInfo;
+  } catch (error) {
     console.error("Error during user login:", error);
     throw new Error(
-      error instanceof Error ? error.message : "An unexpected error occurred."
+      error instanceof Error ? error.message : "An unexpected error occurred.",
     );
   }
 };

@@ -1,5 +1,5 @@
 import { Role } from '../../../../generated/prisma';
-import prisma from '../../shared/prisma';
+import { prisma } from '../../shared/prisma';
 
 // Define prefix mapping for each role
 const ROLE_PREFIXES: Record<Role, string> = {
@@ -20,7 +20,7 @@ export const generateCustomId = async (role: Role): Promise<string> => {
 
   // Determine the next ID number
   let nextNumber = 1; // Default to 1 if no users exist
-  
+
   if (lastUser?.customId) {
     // Extract the numeric part (assuming format "XX-0000")
     const numberPart = lastUser.customId.split('-')[1];

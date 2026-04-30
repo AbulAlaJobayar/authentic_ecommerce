@@ -1,29 +1,33 @@
 
-const agentApi = baseApi.injectEndpoints({
+import { tagType } from "../tagtype";
+import { baseApi } from "./baseApi";
+
+const categoryApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    createAgent: build.mutation({
+    createCategory: build.mutation({
       query: (data) => ({
-        url: "/agent/create_agent",
+        url: "/category",
         method: "POST",
         data
       }),
-      invalidatesTags:[tagType.agent]
+      invalidatesTags:[tagType.category]
     }),
-    allAgent: build.query({
+    allCategory: build.query({
       query: () => ({
-        url: "/agent/all_agent",
+        url: "/category",
         method: "GET",
       }),
-     providesTags:[tagType.agent]
+     providesTags:[tagType.category]
     }),
-    approvedAgent: build.mutation({
-      query: (data) => ({
-        url: "/agent/approved_agent",
-        method: "PUT",
-        data
-      }),
-     invalidatesTags:[tagType.agent]
-    }),
+    // approvedAgent: build.mutation({
+    //   query: (data) => ({
+    //     url: "/agent/approved_agent",
+    //     method: "PUT",
+    //     data
+    //   }),
+    //  invalidatesTags:[tagType.agent]
+    // }),
   }),
 });
-export const {useCreateAgentMutation,useAllAgentQuery,useApprovedAgentMutation} =agentApi;
+
+export const {useCreateCategoryMutation,useAllCategoryQuery} =categoryApi;

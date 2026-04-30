@@ -4,9 +4,9 @@ import { AppError } from '../error/AppError';
 import { jwtHelper } from '../helper/jwtHelper';
 import config from '../config';
 import { JwtPayload, Secret } from 'jsonwebtoken';
-import prisma from '../shared/prisma';
 import { TUserRole } from '../module/user/user.interface';
 import catchAsync from '../shared/catchAsync';
+import { prisma } from '../shared/prisma';
 
 const auth = (...role: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -16,7 +16,7 @@ const auth = (...role: TUserRole[]) => {
     }
     const verifyUser = jwtHelper.verifyToken(
       token,
-      config.jwt.jwtAccessSecret as Secret
+      config.jwt.jwtAccessSecret as Secret,
     ) as JwtPayload;
     const user = await prisma.user.findUnique({
       where: { id: verifyUser?.id, isDeleted: false },
@@ -42,4 +42,4 @@ const auth = (...role: TUserRole[]) => {
     next();
   });
 };
-export default auth
+export default auth;

@@ -10,6 +10,7 @@ export interface DrawerItem {
   child?: DrawerItem[];
 }
 export type TATSDataProps = {
+  id: string;
   image?: string;
   name?: string;
   email?: string;
@@ -23,6 +24,8 @@ export type TATSDataProps = {
   category?: string;
   isDelete?: boolean;
   review?: string;
+  price?: number;
+  action?: string;
 };
 
 export type TATSHeadProps<T> = {

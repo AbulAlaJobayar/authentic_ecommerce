@@ -2,7 +2,7 @@
 import httpStatus from 'http-status';
 import { paginationHelpers } from '../../helper/paginationHelper';
 import { TPaginationOption } from '../../interfaces/pagination';
-import prisma from '../../shared/prisma';
+import { prisma } from '../../shared/prisma';
 import { productSearchableFields } from './inventory.constant';
 import {
   TInventoryFilterRequest,
@@ -13,7 +13,7 @@ import { AppError } from '../../error/AppError';
 
 const getAllInventoryFromDB = async (
   filters: TInventoryFilterRequest,
-  option: TPaginationOption
+  option: TPaginationOption,
 ) => {
   const { searchTerm, ...filterData } = filters;
   const { page, limit, skip, sortBy, sortOrder } =
@@ -73,7 +73,7 @@ const getAllInventoryFromDB = async (
       })),
     });
   }
- andConditions.push({isDeleted:false})
+  andConditions.push({ isDeleted: false });
   const whereConditions =
     andConditions.length > 0 ? { AND: andConditions } : {};
 
@@ -199,7 +199,7 @@ const getSingleInventoryFromDB = async (id: string) => {
 
 const updateInventoryFromDB = async (
   id: string,
-  payload: TUpdateProductRequest
+  payload: TUpdateProductRequest,
 ) => {
   const inventory = await prisma.inventory.findUnique({
     where: { id },

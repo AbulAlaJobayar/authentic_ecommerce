@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import hashPassword from '../../helper/hashPassword';
-import prisma from '../../shared/prisma';
 import { generateCustomId } from './user.utils';
 import { imageUploader, MulterFile } from '../../shared/imageUpload';
 import { Request } from 'express';
@@ -8,6 +7,7 @@ import { TUserFilterRequest } from './user.interface';
 import { TPaginationOption } from '../../interfaces/pagination';
 import { userSearchableFields } from './user.constant';
 import { paginationHelpers } from '../../helper/paginationHelper';
+import { prisma } from '../../shared/prisma';
 
 const createUserIntoDB = async (req: Request) => {
   // const file = req.file as MulterFile;
@@ -15,6 +15,7 @@ const createUserIntoDB = async (req: Request) => {
   //   const image = await imageUploader.uploadImageToS3(file);
   //   req.body.image = image;
   // }
+  console.log(' hello user services');
   const password = (await hashPassword(req.body.password as string)) as string;
   req.body.password = password;
   const customId = (await generateCustomId(req.body.role)) as string;
@@ -35,34 +36,12 @@ const createUserIntoDB = async (req: Request) => {
       updatedAt: true,
     },
   });
-
-  // //localhost:3000/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
-
-  // const tokenData = {
-  //   id: user.id,
-  //   email: user.email,
-  //   customId: user.customId,
-  //   role: user.role,
-  // };
-  // const verifyToken = jwtHelper.generateToken(
-  //   tokenData,
-  //   config.jwt.jwtVerifySecret as Secret,
-  //   config.jwt.jwtVerifyExpire as any
-  // );
-  // const url = `${config.domainName}/verify?token=${verifyToken}`;
-
-  // sendEmail({
-  //   to: user.email,
-  //   subject: 'Verify your email',
-  //   html: verificationEmailTemplate(url, 'Verify My Email', otp as string),
-  // });
-
-  return {data:user};
+  return { data: user };
 };
 
 const getAllUserFromDB = async (
   filters: TUserFilterRequest,
-  option: TPaginationOption
+  option: TPaginationOption,
 ) => {
   const { searchTerm, ...filterData } = filters;
   const { page, limit, skip, sortBy, sortOrder } =

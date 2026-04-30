@@ -1,5 +1,5 @@
-import prisma from './src/app/shared/prisma'
+// import prisma from './src/app/shared/prisma'
 
-afterAll(async () => {
-  await prisma.$disconnect()
-})
+// afterAll(async () => {
+//   await prisma.$disconnect()
+// })

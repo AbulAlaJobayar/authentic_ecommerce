@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
-import prisma from '../../shared/prisma';
+import { prisma } from '../../shared/prisma';
 import { Request } from 'express';
 import { TCreateOrder, TOrderFilterRequest } from './order.interface';
 import { generateOrderNumber } from '../../utils/orderNumber';
@@ -30,7 +30,7 @@ const createOrderIntoDB = async (req: Request) => {
       if (products.length !== payload.items.length) {
         throw new AppError(
           httpStatus.NOT_FOUND,
-          'One or more products not found'
+          'One or more products not found',
         );
       }
 
@@ -65,12 +65,12 @@ const createOrderIntoDB = async (req: Request) => {
         if (discount) {
           // Filter items that the discount applies to
           const applicableItems = orderItemsData.filter((item) =>
-            discount.ProductIds.includes(item.productId)
+            discount.ProductIds.includes(item.productId),
           );
 
           const applicableSubtotal = applicableItems.reduce(
             (sum, item) => sum + item.totalPrice,
-            0
+            0,
           );
 
           discountAmount = (applicableSubtotal * discount.percentage) / 100;
@@ -117,7 +117,7 @@ const createOrderIntoDB = async (req: Request) => {
 };
 const getAllOrderFromDB = async (
   filters: TOrderFilterRequest,
-  option: TPaginationOption
+  option: TPaginationOption,
 ) => {
   const { searchTerm, ...filterData } = filters;
   const { page, limit, skip, sortBy, sortOrder } =
@@ -190,7 +190,7 @@ const getAllOrderFromDB = async (
 const getOrderByUserIdFromDB = async (
   userId: string,
   filters: TOrderFilterRequest,
-  option: TPaginationOption
+  option: TPaginationOption,
 ) => {
   const { searchTerm, ...filterData } = filters;
   const { page, limit, skip, sortBy, sortOrder } =

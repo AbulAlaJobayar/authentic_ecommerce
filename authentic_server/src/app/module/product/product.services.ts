@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { imageUploader, MulterFile } from '../../shared/imageUpload';
-import prisma from '../../shared/prisma';
+import { prisma } from '../../shared/prisma';
 import { TPaginationOption } from '../../interfaces/pagination';
 import { TProduct, TProductFilterRequest } from './product.interface';
 import { paginationHelpers } from '../../helper/paginationHelper';
@@ -13,6 +13,7 @@ const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
     const image = file
       ? await imageUploader.uploadImageToS3(file)
       : 'no image found';
+
     const productData = {
       sku: payload.product.sku,
       name: payload.product.name,
@@ -58,7 +59,7 @@ const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
 
 const getAllProductFromDB = async (
   filters: TProductFilterRequest,
-  option: TPaginationOption
+  option: TPaginationOption,
 ) => {
   const { searchTerm, ...filterData } = filters;
   const { page, limit, skip, sortBy, sortOrder } =
