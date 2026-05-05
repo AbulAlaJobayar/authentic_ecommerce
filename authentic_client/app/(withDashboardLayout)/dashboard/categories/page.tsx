@@ -7,6 +7,7 @@ import { SquarePen } from 'lucide-react';
 import { useState } from 'react';
 import AddCategories from './AddCategories';
 import { useAllCategoryQuery } from '@/redux/api/categorieApi';
+import { useSelector } from 'react-redux';
 
 
 export const head: TATSHeadProps<TATSDataProps>[] = [
@@ -18,7 +19,10 @@ export const head: TATSHeadProps<TATSDataProps>[] = [
 const CategoriesPage = () => {
     const [open, setOpen] = useState(false)
     const { data, isLoading, isError } = useAllCategoryQuery('')
-    console.log(data, "from category page")
+  
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     const id = useSelector((state:any )=>state.paramsInfo.id)
+       console.log(id, "from category page")
     const categories = data?.data
     const handleOpen = () => {
         setOpen(true)
@@ -26,6 +30,11 @@ const CategoriesPage = () => {
     if (isLoading) {
         return <div>Loading...</div>
     }
+    if (isError) {
+        return <div className='justify-center items-center mx-auto max-w-full text-center font-bold text-red-500'>Error loading categories.</div>
+    }
+    
+   
     return (
 
         <div className=' mx-5 my-2'>
@@ -37,6 +46,10 @@ const CategoriesPage = () => {
                     <SquarePen />
                     Add Categories</Button>
             </div>
+<h1 className='text-blue-500 font-bold size-48'>
+{id}
+</h1>
+
             <ATSTable head={head} data={categories} />
             <ATSModal open={open} setOpen={setOpen} title='Add Categories' >
                 <AddCategories setOpen={setOpen} open={open} />

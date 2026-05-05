@@ -1,10 +1,13 @@
+
 import { configureStore } from "@reduxjs/toolkit";
 import loginReducer from "./features/login/loginSlice";
+import paramsReducer from "./features/params/paramSlice"
 import { baseApi } from "./api/baseApi";
 
 export const store = configureStore({
   reducer: {
     loginInfo: loginReducer,
+    paramsInfo:paramsReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

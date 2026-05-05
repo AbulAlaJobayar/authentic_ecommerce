@@ -2,19 +2,24 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TATSDataProps, TATSHeadProps } from '@/types';
+import { SquarePen } from 'lucide-react';
 import Image from 'next/image';
+import { Trash2Icon, } from "@animateicons/react/lucide"
+import { useDispatch } from 'react-redux';
+import { setParams } from '@/redux/features/params/paramSlice';
+const ATSTable = ({ head, data, }: { head: TATSHeadProps<TATSDataProps>[]; data: TATSDataProps[] }) => {
+  const dispatch = useDispatch()
 
-const ATSTable = ({ head, data }: { head: TATSHeadProps<TATSDataProps>[]; data: TATSDataProps[] }) => {
   return (
     <div>
       <Table>
         <TableCaption>A list of your recent invoices.</TableCaption>
-        <TableHeader>
-          <TableRow>
-
+        <TableHeader >
+          <TableRow >
             {
               head?.map((h) => (
-                <TableHead key={h.key}>{h.label}</TableHead>
+                <TableHead key={h.key} className="text-center align-middle">
+                  {h.label}</TableHead>
               ))
             }
           </TableRow>
@@ -23,7 +28,7 @@ const ATSTable = ({ head, data }: { head: TATSHeadProps<TATSDataProps>[]; data: 
           {data.map((row) => (
             <TableRow key={row?.id}>
               {head.map((h) => (
-                <TableCell key={String(h.key)}>
+                <TableCell className="text-center align-middle" key={String(h.key)}>
                   {(() => {
                     const value = row[h.key];
 
@@ -51,16 +56,26 @@ const ATSTable = ({ head, data }: { head: TATSHeadProps<TATSDataProps>[]; data: 
 
                     if (h.key === 'action') {
                       return <>
-                        <div className='flex justify-end'>
+                        <div className='flex justify-center gap-10'>
 
-                          <Button >Update</Button>
-                          <Button variant="destructive" className='ml-2'>Delete</Button>
-                        </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() =>
+                              dispatch(setParams(row.id))
+                            }
+                          >
+                            <SquarePen />
+                          </Button>
+                          <Button variant="destructive"  onClick={() =>
+                              dispatch(setParams(row.id))
+                            }><Trash2Icon size={24} /></Button>
+                        </div >
                       </>
 
                     }
 
-                    return <span>{String(value ?? '')}</span>;
+                    return <span className='justify-between'>{String(value ?? '')}</span>;
                   })()}
                 </TableCell>
               ))}
@@ -68,7 +83,7 @@ const ATSTable = ({ head, data }: { head: TATSHeadProps<TATSDataProps>[]; data: 
           ))}
         </TableBody>
       </Table>
-    </div>
+    </div >
   );
 };
 
