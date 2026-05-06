@@ -4,8 +4,8 @@ import { categoryValidation } from './category.validation';
 import validateRequest from '../../middleware/validateRequest';
 import { USER_ROLE } from '../user/user.constant';
 import { CategoryController } from './category.controller';
-import { imageUploader } from '../../shared/imageUpload';
-import parseData from '../../middleware/parseData';
+// import { imageUploader } from '../../shared/imageUpload';
+// import parseData from '../../middleware/parseData';
 
 const router = Router();
 router.post(
@@ -28,9 +28,9 @@ router.get(
 );
 router.patch(
   '/:id',
-  imageUploader.upload.single('image'),
+  // imageUploader.upload.single('image'),
   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
-  parseData(),
+  // parseData(),
   validateRequest(categoryValidation.updateCategorySchemaValidation),
   CategoryController.updateCategoryFromDB,
 );
