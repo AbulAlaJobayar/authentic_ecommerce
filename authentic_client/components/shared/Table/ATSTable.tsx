@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { Trash2Icon, } from "@animateicons/react/lucide"
 import { useDispatch } from 'react-redux';
 import { setParams } from '@/redux/features/params/paramSlice';
-const ATSTable = ({ head, data, }: { head: TATSHeadProps<TATSDataProps>[]; data: TATSDataProps[] }) => {
+const ATSTable = ({ head, data, setOpen }: { head: TATSHeadProps<TATSDataProps>[]; data: TATSDataProps[]; setOpen?: (open: boolean) => void }) => {
   const dispatch = useDispatch()
 
   return (
@@ -61,15 +61,23 @@ const ATSTable = ({ head, data, }: { head: TATSHeadProps<TATSDataProps>[]; data:
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() =>
+                            onClick={() => {
+                              if (setOpen) {
+                                setOpen(true)
+                              }
+
                               dispatch(setParams(row.id))
+                            }
                             }
                           >
                             <SquarePen />
                           </Button>
-                          <Button variant="destructive"  onClick={() =>
-                              dispatch(setParams(row.id))
-                            }><Trash2Icon size={24} /></Button>
+                          <Button variant="destructive" onClick={() => {
+                            if (setOpen) {
+                              setOpen(true)
+                            }
+                            dispatch(setParams(row.id))
+                          }}><Trash2Icon size={24} /></Button>
                         </div >
                       </>
 

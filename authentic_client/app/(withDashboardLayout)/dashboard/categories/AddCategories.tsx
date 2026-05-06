@@ -41,9 +41,13 @@ const AddCategories = ({ setOpen }: TProps) => {
             }
             else {
                 toast.error(res?.data?.message || "Failed to create category");
+               console.log(res?.data?.message || "from else")
+               
                 setOpen(false)
             }
         } catch (error) {
+
+            console.log(error,"from error")
             if (isError) {
                 toast.error("Failed to create category");
                 setOpen(false)
