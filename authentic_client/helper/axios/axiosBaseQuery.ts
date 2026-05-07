@@ -15,7 +15,7 @@ export const axiosBaseQuery =
       data?: AxiosRequestConfig["data"];
       params?: AxiosRequestConfig["params"];
       headers?: AxiosRequestConfig["headers"];
-        meta?: any //IMeta;
+      meta?: any; //IMeta;
       ContentType?: string;
     },
     unknown,
@@ -24,7 +24,7 @@ export const axiosBaseQuery =
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async ({ url, method, data, params, headers, ContentType }) => {
     try {
-      const result = await axiosInstance ({
+      const result = await axiosInstance({
         url: baseUrl + url,
         method,
         data,

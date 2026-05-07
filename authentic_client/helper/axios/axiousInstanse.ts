@@ -13,16 +13,12 @@ instance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
     const accessToken = getFromLocalStorage(authKey);
-    console.log("accessUpdate", { accessToken });
     if (accessToken) {
       config.headers.Authorization = accessToken;
     }
     return config;
   },
-  function (error) {
-    // Do something with request error
-    return Promise.reject(error);
-  },
+   (error) => Promise.reject(error)
 );
 
 // Add a response interceptor
@@ -36,16 +32,13 @@ instance.interceptors.response.use(
     //     meta: response?.data?.meta,
     //   };
     // return responseObject;
-    console.log(response, "config from axios instance response");
     return response;
   },
   async function (error) {
-    console.log("error from instance", error);
     const config = error.config;
     if (error?.response?.status === 500 && !config.sent) {
       config.sent = true;
       const response = await getNewAccessToken();
-      console.log("from instance response", { response });
       const { accessToken } = response.data.data;
       config.headers["Authorization"] = accessToken;
       setToLocalStorage(authKey, accessToken);
@@ -57,7 +50,7 @@ instance.interceptors.response.use(
         message: error?.response?.data?.message || "Something went wrong!!!",
         errorMessage: error?.response?.data?.message,
       };
-      return responseObject;
+      return Promise.reject(responseObject);
     }
   },
 );

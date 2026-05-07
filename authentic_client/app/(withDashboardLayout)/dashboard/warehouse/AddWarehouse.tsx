@@ -1,6 +1,5 @@
 "use client"
 import ATSFrom from '@/components/shared/Form/ATSForm';
-import ATSImageInput from '@/components/shared/Form/ATSImageInput';
 import ATSInput from '@/components/shared/Form/ATSInput';
 import { Button } from '@/components/ui/button';
 import DotWave from '@/components/ui/dot-wave';
@@ -14,19 +13,19 @@ import z from 'zod';
 
 const FormSchema = z.object({
     name: z.string().regex(/^[A-Z][a-zA-Z]*$/, "Name must start with a capital letter"),
-    image: z.any(),
+    address: z.string,
 });
 type TFormValues = z.infer<typeof FormSchema>
 const defaultValue = {
     name: "",
-    image: "",
+    address: "",
 }
 type TProps = {
     open?: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const AddCategories = ({ setOpen }: TProps) => {
+const AddWarehouse = ({ setOpen }: TProps) => {
     const [createCategory, { isLoading, isError, }] = useCreateCategoryMutation()
     const handleSubmit = async (values: TFormValues) => {
         try {
@@ -60,15 +59,17 @@ const AddCategories = ({ setOpen }: TProps) => {
                 <FieldGroup >
                     <Field>
                         <FieldLabel htmlFor="name">Name</FieldLabel>
-                        <ATSInput name="name" id="name" type="text" required />
+                        <ATSInput name="name" id="name" type="text" placeholder='Sonar Bangla Warehouse' required />
                     </Field>
                     <Field>
-                        <FieldLabel htmlFor="image">Image</FieldLabel>
-                        <ATSImageInput name="image" id="image" required />
+                        <FieldLabel htmlFor="address" >Address</FieldLabel>
+                        <ATSInput name="address" id="address" type="text" placeholder='House 12, Road 5, Sector 7
+Uttara, Dhaka-1230
+Bangladesh' required />
                     </Field>
 
                     <Field>
-                        <Button className='bg-[#6777EF] hover:bg-[#4C60DA]' type="submit">{isLoading ? <span>Adding <DotWave /></span> : "Add Category"}</Button>
+                        <Button className='bg-[#6777EF] hover:bg-[#4C60DA]' type="submit">{isLoading ? <DotWave /> : "Add Warehouse"}</Button>
                     </Field>
                 </FieldGroup>
             </ATSFrom>
@@ -86,4 +87,4 @@ const AddCategories = ({ setOpen }: TProps) => {
     );
 };
 
-export default AddCategories;
+export default AddWarehouse;
