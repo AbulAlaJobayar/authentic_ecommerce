@@ -19,11 +19,15 @@ const createWarehouseIntoDB = async (payload: Warehouse) => {
   return result;
 };
 const getAllWarehouseFromDB = async () => {
+
+
   const result = await prisma.warehouse.findMany({
     where: { isDeleted: false },
   });
   return result;
 };
+
+
 const getSingleWarehouse = async (id: string) => {
   const result = await prisma.warehouse.findUnique({
     where: {

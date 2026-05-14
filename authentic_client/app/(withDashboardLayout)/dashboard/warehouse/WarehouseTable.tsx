@@ -163,9 +163,10 @@ const WarehouseTable = ({ columns, data }: CategoryTableProps) => {
   // =========================
   // Edit
   // =========================
-  const handleEdit = (id: string) => {
+  const handleEdit = (id: any) => {
     setOpen(true);
     setEditedId(id);
+    console.log(id, "from edit")
   };
 
   // =========================

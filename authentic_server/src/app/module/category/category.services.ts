@@ -1,7 +1,12 @@
+
 import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
 import { prisma } from '../../shared/prisma';
 import { Request } from 'express';
+import { TCategoryFilterRequest } from './category.interface';
+import { TPaginationOption } from '../../interfaces/pagination';
+import { paginationHelpers } from '../../helper/paginationHelper';
+import { categorySearchableFields } from './category.constant';
 //import { imageUploader } from '../../shared/imageUpload';
 
 const createCategoryIntoDB = async (req: Request) => {
@@ -18,11 +23,174 @@ const createCategoryIntoDB = async (req: Request) => {
   return result;
 };
 
-const getAllCategoryFromDB = async () => {
+const getAllCategoryFromDB = async (
+  filters: TCategoryFilterRequest,
+  option: TPaginationOption,
+) => {
+  // const { searchTerm, ...filterData } = filters;
+  // const { page, limit, skip, sortBy, sortOrder } =
+  //   paginationHelpers.calculatePagination(option);
+
+  // if (typeof filterData.isDeleted === 'string') {
+  //   if (filterData.isDeleted === 'true') {
+  //     filterData.isDeleted = true;
+  //   } else if (filterData.isDeleted === 'false') {
+  //     filterData.isDeleted = false;
+  //   }
+  // }
+  // const andConditions = [];
+  // if (searchTerm) {
+  //   andConditions.push({
+  //     OR: categorySearchableFields.map((field) => ({
+  //       [field]: {
+  //         contains: searchTerm,
+  //         mode: 'insensitive',
+  //       },
+  //     })),
+  //   });
+  // }
+
+  // if (Object.keys(filterData).length > 0) {
+  //   andConditions.push({
+  //     AND: Object.keys(filterData).map((key) => ({
+  //       [key]: {
+  //         equals: (filterData as any)[key],
+  //       },
+  //     })),
+  //   });
+  // }
+
+  // const whereConditions =
+  //   andConditions.length > 0 ? { AND: andConditions } : {};
+
+  // const result = await prisma.category.findMany({
+  //   where: whereConditions,
+  //   skip,
+  //   take: limit,
+  //   orderBy:
+  //     sortBy && sortOrder
+  //       ? { [sortBy]: sortOrder }
+  //       : {
+  //           createdAt: 'desc',
+  //         },
+  // });
+  // const total = await prisma.category.count({
+  //   where: whereConditions,
+  // });
+  // return {
+  //   meta: {
+  //     total,
+  //     page,
+  //     limit,
+  //   },
+  //   data: result,
+  // };
+
+   // =========================
+  // Filters
+  // =========================
+  const { searchTerm, ...filterData } = filters;
+
+  // =========================
+  // Pagination
+  // =========================
+  const {
+    page,
+    limit,
+    skip,
+    sortBy,
+    sortOrder,
+  } = paginationHelpers.calculatePagination(option);
+
+  // =========================
+  // Dynamic Conditions
+  // =========================
+  const andConditions = [];
+
+  // =========================
+  // Search
+  // =========================
+  if (searchTerm) {
+    andConditions.push({
+      OR: categorySearchableFields.map((field) => ({
+        [field]: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  // =========================
+  // Boolean Convert
+  // =========================
+  if (typeof filterData.isDeleted === "string") {
+    filterData.isDeleted = filterData.isDeleted === "true";
+  }
+
+  // =========================
+  // Dynamic Filter
+  // =========================
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.entries(filterData).map(
+        ([key, value]) => ({
+          [key]: {
+            equals: value,
+          },
+        })
+      ),
+    });
+  }
+
+  // =========================
+  // Where
+  // =========================
+  const whereConditions=
+    andConditions.length > 0
+      ? { AND: andConditions }
+      : {};
+
+  // =========================
+  // Query
+  // =========================
   const result = await prisma.category.findMany({
-    where: { isDeleted: false },
+    where: whereConditions,
+
+    skip,
+
+    take: limit,
+
+    orderBy:
+      sortBy && sortOrder
+        ? {
+            [sortBy]: sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
   });
-  return result;
+
+  // =========================
+  // Total Count
+  // =========================
+  const total = await prisma.category.count({
+    where: whereConditions,
+  });
+
+  // =========================
+  // Response
+  // =========================
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage: Math.ceil(total / limit),
+    },
+
+    data: result,
+  };
 };
 const getSingleCategory = async (id: string) => {
   const result = await prisma.category.findUnique({

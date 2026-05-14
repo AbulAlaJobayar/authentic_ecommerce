@@ -1,5 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { tagType } from "../tagtype";
 import { baseApi } from "./baseApi";
+
+export type TCategoryQuery = {
+  page?: number;
+  limit?: number;
+  searchTerm?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+};
 
 const categoryApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -12,9 +21,29 @@ const categoryApi = baseApi.injectEndpoints({
       invalidatesTags: [tagType.category],
     }),
     allCategory: build.query({
-      query: () => ({
+      query: ({
+        page = 1,
+        limit = 10,
+        searchTerm = "",
+        sortBy = "createdAt",
+        sortOrder = "desc",
+        isDeleted=undefined
+      }) => ({
         url: "/category",
         method: "GET",
+         params: {
+          page,
+          limit,
+          searchTerm,
+          sortBy,
+          sortOrder,
+          isDeleted
+        },
+      }),
+
+      transformResponse: (response: any) => ({
+        data: response?.data || [],
+        meta: response?.meta || {},
       }),
       providesTags: [tagType.category],
     }),
@@ -62,5 +91,5 @@ export const {
   useAllCategoryQuery,
   useGetSingleCategoryQuery,
   useUpdateCategoryMutation,
-  useDeleteCategoryMutation
+  useDeleteCategoryMutation,
 } = categoryApi;

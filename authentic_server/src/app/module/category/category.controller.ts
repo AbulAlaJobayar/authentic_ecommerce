@@ -1,10 +1,11 @@
+import { categoryFilterableFields } from './category.constant';
 import httpStatus from 'http-status';
 import catchAsync from '../../shared/catchAsync';
 import sendResponse from '../../shared/sendResponse';
 import { CategoryServices } from './category.services';
+import pick from '../../shared/pick';
 
 const createCategoryIntoDB = catchAsync(async (req, res) => {
-  console.log(req, 'create category');
   const result = await CategoryServices.createCategoryIntoDB(req);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -14,7 +15,10 @@ const createCategoryIntoDB = catchAsync(async (req, res) => {
   });
 });
 const getCategoryFromDB = catchAsync(async (req, res) => {
-  const result = await CategoryServices.getAllCategoryFromDB();
+  const filters = pick(req.query, categoryFilterableFields);
+  const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+  const result = await CategoryServices.getAllCategoryFromDB(filters, options);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

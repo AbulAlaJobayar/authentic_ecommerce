@@ -17,6 +17,7 @@ const createWarehouseIntoDB = catchAsync(
 );
 
 const getWarehouseFromDB = catchAsync(async (req: Request, res: Response) => {
+  
   const result = await WarehouseServices.getAllWarehouseFromDB();
   sendResponse(res, {
     statusCode: httpStatus.OK,
