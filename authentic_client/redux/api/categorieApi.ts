@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { tagType } from "../tagtype";
+import { tagType } from "../tagType";
 import { baseApi } from "./baseApi";
 
 export type TCategoryQuery = {
@@ -27,17 +27,17 @@ const categoryApi = baseApi.injectEndpoints({
         searchTerm = "",
         sortBy = "createdAt",
         sortOrder = "desc",
-        isDeleted=undefined
+        isDeleted = undefined,
       }) => ({
         url: "/category",
         method: "GET",
-         params: {
+        params: {
           page,
           limit,
           searchTerm,
           sortBy,
           sortOrder,
-          isDeleted
+          isDeleted,
         },
       }),
 

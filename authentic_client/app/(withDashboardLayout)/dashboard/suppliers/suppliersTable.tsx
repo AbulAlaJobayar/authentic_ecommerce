@@ -14,8 +14,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import moment from "moment";
 import { useState } from "react";
 import ATSModal from "@/components/shared/Modal/ATSModal";
-import EditWarehouse from "./EditedWarehouse";
-import DeleteWarehouse from "./DeleteWartehouse";
+import EditSuppliers from "./EditSuppliers";
+import DeleteSuppliers from "./DeleteSuppliers";
 type Props = {
     columns: {
         key: string;
@@ -33,7 +33,7 @@ type Props = {
     sortOrder?: "asc" | "desc";
 };
 
-const WarehouseTable = ({
+const SuppliersTable = ({
     columns,
     data,
     isLoading,
@@ -180,11 +180,11 @@ const WarehouseTable = ({
 
             {/* Edit Modal */}
             <ATSModal open={open} setOpen={setOpen} title="Edit Categories">
-                <EditWarehouse setOpen={setOpen} id={editedId} />
+                <EditSuppliers setOpen={setOpen} id={editedId} />
             </ATSModal>
 
             {/* Delete Modal */}
-            <DeleteWarehouse
+            <DeleteSuppliers
                 id={deletedId}
                 open={isDeleteOpen}
                 setOpen={setIsDeleteOpen}
@@ -193,4 +193,4 @@ const WarehouseTable = ({
     );
 };
 
-export default WarehouseTable;
+export default SuppliersTable;

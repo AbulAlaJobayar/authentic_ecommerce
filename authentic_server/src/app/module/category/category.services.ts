@@ -27,64 +27,6 @@ const getAllCategoryFromDB = async (
   filters: TCategoryFilterRequest,
   option: TPaginationOption,
 ) => {
-  // const { searchTerm, ...filterData } = filters;
-  // const { page, limit, skip, sortBy, sortOrder } =
-  //   paginationHelpers.calculatePagination(option);
-
-  // if (typeof filterData.isDeleted === 'string') {
-  //   if (filterData.isDeleted === 'true') {
-  //     filterData.isDeleted = true;
-  //   } else if (filterData.isDeleted === 'false') {
-  //     filterData.isDeleted = false;
-  //   }
-  // }
-  // const andConditions = [];
-  // if (searchTerm) {
-  //   andConditions.push({
-  //     OR: categorySearchableFields.map((field) => ({
-  //       [field]: {
-  //         contains: searchTerm,
-  //         mode: 'insensitive',
-  //       },
-  //     })),
-  //   });
-  // }
-
-  // if (Object.keys(filterData).length > 0) {
-  //   andConditions.push({
-  //     AND: Object.keys(filterData).map((key) => ({
-  //       [key]: {
-  //         equals: (filterData as any)[key],
-  //       },
-  //     })),
-  //   });
-  // }
-
-  // const whereConditions =
-  //   andConditions.length > 0 ? { AND: andConditions } : {};
-
-  // const result = await prisma.category.findMany({
-  //   where: whereConditions,
-  //   skip,
-  //   take: limit,
-  //   orderBy:
-  //     sortBy && sortOrder
-  //       ? { [sortBy]: sortOrder }
-  //       : {
-  //           createdAt: 'desc',
-  //         },
-  // });
-  // const total = await prisma.category.count({
-  //   where: whereConditions,
-  // });
-  // return {
-  //   meta: {
-  //     total,
-  //     page,
-  //     limit,
-  //   },
-  //   data: result,
-  // };
 
    // =========================
   // Filters

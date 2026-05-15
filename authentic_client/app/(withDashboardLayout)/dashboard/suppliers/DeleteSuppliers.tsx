@@ -4,7 +4,7 @@
 import { useDeleteCategoryMutation } from "@/redux/api/categorieApi";
 import { toast } from "sonner";
 
-const DeleteWarehouse = ({ id, open, setOpen }: { id: string; open: boolean; setOpen: (open: boolean) => void }) => {
+const DeleteSuppliers = ({ id, open, setOpen }: { id: string; open: boolean; setOpen: (open: boolean) => void }) => {
   const [deleteCategory] = useDeleteCategoryMutation();
   const handleDelete = async () => {
     try {
@@ -59,4 +59,4 @@ const DeleteWarehouse = ({ id, open, setOpen }: { id: string; open: boolean; set
   );
 };
 
-export default DeleteWarehouse;
+export default DeleteSuppliers;

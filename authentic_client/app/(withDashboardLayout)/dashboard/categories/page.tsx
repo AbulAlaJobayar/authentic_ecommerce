@@ -261,7 +261,7 @@ const CategoriesPage = () => {
                         {/* Previous */}
                         <PaginationItem>
                             <PaginationPrevious
-                                href="#"
+                               
                                 onClick={(e) => {
                                     e.preventDefault();
 
@@ -278,7 +278,6 @@ const CategoriesPage = () => {
                         }).map((_, index) => (
                             <PaginationItem key={index}>
                                 <PaginationLink
-                                    href="#"
                                     isActive={page === index + 1}
                                     onClick={(e) => {
                                         e.preventDefault();
@@ -293,7 +292,7 @@ const CategoriesPage = () => {
                         {/* Next */}
                         <PaginationItem>
                             <PaginationNext
-                                href="#"
+                                
                                 onClick={(e) => {
                                     e.preventDefault();
 

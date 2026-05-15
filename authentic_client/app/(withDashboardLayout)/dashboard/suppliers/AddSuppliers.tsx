@@ -25,7 +25,7 @@ type TProps = {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const AddWarehouse = ({ setOpen }: TProps) => {
+const AddSuppliers = ({ setOpen }: TProps) => {
     const [createWarehouse, { isLoading, isError, }] = useCreateWarehouseMutation()
     const handleSubmit = async (values: TFormValues) => {
         try {
@@ -86,4 +86,4 @@ const AddWarehouse = ({ setOpen }: TProps) => {
     );
 };
 
-export default AddWarehouse;
+export default AddSuppliers;

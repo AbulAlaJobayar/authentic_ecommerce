@@ -5,17 +5,8 @@ import { useDeleteCategoryMutation } from "@/redux/api/categorieApi";
 import { toast } from "sonner";
 
 const DeleteCategory = ({ id, open, setOpen }: { id: string; open: boolean; setOpen: (open: boolean) => void }) => {
-  // const deleteCategory = async (id: string) => {
-  //     // Simulate an API call to delete the category
-  //     return new Promise((resolve, reject) => {
-  //       setTimeout(() => {
-  //         resolve(undefined);
-  //       }, 1000);
-  //     });
-  //   };  
   const [deleteCategory] = useDeleteCategoryMutation();
   const handleDelete = async () => {
-
     try {
       const res = await deleteCategory(id).unwrap()
       console.log(res, "delete response")
