@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { tagType } from "../tagType";
 import { baseApi } from "./baseApi";
 
@@ -5,7 +6,7 @@ const suppliersApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     createSuppliers: build.mutation({
       query: (data) => ({
-        url: "/suppliers",
+        url: "/supplier",
         method: "POST",
         data,
       }),
@@ -20,7 +21,7 @@ const suppliersApi = baseApi.injectEndpoints({
         sortOrder = "desc",
         isDeleted = undefined,
       }) => ({
-        url: "/suppliers",
+        url: "/supplier",
         method: "GET",
         params: {
           page,
@@ -31,10 +32,14 @@ const suppliersApi = baseApi.injectEndpoints({
           isDeleted,
         },
       }),
+       transformResponse: (response: any) => ({
+        data: response?.data || [],
+        meta: response?.meta || {},
+      }),
     }),
     getSingleSuppliers: build.query({
       query: (id: string) => ({
-        url: `/suppliers/${id}`,
+        url: `/supplier/${id}`,
         method: "GET",
       }),
       providesTags: [tagType.suppliers],
@@ -50,9 +55,10 @@ const suppliersApi = baseApi.injectEndpoints({
           email?: string;
           phone?: string;
           address?: string;
+          isDeleted?: boolean;
         };
       }) => ({
-        url: `/suppliers/${id}`,
+        url: `/supplier/${id}`,
         method: "PATCH",
         data,
       }),
@@ -60,7 +66,7 @@ const suppliersApi = baseApi.injectEndpoints({
     }),
     deleteSuppliers: build.mutation({
       query: (id: string) => ({
-        url: `/suppliers/${id}`,
+        url: `/supplier/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: [tagType.suppliers],

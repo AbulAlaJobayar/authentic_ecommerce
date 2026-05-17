@@ -125,7 +125,6 @@ const WarehousePage = () => {
     // Data
     // =========================
     const warehouses = data?.data?.data || [];
-console.log(data, "from warehouse page")
     const meta = data?.data?.meta || {};
 
     // =========================
@@ -193,7 +192,7 @@ console.log(data, "from warehouse page")
                 <TabsList>
                     <TabsTrigger value="all">
                         All
-                    </TabsTrigger>
+                    </TabsTrigger> 
 
                     <TabsTrigger value="false">
                         Active
@@ -209,7 +208,7 @@ console.log(data, "from warehouse page")
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 {/* Search */}
                 <Input
-                    placeholder="Search category..."
+                    placeholder="Search Warehouses..."
                     className="md:max-w-sm"
                     value={searchTerm}
                     onChange={(e) => {

@@ -31,13 +31,15 @@ import {
 } from "@/components/ui/tabs";
 
 import Papa from "papaparse";
-import { useAllWarehouseQuery } from "@/redux/api/warehouse";
 import SuppliersTable from "./suppliersTable";
 import AddSuppliers from "./AddSuppliers";
+import { useGetAllSuppliersQuery } from "@/redux/api/suppliers";
 export type ProductRow = {
     id: string;
     name: string;
-    address:string;
+    email: string;
+    phone: string;
+    address: string;
     action: string;
     createdAt: Date;
     isDeleted: boolean;
@@ -49,8 +51,10 @@ export type TableColumn<T> = {
 };
 
 const columns: TableColumn<ProductRow>[] = [
-    { key: "name", label: "Name" },     
-    { key: "address", label: "Address" },   
+    { key: "name", label: "Name" },
+    { key: "email", label: "Email" },
+    { key: "phone", label: "Phone" },
+    { key: "address", label: "Address" },
     { key: "isDeleted", label: "Status" },
     { key: "createdAt", label: "Created" },
     { key: "id", label: "Action" },
@@ -85,7 +89,7 @@ const SuppliersPage = () => {
     // =========================
     const handleExport = () => {
         const csv = Papa.unparse(
-            warehouses.map((item: any) => ({
+            suppliers.map((item: any) => ({
                 name: item.name,
                 status: item.isDeleted ? "Deleted" : "Active",
                 createdAt: item.createdAt,
@@ -109,7 +113,7 @@ const SuppliersPage = () => {
     // Query
     // =========================
     const { data, isLoading, isFetching } =
-        useAllWarehouseQuery({
+        useGetAllSuppliersQuery({
             page,
             limit,
             searchTerm,
@@ -124,8 +128,8 @@ const SuppliersPage = () => {
     // =========================
     // Data
     // =========================
-    const warehouses = data?.data?.data || [];
-console.log(data, "from warehouse page")
+    const suppliers = data?.data?.data || [];
+    console.log(data?.data, "from suppliers page")
     const meta = data?.data?.meta || {};
 
     // =========================
@@ -209,7 +213,7 @@ console.log(data, "from warehouse page")
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 {/* Search */}
                 <Input
-                    placeholder="Search category..."
+                    placeholder="Search Suppliers..."
                     className="md:max-w-sm"
                     value={searchTerm}
                     onChange={(e) => {
@@ -232,7 +236,7 @@ console.log(data, "from warehouse page")
             {/* ================= TABLE ================= */}
             <SuppliersTable
                 columns={columns}
-                data={warehouses}
+                data={suppliers}
                 isLoading={isLoading || isFetching}
                 sortBy={sortBy}
                 sortOrder={sortOrder}
@@ -257,7 +261,7 @@ console.log(data, "from warehouse page")
                         {/* Previous */}
                         <PaginationItem>
                             <PaginationPrevious
-                               
+
                                 onClick={(e) => {
                                     e.preventDefault();
 
@@ -274,7 +278,7 @@ console.log(data, "from warehouse page")
                         }).map((_, index) => (
                             <PaginationItem key={index}>
                                 <PaginationLink
-                                   
+
                                     isActive={page === index + 1}
                                     onClick={(e) => {
                                         e.preventDefault();
@@ -289,7 +293,7 @@ console.log(data, "from warehouse page")
                         {/* Next */}
                         <PaginationItem>
                             <PaginationNext
-                               
+
                                 onClick={(e) => {
                                     e.preventDefault();
 

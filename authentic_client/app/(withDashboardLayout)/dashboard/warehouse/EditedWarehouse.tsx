@@ -8,7 +8,6 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useGetSingleCategoryQuery, useUpdateCategoryMutation } from '@/redux/api/categorieApi';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Image from 'next/image';
 import { toast } from 'sonner';
 import z from 'zod';
 
@@ -108,15 +107,7 @@ const EditWarehouse = ({ setOpen, id }: TProps) => {
                     </Field>
                 </FieldGroup>
             </ATSFrom>
-            <div className="bg-muted relative hidden md:block">
-                <Image
-                    src=""
-                    alt="Image"
-                    width={200}
-                    height={200}
-                    className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-                />
-            </div>
+           
         </div >
 
     );

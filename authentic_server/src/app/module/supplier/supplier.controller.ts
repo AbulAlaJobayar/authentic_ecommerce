@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import catchAsync from '../../shared/catchAsync';
 import sendResponse from '../../shared/sendResponse';
 import { SupplierServices } from './supplier.services';
+import pick from '../../shared/pick';
+import { supplierFiltarableableFields } from './supplier.constant';
 
 const createUserIntoDB = catchAsync(async (req, res) => {
   const result = await SupplierServices.createSupplierIntoDB(req.body);
@@ -13,7 +16,10 @@ const createUserIntoDB = catchAsync(async (req, res) => {
   });
 });
 const getAllSupplierFromDB = catchAsync(async (req, res) => {
-  const result = await SupplierServices.getAllSupplierFromDB();
+  const filters = pick(req.query, supplierFiltarableableFields);
+  const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+
+  const result = await SupplierServices.getAllSupplierFromDB(filters, options);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -22,8 +28,8 @@ const getAllSupplierFromDB = catchAsync(async (req, res) => {
   });
 });
 const getSingleSupplierFromDB = catchAsync(async (req, res) => {
- const {id}=req.params
-  const result = await SupplierServices.getSingleSupplierFromDB(id);
+  const { id } = req.params;
+  const result = await SupplierServices.getSingleSupplierFromDB(id as any);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -34,7 +40,7 @@ const getSingleSupplierFromDB = catchAsync(async (req, res) => {
 
 const updateSupplierFromDB = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await SupplierServices.updateSupplierFromDB(id, req.body);
+  const result = await SupplierServices.updateSupplierFromDB(id as any, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -44,7 +50,7 @@ const updateSupplierFromDB = catchAsync(async (req, res) => {
 });
 const deleteSupplierFromDB = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await SupplierServices.deleteSupplierFromDB(id)
+  const result = await SupplierServices.deleteSupplierFromDB(id as any);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -57,5 +63,5 @@ export const SupplierController = {
   getAllSupplierFromDB,
   getSingleSupplierFromDB,
   updateSupplierFromDB,
-  deleteSupplierFromDB
+  deleteSupplierFromDB,
 };

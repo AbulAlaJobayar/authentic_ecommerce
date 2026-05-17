@@ -1,14 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
-import Image from "next/image";
-
-
-
 import { Button } from "@/components/ui/button";
-
 import { ChevronDown, ChevronUp, Loader2, SquarePen } from "lucide-react";
-
 import { Trash2Icon } from "@animateicons/react/lucide";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import moment from "moment";
@@ -16,6 +9,7 @@ import { useState } from "react";
 import ATSModal from "@/components/shared/Modal/ATSModal";
 import EditSuppliers from "./EditSuppliers";
 import DeleteSuppliers from "./DeleteSuppliers";
+import ActiveSuppliers from "./ActiveSupplier";
 type Props = {
     columns: {
         key: string;
@@ -47,6 +41,8 @@ const SuppliersTable = ({
 
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [deletedId, setDeletedId] = useState("");
+    const [activeId, setActiveId] = useState("");
+    const [isActive, setIsActive] = useState(false);
 
     // Edit
     // =========================
@@ -63,16 +59,11 @@ const SuppliersTable = ({
         setDeletedId(id);
     };
     // =========================
-    // Image Checker
+    // Active
     // =========================
-    const isImageUrl = (val: unknown): boolean => {
-        if (typeof val !== "string") return false;
-
-        return (
-            val.startsWith("http") ||
-            val.startsWith("/") ||
-            /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(val)
-        );
+    const handleActive = (id: any) => {
+        setActiveId(id);
+        setIsActive(true);
     };
 
     // =========================
@@ -95,9 +86,6 @@ const SuppliersTable = ({
                             <TableHead
                                 key={column.key}
                             >
-
-
-
                                 <div className="flex items-center gap-2">
                                     {column.label}
 
@@ -123,43 +111,39 @@ const SuppliersTable = ({
 
                                     return (
                                         <TableCell key={column.key}>
-                                            {/* Image */}
-                                            {isImageUrl(value) ? (
-                                                <Image
-                                                    src={value}
-                                                    alt="table-image"
-                                                    width={40}
-                                                    height={40}
-                                                    className="rounded-md object-cover"
-                                                />
+                                            {column.key === "createdAt" ? (
+                                                <span>{moment(value).format('ll')}</span>
                                             )
-
-                                                : column.key === "createdAt" ? (
-                                                    <span>{moment(value).format('ll')}</span>
+                                                : column.key === "isDeleted" ? (
+                                                    <span className={`px-2 py-1 rounded-full text-sm font-medium ${value ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                                                        {value ? "Deleted" : "Active"}
+                                                    </span>
                                                 )
-                                                    : column.key === "isDeleted" ? (
-                                                        <span className={`px-2 py-1 rounded-full text-sm font-medium ${value ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                                                            {value ? "Deleted" : "Active"}
-                                                        </span>
-                                                    )
 
-                                                        : column.key === "id" ? (
-                                                            <div className="flex items-center gap-3">
-                                                                <Button size="icon" variant="outline"
-                                                                    onClick={() => handleEdit(value)}
-                                                                >
-                                                                    <SquarePen size={18} />
-                                                                </Button>
+                                                    : column.key === "id" ? (
+                                                        <div className="flex items-center gap-3">
+                                                            <Button size="icon" variant="outline" disabled={item.isDeleted === true}
+                                                                onClick={() => handleEdit(value)}
+                                                            >
+                                                                <SquarePen size={18} />
+                                                            </Button>
 
+                                                            {item.isDeleted === false ? (
                                                                 <Button size="icon" variant="destructive"
+                                                                    disabled={item.isDeleted === true}
                                                                     onClick={() => handleDelete(value)}
                                                                 >
                                                                     <Trash2Icon size={18} />
                                                                 </Button>
-                                                            </div>
-                                                        ) : (
-                                                            <span>{String(value ?? "")}</span>
-                                                        )}
+                                                            ) : (
+                                                                <Button size="icon" onClick={() => handleActive(value)} variant="outline" className="px-7 bg-green-100 text-green-800 ">
+                                                                    Active
+                                                                </Button>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <span>{String(value ?? "")}</span>
+                                                    )}
                                         </TableCell>
                                     );
                                 })}
@@ -189,6 +173,13 @@ const SuppliersTable = ({
                 open={isDeleteOpen}
                 setOpen={setIsDeleteOpen}
             />
+            {/* Active Modal */}
+            <ActiveSuppliers
+                id={activeId}
+                open={isActive}
+                setOpen={setIsActive}
+            />
+         
         </div>
     );
 };

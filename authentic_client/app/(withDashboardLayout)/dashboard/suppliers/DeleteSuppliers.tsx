@@ -1,27 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-
-import { useDeleteCategoryMutation } from "@/redux/api/categorieApi";
+import { useDeleteSuppliersMutation } from "@/redux/api/suppliers";
 import { toast } from "sonner";
 
 const DeleteSuppliers = ({ id, open, setOpen }: { id: string; open: boolean; setOpen: (open: boolean) => void }) => {
-  const [deleteCategory] = useDeleteCategoryMutation();
+  const [deleteSuppliers] = useDeleteSuppliersMutation();
   const handleDelete = async () => {
     try {
-      const res = await deleteCategory(id).unwrap()
+      const res = await deleteSuppliers(id).unwrap()
       console.log(res, "delete response")
       if (res && res.success) {
-        toast?.success(res.message || "Category deleted successfully");
+        toast?.success(res.message || "Suppliers deleted successfully");
         setOpen(false);
       }
       else {
-        toast?.error(res.message || "Failed to delete category");
+        toast?.error(res.message || "Failed to delete suppliers");
         setOpen(false);
       }
 
 
     } catch (error: any) {
-      toast.error(error?.message || "An error occurred while deleting the category");
+      toast.error(error?.message || "An error occurred while deleting the suppliers");
       setOpen(false);
     }
   };
@@ -32,9 +31,9 @@ const DeleteSuppliers = ({ id, open, setOpen }: { id: string; open: boolean; set
       {open && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">
           <div className="bg-white p-6 rounded shadow-md w-100">
-            <h2 className="text-lg font-semibold">Delete this category?</h2>
+            <h2 className="text-lg font-semibold">Delete this suppliers?</h2>
             <p className="text-sm text-gray-500 mt-2">
-              This will permanently remove the category and all associated data.
+              This will permanently remove the suppliers and all associated data.
             </p>
 
             <div className="flex justify-end gap-3 mt-5">
