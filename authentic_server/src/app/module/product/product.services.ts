@@ -84,8 +84,8 @@ const getAllProductFromDB = async (
       })),
     });
   }
-  andConditions.push({ isDeleted: false });
-  andConditions.push({ status: Status.ACTIVE });
+  // andConditions.push({ isDeleted: false });
+  // andConditions.push({ status: Status.ACTIVE });
   const whereConditions =
     andConditions.length > 0 ? { AND: andConditions } : {};
   const result = await prisma.product.findMany({

@@ -27,7 +27,7 @@ export const drawerItems = (role: userRole): DrawerItem[] => {
   switch (role) {
     case UserRole.SUPER_ADMIN:
       roleMenu.push(
-      
+
         {
           title: "Warehouse",
           path: "/dashboard/warehouse",
@@ -43,12 +43,18 @@ export const drawerItems = (role: userRole): DrawerItem[] => {
           path: "/dashboard/suppliers",
           icon: UserCog
         },
-          {
+        {
           title: "Products",
-          path: `/dashboard/add-product`,
-          icon: PackagePlus
+          path: `/dashboard/product`,
+          icon: PackagePlus,
+          child: [
+            {
+              title: "Add Product",
+              path: `/dashboard/product/addProduct`
+            }
+          ]
         },
-          {
+        {
           title: "Employees",
           path: `/dashboard/employees`,
           icon: Users

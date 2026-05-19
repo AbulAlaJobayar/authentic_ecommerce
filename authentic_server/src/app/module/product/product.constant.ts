@@ -1,7 +1,4 @@
-export const productSearchableFields: string[] = [
-  'sku',
-  'name',
-];
+export const productSearchableFields: string[] = ['sku', 'name'];
 
 export const productFiltarableableFields: string[] = [
   'searchTerm',
@@ -10,4 +7,5 @@ export const productFiltarableableFields: string[] = [
   'name',
   'status',
   'isDeleted',
+  'categoryId',
 ];

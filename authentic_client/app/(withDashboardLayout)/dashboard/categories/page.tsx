@@ -36,7 +36,7 @@ import {
 
 import { useAllCategoryQuery } from "@/redux/api/categorieApi";
 import Papa from "papaparse";
-export type ProductRow = {
+export type CategoryRow = {
     id: string;
     image: string;
     name: string;
@@ -50,7 +50,7 @@ export type TableColumn<T> = {
     label: string;
 };
 
-const columns: TableColumn<ProductRow>[] = [
+const columns: TableColumn<CategoryRow>[] = [
     { key: "image", label: "Image" },
     { key: "name", label: "Name" },
     { key: "isDeleted", label: "Status" },

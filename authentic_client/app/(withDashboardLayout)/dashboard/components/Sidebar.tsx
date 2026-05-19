@@ -1,6 +1,6 @@
 "use client";
 
-import { Sidebar, SidebarContent, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarRail} from "@/components/ui/sidebar";
 import { userRole } from "@/types";
 import { drawerItems } from "@/utils/drawerItems";
 import Link from "next/link";
@@ -45,7 +45,7 @@ const SidebarPage = () => {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      {/* <SidebarRail /> */}
+      <SidebarRail />
     </Sidebar>
   );
 };

@@ -22,12 +22,12 @@ const categoryApi = baseApi.injectEndpoints({
     }),
     allCategory: build.query({
       query: ({
-        page = 1,
-        limit = 10,
-        searchTerm = "",
-        sortBy = "createdAt",
-        sortOrder = "desc",
-        isDeleted = undefined,
+        page ,
+        limit ,
+        searchTerm ,
+        sortBy ,
+        sortOrder ,
+        isDeleted ,
       }) => ({
         url: "/category",
         method: "GET",
@@ -76,14 +76,7 @@ const categoryApi = baseApi.injectEndpoints({
       invalidatesTags: [tagType.category],
     }),
   }),
-  // approvedAgent: build.mutation({
-  //   query: (data) => ({
-  //     url: "/agent/approved_agent",
-  //     method: "PUT",
-  //     data
-  //   }),
-  //  invalidatesTags:[tagType.agent]
-  // }),
+
 });
 
 export const {
