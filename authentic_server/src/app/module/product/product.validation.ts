@@ -12,11 +12,13 @@ const productSchemaValidation = z.object({
       error: (issue) =>
         issue.input === undefined ? 'Sku is Required' : ' Not a string',
     })
-    .regex(
-      /^[A-Z0-9]+$/,
-      'SKU must contain only uppercase letters, numbers, dashes'
-    )
+     .regex(
+            /^[A-Z0-9-]+$/,
+            "SKU must contain only uppercase letters, numbers, and hyphens"
+        )
     .trim(),
+
+  image: z.string(),
   description: z
     .string({
       error: (issue) =>
@@ -43,10 +45,7 @@ const productBatchSchemaValidation = z.object({
           ? ' batchNumber is Required'
           : ' Not a string',
     })
-    .regex(
-      /^BATCH-\d{4}-\d{2}$/,
-      'batchNumber must follow format: BATCH-YYYY-MM'
-    )
+    .regex(/^LOT\d{6}$/, 'Format: LOT######')
     .trim(),
   expiryDate: z
     .string({

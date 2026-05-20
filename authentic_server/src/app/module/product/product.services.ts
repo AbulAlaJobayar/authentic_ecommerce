@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { imageUploader, MulterFile } from '../../shared/imageUpload';
 import { prisma } from '../../shared/prisma';
@@ -10,15 +11,15 @@ import { Status } from '../../../../generated/prisma';
 
 const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
   try {
-    const image = file
-      ? await imageUploader.uploadImageToS3(file)
-      : 'no image found';
+    // const image = file
+    //   ? await imageUploader.uploadImageToS3(file)
+    //   : 'no image found';
 
     const productData = {
       sku: payload.product.sku,
       name: payload.product.name,
       description: payload.product.description,
-      image: [image || 'no image found'],
+      image: [payload.product.image || 'no image found'],
       sellingPrice: payload.productBatch.sellingPrice,
       categoryId: payload.product.categoryId,
     };
@@ -37,7 +38,7 @@ const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
       const productBatchData = {
         inventoryId: createInventory.id,
         batchNumber: payload.productBatch.batchNumber,
-        expiryDate: payload.productBatch.expiryDate,
+        expiryDate: new Date(payload.productBatch.expiryDate).toISOString(),
         quantity: payload.productBatch.quantity,
         buyingPrice: payload.productBatch.buyingPrice,
         costPrice: payload.productBatch.costPrice,
@@ -50,6 +51,7 @@ const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
       await tx.productBatch.create({ data: productBatchData });
       return createProduct;
     });
+    console.log(result, 'my result');
     return result;
   } catch (err) {
     console.log(err);
@@ -103,11 +105,20 @@ const getAllProductFromDB = async (
       name: true,
       image: true,
       sellingPrice: true,
+      sku: true,
+      category: {
+        select: {
+          name: true,
+        },
+      },
+      isDeleted: true,
+      status: true,
     },
   });
   const total = await prisma.product.count({
     where: whereConditions,
   });
+
   return {
     meta: {
       total,

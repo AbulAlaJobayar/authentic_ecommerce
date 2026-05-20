@@ -2,6 +2,7 @@
 "use client";
 
 import ATSFrom from "@/components/shared/Form/ATSForm";
+import ATSImageInput from "@/components/shared/Form/ATSImageInput";
 import ATSInput from "@/components/shared/Form/ATSInput";
 import ATSSelect from "@/components/shared/Form/ATSSelect";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import {
     FieldLabel,
 } from "@/components/ui/field";
 import { useAllCategoryQuery } from "@/redux/api/categorieApi";
+import { useCreateProductsMutation } from "@/redux/api/productApi";
 import { useGetAllSuppliersQuery } from "@/redux/api/suppliers";
 import { useAllWarehouseQuery } from "@/redux/api/warehouse";
 
@@ -29,8 +31,8 @@ const productSchemaValidation = z.object({
         .string()
         .trim()
         .regex(
-            /^[A-Z0-9]+$/,
-            "SKU must contain only uppercase letters and numbers"
+            /^[A-Z0-9-]+$/,
+            "SKU must contain only uppercase letters, numbers, and hyphens"
         ),
 
     description: z
@@ -42,6 +44,8 @@ const productSchemaValidation = z.object({
         .string()
         .trim()
         .min(1, "Category is Required"),
+
+       image: z.any(),
 });
 
 const inventorySchemaValidation = z.object({
@@ -55,8 +59,8 @@ const productBatchSchemaValidation = z.object({
         .string()
         .trim()
         .regex(
-            /^BATCH-\d{4}-\d{2}$/,
-            "Format: BATCH-YYYY-MM"
+            /^LOT\d{6}$/,
+            "Format: LOT######"
         ),
 
     expiryDate: z.string(),
@@ -109,6 +113,7 @@ const defaultValues: TFormValues = {
         sku: "",
         description: "",
         categoryId: "",
+        image:""
     },
 
     inventory: {
@@ -160,333 +165,336 @@ const AddProduct = () => {
     const { data: categoriesData } =
         useAllCategoryQuery({});
     const { data: warehousesData } = useAllWarehouseQuery({});
-const { data: suppliersData } = useGetAllSuppliersQuery({});
-    const handleSubmit = (data: TFormValues) => {
+    const { data: suppliersData } = useGetAllSuppliersQuery({});
+    const [createProduct] = useCreateProductsMutation()
+
+    // ================= submit form===============
+    const handleSubmit = async (data: TFormValues) => {
         console.log(data);
+        try {
+            const res = await createProduct(data)
+            console.log(res, "res")
+        } catch (error) {
+            console.log(error)
+        }
+
     };
 
     return (
         <div className="min-h-screen bg-gray-50 ">
-        
-                <div className="">
-                    <ATSFrom
-                        resolver={zodResolver(FormSchema)}
-                        onSubmit={handleSubmit}
-                        defaultValues={defaultValues}
-                        className="p-5 md:p-8 lg:p-10"
-                    >
-                        <FieldGroup className="space-y-10">
 
-                            {/* ===================================================== */}
-                            {/* PRODUCT INFORMATION */}
-                            {/* ===================================================== */}
+            <div className="">
+                <ATSFrom
+                    resolver={zodResolver(FormSchema)}
+                    onSubmit={handleSubmit}
+                    defaultValues={defaultValues}
+                    className="p-5 md:p-8 lg:p-10"
+                >
+                    <FieldGroup className="space-y-10">
 
-                            <section className="space-y-6">
-                                <SectionTitle
-                                    title="Product Information"
-                                    subtitle="Basic information about the product"
-                                />
+                        {/* ===================================================== */}
+                        {/* PRODUCT INFORMATION */}
+                        {/* ===================================================== */}
 
-                                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+                        <section className="space-y-6">
+                            <SectionTitle
+                                title="Product Information"
+                                subtitle="Basic information about the product"
+                            />
 
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="name">
-                                            Product Name
-                                        </FieldLabel>
+                            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
 
-                                        <ATSInput
-                                            name="product.name"
-                                            id="name"
-                                            type="text"
-                                            placeholder="Enter product name"
-                                            required
-                                        />
-                                    </Field>
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="name">
+                                        Product Name
+                                    </FieldLabel>
 
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="sku">
-                                            SKU
-                                        </FieldLabel>
+                                    <ATSInput
+                                        name="product.name"
+                                        id="name"
+                                        type="text"
+                                        placeholder="Examination Gloves"
+                                        required
+                                    />
+                                </Field>
 
-                                        <ATSInput
-                                            name="product.sku"
-                                            id="sku"
-                                            type="text"
-                                            placeholder="ABC123"
-                                            required
-                                        />
-                                    </Field>
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="sku">
+                                        SKU
+                                    </FieldLabel>
 
-                                    <Field className="space-y-2 xl:col-span-2">
-                                        <FieldLabel htmlFor="description">
-                                            Description
-                                        </FieldLabel>
+                                    <ATSInput
+                                        name="product.sku"
+                                        id="sku"
+                                        type="text"
+                                        placeholder="SAT-LAT-PWD-M-100"
+                                        required
+                                    />
+                                </Field>
 
-                                        <ATSInput
-                                            name="product.description"
-                                            id="description"
-                                            type="text"
-                                            placeholder="Short product description"
-                                            required
-                                        />
-                                    </Field>
+                                <Field className="space-y-2 xl:col-span-2">
+                                    <FieldLabel htmlFor="description">
+                                        Description
+                                    </FieldLabel>
 
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="categoryId">
-                                            Category ID
-                                        </FieldLabel>
+                                    <ATSInput
+                                        name="product.description"
+                                        id="description"
+                                        type="text"
+                                        placeholder="Short product description"
+                                        required
+                                    />
+                                </Field>
+                                <Field className="space-y-2 xl:col-span-2">
+                                    <FieldLabel htmlFor="image">
+                                        Image
+                                    </FieldLabel>
 
-                                        {/* CATEGORY */}
+                                    <ATSImageInput
+                                        name="product.image"
+                                        id="image"
+                                        required
+                                    />
+                                </Field>
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="categoryId">
+                                        Category ID
+                                    </FieldLabel>
+
+                                    {/* CATEGORY */}
 
 
-                                        <ATSSelect
-                                            name="product.categoryId"
-                                            label="Category"
-                                            placeholder="Select category"
-                                            options={categoriesData?.data?.data.map((cat: any) => ({
-                                                label: cat.name,
-                                                value: cat.id,
-                                            })) || []}
-                                            required
-                                        />
+                                    <ATSSelect
+                                        name="product.categoryId"
+                                        label="Category"
+                                        placeholder="Select category"
+                                        options={categoriesData?.data?.data.map((cat: any) => ({
+                                            label: cat.name,
+                                            value: cat.id,
+                                        })) || []}
+                                        required
+                                    />
 
 
-                                    </Field>
-                                </div>
-                            </section>
-
-                            {/* ===================================================== */}
-                            {/* INVENTORY */}
-                            {/* ===================================================== */}
-
-                            <section className="space-y-6">
-                                <SectionTitle
-                                    title="Inventory Settings"
-                                    subtitle="Inventory alert configuration"
-                                />
-
-                                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="alertQuantity">
-                                            Alert Quantity
-                                        </FieldLabel>
-
-                                        <ATSInput
-                                            name="inventory.alertQuantity"
-                                            id="alertQuantity"
-                                            type="number"
-                                            placeholder="10"
-                                            required
-                                        />
-                                    </Field>
-                                </div>
-                            </section>
-
-                            {/* ===================================================== */}
-                            {/* PRODUCT BATCH */}
-                            {/* ===================================================== */}
-
-                            <section className="space-y-6">
-                                <SectionTitle
-                                    title="Batch & Pricing"
-                                    subtitle="Batch tracking, stock quantity and pricing"
-                                />
-
-                                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="batchNumber">
-                                            Batch Number
-                                        </FieldLabel>
-
-                                        <ATSInput
-                                            name="productBatch.batchNumber"
-                                            id="batchNumber"
-                                            type="text"
-                                            placeholder="BATCH-2026-05"
-                                            required
-                                        />
-                                    </Field>
-
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="expiryDate">
-                                            Expiry Date
-                                        </FieldLabel>
-
-                                        <ATSInput
-                                            name="productBatch.expiryDate"
-                                            id="expiryDate"
-                                            type="date"
-                                            required
-                                        />
-                                    </Field>
-
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="quantity">
-                                            Quantity
-                                        </FieldLabel>
-
-                                        <ATSInput
-                                            name="productBatch.quantity"
-                                            id="quantity"
-                                            type="number"
-                                            placeholder="0"
-                                            required
-                                        />
-                                    </Field>
-
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="buyingPrice">
-                                            Buying Price
-                                        </FieldLabel>
-
-                                        <ATSInput
-                                            name="productBatch.buyingPrice"
-                                            id="buyingPrice"
-                                            type="number"
-                                            placeholder="0.00"
-                                            required
-                                        />
-                                    </Field>
-
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="costPrice">
-                                            Cost Price
-                                        </FieldLabel>
-
-                                        <ATSInput
-                                            name="productBatch.costPrice"
-                                            id="costPrice"
-                                            type="number"
-                                            placeholder="0.00"
-                                            required
-                                        />
-                                    </Field>
-
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="sellingPrice">
-                                            Selling Price
-                                        </FieldLabel>
-
-                                        <ATSInput
-                                            name="productBatch.sellingPrice"
-                                            id="sellingPrice"
-                                            type="number"
-                                            placeholder="0.00"
-                                            required
-                                        />
-                                    </Field>
-                                </div>
-                            </section>
-
-                            {/* ===================================================== */}
-                            {/* STORAGE INFORMATION */}
-                            {/* ===================================================== */}
-
-                            <section className="space-y-6">
-                                <SectionTitle
-                                    title="Storage & Supplier"
-                                    subtitle="Warehouse, rack and supplier information"
-                                />
-
-                                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="shelfCode">
-                                            Shelf Code
-                                        </FieldLabel>
-
-                                        <ATSInput
-                                            name="productBatch.shelfCode"
-                                            id="shelfCode"
-                                            type="text"
-                                            placeholder="S-01A"
-                                            required
-                                        />
-                                    </Field>
-
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="rackCode">
-                                            Rack Code
-                                        </FieldLabel>
-
-                                        <ATSInput
-                                            name="productBatch.rackCode"
-                                            id="rackCode"
-                                            type="text"
-                                            placeholder="R-01"
-                                            required
-                                        />
-                                    </Field>
-
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="supplierId">
-                                            Supplier
-                                        </FieldLabel>
-                                        <ATSSelect
-                                            name="product.supplierId"
-                                            label="Supplier"
-                                            placeholder="Select supplier"
-                                            options={suppliersData?.data?.data.map((cat: any) => ({
-                                                label: cat.name,
-                                                value: cat.id,
-                                            })) || []}
-                                            required
-                                        />
-
-                                        {/* <ATSInput
-                                            name="productBatch.supplierId"
-                                            id="supplierId"
-                                            type="text"
-                                            placeholder="SUP-001"
-                                            required
-                                        /> */}
-                                    </Field>
-
-                                    <Field className="space-y-2">
-                                        <FieldLabel htmlFor="warehouseId">
-                                            Warehouse
-                                        </FieldLabel>
-
-                                           <ATSSelect
-                                            name="product.warehouseId"
-                                            label="Warehouse"
-                                            placeholder="Select warehouse"
-                                            options={warehousesData?.data?.data.map((cat: any) => ({
-                                                label: cat.name,
-                                                value: cat.id,
-                                            })) || []}
-                                            required
-                                        />
-                                    </Field>
-                                </div>
-                            </section>
-
-                            {/* ===================================================== */}
-                            {/* ACTION BUTTONS */}
-                            {/* ===================================================== */}
-
-                            <div className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
-
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="h-11 px-6"
-                                >
-                                    Cancel
-                                </Button>
-
-                                <Button
-                                    type="submit"
-                                    className="h-11 px-8 bg-black hover:bg-black/90"
-                                >
-                                    Create Product
-                                </Button>
+                                </Field>
                             </div>
+                        </section>
 
-                        </FieldGroup>
-                    </ATSFrom>
+                        {/* ===================================================== */}
+                        {/* INVENTORY */}
+                        {/* ===================================================== */}
+
+                        <section className="space-y-6">
+                            <SectionTitle
+                                title="Inventory Settings"
+                                subtitle="Inventory alert configuration"
+                            />
+
+                            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="alertQuantity">
+                                        Alert Quantity
+                                    </FieldLabel>
+
+                                    <ATSInput
+                                        name="inventory.alertQuantity"
+                                        id="alertQuantity"
+                                        type="number"
+                                        placeholder="10"
+                                        required
+                                    />
+                                </Field>
+                            </div>
+                        </section>
+
+                        {/* ===================================================== */}
+                        {/* PRODUCT BATCH */}
+                        {/* ===================================================== */}
+
+                        <section className="space-y-6">
+                            <SectionTitle
+                                title="Batch & Pricing"
+                                subtitle="Batch tracking, stock quantity and pricing"
+                            />
+
+                            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="batchNumber">
+                                        Batch Number
+                                    </FieldLabel>
+
+                                    <ATSInput
+                                        name="productBatch.batchNumber"
+                                        id="batchNumber"
+                                        type="text"
+                                        placeholder="LOT240518A"
+                                        required
+                                    />
+                                </Field>
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="expiryDate">
+                                        Expiry Date
+                                    </FieldLabel>
+
+                                    <ATSInput
+                                        name="productBatch.expiryDate"
+                                        id="expiryDate"
+                                        type="date"
+                                        required
+                                    />
+                                </Field>
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="quantity">
+                                        Quantity
+                                    </FieldLabel>
+
+                                    <ATSInput
+                                        name="productBatch.quantity"
+                                        id="quantity"
+                                        type="number"
+                                        placeholder="0"
+                                        required
+                                    />
+                                </Field>
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="buyingPrice">
+                                        Buying Price
+                                    </FieldLabel>
+
+                                    <ATSInput
+                                        name="productBatch.buyingPrice"
+                                        id="buyingPrice"
+                                        type="number"
+                                        placeholder="0.00"
+                                        required
+                                    />
+                                </Field>
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="costPrice">
+                                        Cost Price
+                                    </FieldLabel>
+
+                                    <ATSInput
+                                        name="productBatch.costPrice"
+                                        id="costPrice"
+                                        type="number"
+                                        placeholder="0.00"
+                                        required
+                                    />
+                                </Field>
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="sellingPrice">
+                                        Selling Price
+                                    </FieldLabel>
+
+                                    <ATSInput
+                                        name="productBatch.sellingPrice"
+                                        id="sellingPrice"
+                                        type="number"
+                                        placeholder="0.00"
+                                        required
+                                    />
+                                </Field>
+                            </div>
+                        </section>
+
+                        {/* ===================================================== */}
+                        {/* STORAGE INFORMATION */}
+                        {/* ===================================================== */}
+
+                        <section className="space-y-6">
+                            <SectionTitle
+                                title="Storage & Supplier"
+                                subtitle="Warehouse, rack and supplier information"
+                            />
+
+                            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="shelfCode">
+                                        Shelf Code
+                                    </FieldLabel>
+
+                                    <ATSInput
+                                        name="productBatch.shelfCode"
+                                        id="shelfCode"
+                                        type="text"
+                                        placeholder="S-01A"
+                                        required
+                                    />
+                                </Field>
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="rackCode">
+                                        Rack Code
+                                    </FieldLabel>
+
+                                    <ATSInput
+                                        name="productBatch.rackCode"
+                                        id="rackCode"
+                                        type="text"
+                                        placeholder="R-01"
+                                        required
+                                    />
+                                </Field>
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="supplierId">
+                                        Supplier
+                                    </FieldLabel>
+                                    <ATSSelect
+                                        name="productBatch.supplierId"
+                                        label="Supplier"
+                                        placeholder="Select supplier"
+                                        options={suppliersData?.data?.data.map((cat: any) => ({
+                                            label: cat.name,
+                                            value: cat.id,
+                                        })) || []}
+                                        required
+                                    />
+                                </Field>
+
+                                <Field className="space-y-2">
+                                    <FieldLabel htmlFor="warehouseId">
+                                        Warehouse
+                                    </FieldLabel>
+
+                                    <ATSSelect
+                                        name="productBatch.warehouseId"
+                                        label="Warehouse"
+                                        placeholder="Select warehouse"
+                                        options={warehousesData?.data?.data.map((cat: any) => ({
+                                            label: cat.name,
+                                            value: cat.id,
+                                        })) || []}
+                                        required
+                                    />
+                                </Field>
+                            </div>
+                        </section>
+
+                        {/* ===================================================== */}
+                        {/* ACTION BUTTONS */}
+                        {/* ===================================================== */}
+
+                        <div>
+                            <Button
+                                type="submit"
+                            >
+                                Create Product
+                            </Button>
+                        </div>
+
+                    </FieldGroup>
+                </ATSFrom>
             </div>
         </div>
     );

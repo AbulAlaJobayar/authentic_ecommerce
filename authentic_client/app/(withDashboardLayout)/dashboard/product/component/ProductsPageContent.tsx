@@ -442,7 +442,7 @@ const columns: TableColumn<ProductRow>[] = [
   { key: "name", label: "Name" },
   { key: "sku", label: "SKU" },
   { key: "sellingPrice", label: "Price" },
-  { key: "category", label: "Category" },
+  { key: "category.name", label: "Category" },
   { key: "status", label: "Status" },
   { key: "createdAt", label: "Created" },
   { key: "id", label: "Action" },
@@ -504,6 +504,7 @@ const ProductsPageContent = () => {
 
   const products = data?.data || [];
 
+  console.log(data,"products")
   const meta = data?.meta || {};
 
   // ======================

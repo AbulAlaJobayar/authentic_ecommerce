@@ -37,7 +37,7 @@ const getProductFromDB = catchAsync(async (req: Request, res: Response) => {
 const getSingleProductFromDB = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const result = await ProductServices.getSingleProductFromDB(id);
+    const result = await ProductServices.getSingleProductFromDB(id as string);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
