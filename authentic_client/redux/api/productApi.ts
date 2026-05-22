@@ -58,10 +58,11 @@ const productsApi = baseApi.injectEndpoints({
         id: string;
         data: {
           name?: string;
-          email?: string;
-          phone?: string;
-          address?: string;
-          isDeleted?: boolean;
+          sku?: string;
+          description?: string;
+          image?: any;
+          status?: string;
+          sellingPrice?:number;
         };
       }) => ({
         url: `/product/${id}`,

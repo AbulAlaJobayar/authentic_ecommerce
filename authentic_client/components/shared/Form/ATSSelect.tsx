@@ -14,10 +14,6 @@ import {
 } from "motion/react";
 
 import {
-    ChevronDown,
-} from "lucide-react";
-
-import {
     Select,
     SelectContent,
     SelectItem,
@@ -54,12 +50,10 @@ type ATSSelectProps = {
 const ATSSelect = ({
     name,
     label,
-    required,
     className,
     defaultValue,
     placeholder = "Select option",
     id,
-    icon,
     disabled,
     options,
 }: ATSSelectProps) => {

@@ -130,7 +130,7 @@ const getAllProductFromDB = async (
 };
 const getSingleProductFromDB = async (id: string) => {
   const result = await prisma.product.findUnique({
-    where: { id, isDeleted: false, status: Status.ACTIVE },
+    where: {id},
     select: {
       id: true,
       name: true,
@@ -140,6 +140,7 @@ const getSingleProductFromDB = async (id: string) => {
       sellingPrice: true,
       category: true,
       reviews: true,
+      status:true
     },
   });
   return result;
