@@ -15,23 +15,152 @@ const getAllInventoryFromDB = async (
   filters: TInventoryFilterRequest,
   option: TPaginationOption,
 ) => {
+  //   const { searchTerm, ...filterData } = filters;
+  //   const { page, limit, skip, sortBy, sortOrder } =
+  //     paginationHelpers.calculatePagination(option);
+
+  //   const andConditions: any[] = [];
+
+  //   // Search logic
+  //   if (searchTerm) {
+  //     andConditions.push({
+  //       OR: [
+  //         // Example: search inventory `id`
+  //         { id: { contains: searchTerm, mode: 'insensitive' } },
+  //         // Search inside product fields
+  //         {
+  //           product: {
+  //             OR: productSearchableFields.map((field) => ({
+  //               [field]: { contains: searchTerm, mode: 'insensitive' },
+  //             })),
+  //           },
+  //         },
+  //       ],
+  //     });
+  //   }
+
+  //   // Filters logic
+  //   const inventoryFilters: any = {};
+  //   const productFilters: any = {};
+
+  //   Object.keys(filterData).forEach((key) => {
+  //     const value = filterData[key as keyof typeof filterData];
+  //     if (value === undefined || value === null || value === '') return; // skip invalid filters
+
+  //     if (['name', 'category', 'status', 'sku'].includes(key)) {
+  //       productFilters[key] = value;
+  //     } else if (key === 'isDeletedInventory') {
+  //       inventoryFilters['isDeleted'] = value;
+  //     } else if (key === 'isDeletedProduct') {
+  //       productFilters['isDeleted'] = value;
+  //     } else {
+  //       inventoryFilters[key] = value;
+  //     }
+  //   });
+
+  //   if (Object.keys(inventoryFilters).length > 0) {
+  //     andConditions.push({
+  //       AND: Object.entries(inventoryFilters).map(([key, value]) => ({
+  //         [key]: { equals: value },
+  //       })),
+  //     });
+  //   }
+
+  //   if (Object.keys(productFilters).length > 0) {
+  //     andConditions.push({
+  //       AND: Object.entries(productFilters).map(([key, value]) => ({
+  //         product: { [key]: { equals: value } },
+  //       })),
+  //     });
+  //   }
+  //   andConditions.push({ isDeleted: false });
+  //   const whereConditions =
+  //     andConditions.length > 0 ? { AND: andConditions } : {};
+
+  //   const result = await prisma.inventory.findMany({
+  //     where: whereConditions,
+  //     skip,
+  //     take: limit,
+  //     orderBy:
+  //       sortBy && sortOrder
+  //         ? sortBy.startsWith('product.')
+  //           ? { product: { [sortBy.replace('product.', '')]: sortOrder } }
+  //           : { [sortBy]: sortOrder }
+  //         : { createdAt: 'desc' },
+  //     select: {
+  //       id: true,
+  //       quantity: true,
+  //       alertQuantity: true,
+  //       isDeleted: true,
+  //       createdAt: true,
+  //       updatedAt: true,
+  //       product: {
+  //         select: {
+  //           id: true,
+  //           sku: true,
+  //           name: true,
+  //           description: true,
+  //           image: true,
+  //           status: true,
+  //           sellingPrice: true,
+  //           category: true,
+  //           isDeleted: true,
+  //           createdAt: true,
+  //           updatedAt: true,
+  //         },
+  //       },
+
+  //       productBatch: {
+  //         select: {
+  //           id: true,
+  //           batchNumber: true,
+  //           expiryDate: true,
+  //           quantity: true,
+  //           isDeleted: true,
+  //           buyingPrice: true,
+  //           costPrice: true,
+  //           sellingPrice: true,
+  //           shelfCode: true,
+  //           rackCode: true,
+  //           supplier: true,
+  //           warehouse: true,
+  //           createdAt: true,
+  //           updatedAt: true,
+  //         },
+  //       },
+  //     },
+  //   });
+
+  //   const total = await prisma.inventory.count({ where: whereConditions });
+  // const lowStock=await prisma.inventory.count({})
+  //   return {
+  //     meta: { total, page, limit },
+  //     data: result,
+  //   };
   const { searchTerm, ...filterData } = filters;
+
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(option);
 
   const andConditions: any[] = [];
 
-  // Search logic
+  // Search
   if (searchTerm) {
     andConditions.push({
       OR: [
-        // Example: search inventory `id`
-        { id: { contains: searchTerm, mode: 'insensitive' } },
-        // Search inside product fields
+        {
+          id: {
+            contains: searchTerm,
+            mode: 'insensitive',
+          },
+        },
         {
           product: {
             OR: productSearchableFields.map((field) => ({
-              [field]: { contains: searchTerm, mode: 'insensitive' },
+              [field]: {
+                contains: searchTerm,
+                mode: 'insensitive',
+              },
             })),
           },
         },
@@ -39,13 +168,14 @@ const getAllInventoryFromDB = async (
     });
   }
 
-  // Filters logic
+  // Filters
   const inventoryFilters: any = {};
   const productFilters: any = {};
 
   Object.keys(filterData).forEach((key) => {
     const value = filterData[key as keyof typeof filterData];
-    if (value === undefined || value === null || value === '') return; // skip invalid filters
+
+    if (value === undefined || value === null || value === '') return;
 
     if (['name', 'category', 'status', 'sku'].includes(key)) {
       productFilters[key] = value;
@@ -69,13 +199,25 @@ const getAllInventoryFromDB = async (
   if (Object.keys(productFilters).length > 0) {
     andConditions.push({
       AND: Object.entries(productFilters).map(([key, value]) => ({
-        product: { [key]: { equals: value } },
+        product: {
+          [key]: {
+            equals: value,
+          },
+        },
       })),
     });
   }
-  andConditions.push({ isDeleted: false });
+
+  andConditions.push({
+    isDeleted: false,
+  });
+
   const whereConditions =
     andConditions.length > 0 ? { AND: andConditions } : {};
+
+  // =========================
+  // Inventory List
+  // =========================
 
   const result = await prisma.inventory.findMany({
     where: whereConditions,
@@ -84,9 +226,18 @@ const getAllInventoryFromDB = async (
     orderBy:
       sortBy && sortOrder
         ? sortBy.startsWith('product.')
-          ? { product: { [sortBy.replace('product.', '')]: sortOrder } }
-          : { [sortBy]: sortOrder }
-        : { createdAt: 'desc' },
+          ? {
+              product: {
+                [sortBy.replace('product.', '')]: sortOrder,
+              },
+            }
+          : {
+              [sortBy]: sortOrder,
+            }
+        : {
+            createdAt: 'desc',
+          },
+
     select: {
       id: true,
       quantity: true,
@@ -94,6 +245,7 @@ const getAllInventoryFromDB = async (
       isDeleted: true,
       createdAt: true,
       updatedAt: true,
+
       product: {
         select: {
           id: true,
@@ -116,7 +268,6 @@ const getAllInventoryFromDB = async (
           batchNumber: true,
           expiryDate: true,
           quantity: true,
-          isDeleted: true,
           buyingPrice: true,
           costPrice: true,
           sellingPrice: true,
@@ -124,17 +275,98 @@ const getAllInventoryFromDB = async (
           rackCode: true,
           supplier: true,
           warehouse: true,
-          createdAt: true,
-          updatedAt: true,
         },
       },
     },
   });
 
-  const total = await prisma.inventory.count({ where: whereConditions });
+  // =========================
+  // Dashboard Statistics
+  // =========================
+
+  // Total SKUs
+  const totalSKUs = await prisma.inventory.count({
+    where: {
+      isDeleted: false,
+    },
+  });
+
+  // Active Products
+  const activeProducts = await prisma.inventory.count({
+    where: {
+      isDeleted: false,
+      product: {
+        status: 'ACTIVE',
+      },
+    },
+  });
+
+  // Low Stock
+  const lowStock = await prisma.inventory.count({
+    where: {
+      isDeleted: false,
+      quantity: {
+        lte: prisma.inventory.fields.alertQuantity,
+        gt: 0,
+      },
+    },
+  });
+
+  // Out Of Stock
+  const outOfStock = await prisma.inventory.count({
+    where: {
+      isDeleted: false,
+      OR: [
+        {
+          quantity: 0,
+        },
+        {
+          quantity: null,
+        },
+      ],
+    },
+  });
+
+  // Inventory Value
+  const inventories = await prisma.inventory.findMany({
+    where: {
+      isDeleted: false,
+    },
+    select: {
+      quantity: true,
+      product: {
+        select: {
+          sellingPrice: true,
+        },
+      },
+    },
+  });
+
+  const inventoryValue = inventories.reduce((total, item) => {
+    return total + (item.quantity || 0) * item.product.sellingPrice;
+  }, 0);
+
+  // =========================
+
+  const total = await prisma.inventory.count({
+    where: whereConditions,
+  });
 
   return {
-    meta: { total, page, limit },
+    meta: {
+      total,
+      page,
+      limit,
+    },
+
+    statistics: {
+      totalSKUs,
+      activeProducts,
+      lowStock,
+      outOfStock,
+      inventoryValue,
+    },
+
     data: result,
   };
 };

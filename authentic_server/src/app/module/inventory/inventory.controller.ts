@@ -13,56 +13,55 @@ const getAllInventoryFromDB = catchAsync(
 
     const result = await InventoryServices.getAllInventoryFromDB(
       filters,
-      options
+      options,
     );
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Inventory Retrieved successfully!',
-      meta: result.meta,
-      data: result.data,
-    });
-  }
-);
-const getSingleInventoryFromDB = catchAsync(
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const result = await InventoryServices.getSingleInventoryFromDB(id);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: 'Inventory Retrieved successfully!',
       data: result,
     });
-  }
+  },
+);
+const getSingleInventoryFromDB = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await InventoryServices.getSingleInventoryFromDB(id as string);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Inventory Retrieved successfully!',
+      data: result,
+    });
+  },
 );
 const updateInventoryFromDB = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const result = await InventoryServices.updateInventoryFromDB(id, req.body);
+    const result = await InventoryServices.updateInventoryFromDB(id as string, req.body);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: 'Inventory updated successfully!',
       data: result,
     });
-  }
+  },
 );
 const deleteInventoryFromDB = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const result = await InventoryServices.deleteInventoryFromDB(id)
+    const result = await InventoryServices.deleteInventoryFromDB(id as string);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: 'Inventory deleted successfully!',
       data: result,
     });
-  }
+  },
 );
 export const InventoryController = {
   getAllInventoryFromDB,
   getSingleInventoryFromDB,
   updateInventoryFromDB,
-  deleteInventoryFromDB
+  deleteInventoryFromDB,
 };
