@@ -1,11 +1,11 @@
-
 export enum tagType {
   auth = "auth",
   category = "category",
   Warehouse = "warehouse",
   suppliers = "suppliers",
   Product = "product",
-  Inventory="inventory"
+  Inventory = "inventory",
+  batch = "batch",
 }
 export const tagTypeList = [
   tagType.auth,
@@ -13,5 +13,6 @@ export const tagTypeList = [
   tagType.Warehouse,
   tagType.suppliers,
   tagType.Product,
-  tagType.Inventory
+  tagType.Inventory,
+  tagType.batch,
 ];

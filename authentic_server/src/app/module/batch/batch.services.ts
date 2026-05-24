@@ -1,74 +1,162 @@
-import httpStatus from 'http-status';
-import { AppError } from '../../error/AppError';
-import { TCreateProductBatch } from './batch.interface';
-// import { errorLogger } from '../../config/logger';
-import moment from 'moment';
-import { prisma } from '../../shared/prisma';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-const createProductBatchIntoDB = async (payload: TCreateProductBatch) => {
-  payload.expiryDate = moment(payload.expiryDate, 'YYYY-MM-DD')
-    .toDate()
-    .toISOString();
+import moment from "moment";
+import { TCreateProductBatch } from "./batch.interface";
+import { AppError } from "../../error/AppError";
+import httpStatus from "http-status"
+import { prisma } from "../../shared/prisma";
+
+
+
+
+// ------------------------------
+// Inventory Recalculate Helper
+// ------------------------------
+const recalculateInventoryQuantity = async (
+  tx: any,
+  inventoryId: string
+) => {
+  const result = await tx.productBatch.aggregate({
+    where: {
+      inventoryId,
+      isDeleted: false,
+    },
+    _sum: {
+      quantity: true,
+    },
+  });
+
+  await tx.inventory.update({
+    where: { id: inventoryId },
+    data: {
+      quantity: result._sum.quantity || 0,
+    },
+  });
+};
+
+// ------------------------------
+// MAIN SERVICE
+// ------------------------------
+export const createProductBatchIntoDB = async (
+  payload: TCreateProductBatch
+) => {
   try {
-    const result = await prisma.$transaction(async (tx) => {
-      const isInventoryExist = await tx.inventory.findUnique({
-        where: {
-          id: payload.inventoryId,
-        },
+    const formattedExpiryDate = moment(
+      payload.expiryDate,
+      "YYYY-MM-DD",
+      true
+    );
+
+    //  validate date format
+    if (!formattedExpiryDate.isValid()) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Invalid expiry date format (YYYY-MM-DD required)"
+      );
+    }
+
+    // optional business rule: expiry must be future
+    if (formattedExpiryDate.isBefore(moment())) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Expiry date must be in the future"
+      );
+    }
+
+    return await prisma.$transaction(async (tx) => {
+      // ------------------------
+      // 1. Check Inventory
+      // ------------------------
+      const inventory = await tx.inventory.findUnique({
+        where: { id: payload.inventoryId },
       });
-      if (!isInventoryExist) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Inventory Not Found');
+
+      if (!inventory || inventory.isDeleted) {
+        throw new AppError(
+          httpStatus.NOT_FOUND,
+          "Inventory not found or deleted"
+        );
       }
-      if (isInventoryExist.isDeleted) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Inventory is Deleted');
-      }
-      const isSupplierExist = await tx.supplier.findUnique({
+
+      // ------------------------
+      // 2. Check Supplier
+      // ------------------------
+      const supplier = await tx.supplier.findUnique({
         where: { id: payload.supplierId },
       });
-      if (!isSupplierExist) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Supplier Not Found');
+
+      if (!supplier || supplier.isDeleted) {
+        throw new AppError(
+          httpStatus.NOT_FOUND,
+          "Supplier not found or deleted"
+        );
       }
-      if (isSupplierExist.isDeleted) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Inventory is Deleted');
-      }
-      const isWarehouseExist = await tx.warehouse.findUnique({
+
+      // ------------------------
+      // 3. Check Warehouse
+      // ------------------------
+      const warehouse = await tx.warehouse.findUnique({
         where: { id: payload.warehouseId },
       });
-      if (!isWarehouseExist) {
-        throw new AppError(httpStatus.NOT_FOUND, 'warehouse Not Found');
+
+      if (!warehouse || warehouse.isDeleted) {
+        throw new AppError(
+          httpStatus.NOT_FOUND,
+          "Warehouse not found or deleted"
+        );
       }
-      if (isWarehouseExist.isDeleted) {
-        throw new AppError(httpStatus.NOT_FOUND, 'warehouse is Deleted');
-      }
-      //   create new Product Batch
+
+      // ------------------------
+      // 4. Create Batch
+      // ------------------------
       const batch = await tx.productBatch.create({
-        data: payload,
-      });
-      const inventory = await tx.inventory.update({
-        where: { id: batch.inventoryId },
         data: {
-          quantity: {
-            increment: batch.quantity,
-          },
+          inventoryId: payload.inventoryId,
+          batchNumber: payload.batchNumber,
+          expiryDate: formattedExpiryDate.toDate(),
+          quantity: payload.quantity,
+          buyingPrice: payload.buyingPrice,
+          costPrice: payload.costPrice,
+          sellingPrice: payload.sellingPrice,
+          shelfCode: payload.shelfCode,
+          rackCode: payload.rackCode,
+          supplierId: payload.supplierId,
+          warehouseId: payload.warehouseId,
+          remainingQuantity: payload.quantity,
         },
       });
 
-      //update product price if the new batch price is higher than the existing price
+      // ------------------------
+      // 5. Recalculate Inventory (SAFE WAY)
+      // ------------------------
+      await recalculateInventoryQuantity(tx, batch.inventoryId);
+
+      // ------------------------
+      // 6. Update Product Price (SAFE RULE)
+      // ------------------------
       const product = await tx.product.findUnique({
         where: { id: inventory.productId },
       });
-      if (product?.sellingPrice && batch.sellingPrice > product?.sellingPrice) {
-        await tx.product.update({
-          where: { id: product.id },
-          data: { sellingPrice: batch.sellingPrice },
-        });
+
+      if (product) {
+        const shouldUpdatePrice =
+          payload.sellingPrice > product.sellingPrice;
+
+        //  only update if business allows auto pricing
+        if (shouldUpdatePrice) {
+          await tx.product.update({
+            where: { id: product.id },
+            data: {
+              sellingPrice: payload.sellingPrice,
+            },
+          });
+        }
       }
+
       return batch;
     });
-    return result;
   } catch (error) {
-    console.log(error);
-    // errorLogger.error('Failed to create product batch', error);
+    console.error("Create Product Batch Error:", error);
     throw error;
   }
 };

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import { AppError } from '../../error/AppError';
 import { prisma } from '../../shared/prisma';
@@ -11,109 +12,136 @@ import { orderSearchableFields } from './order.constant';
 const createOrderIntoDB = async (req: Request) => {
   const userId = req.user.id;
   const payload: TCreateOrder = req.body;
-  try {
-    const user = await prisma.user.findFirst({
-      where: { id: userId, isDeleted: false },
-    });
-    if (!user) {
-      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-    }
-    const order = await prisma.$transaction(async (tx) => {
-      // Fetch products
-      const products = await tx.product.findMany({
+
+  const user = await prisma.user.findFirst({
+    where: { id: userId, isDeleted: false },
+  });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  const order = await prisma.$transaction(async (tx) => {
+    let subtotal = 0;
+
+    const orderItemsData: any[] = [];
+
+    for (const item of payload.items) {
+      // 1. Get inventory
+      const inventory = await tx.inventory.findFirst({
         where: {
-          id: { in: payload.items.map((i) => i.productId) },
+          productId: item.productId,
           isDeleted: false,
         },
       });
 
-      if (products.length !== payload.items.length) {
-        throw new AppError(
-          httpStatus.NOT_FOUND,
-          'One or more products not found',
-        );
+      if (!inventory) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Inventory not found');
       }
 
-      // Calculate subtotal and prepare order items
-      let subtotal = 0;
-      const orderItemsData = payload.items.map((item) => {
-        const product = products.find((p) => p.id === item.productId)!;
-        const totalPrice = product.sellingPrice * item.quantity;
-        subtotal += totalPrice;
-        return {
-          productId: item.productId,
-          quantity: item.quantity,
-          unitPrice: product.sellingPrice,
-          totalPrice,
-        };
+      // 2. Get batches FIFO (expiry first)
+      const batches = await tx.productBatch.findMany({
+        where: {
+          inventoryId: inventory.id,
+          isDeleted: false,
+          remainingQuantity: { gt: 0 },
+          expiryDate: { gt: new Date() },
+        },
+        orderBy: {
+          expiryDate: 'asc',
+        },
       });
 
-      // Calculate discount if applicable
-      let discountAmount = 0;
-      if (payload.discountId) {
-        const now = new Date();
-        const discount = await tx.discount.findFirst({
-          where: {
-            id: payload.discountId,
-            active: true,
-            isDeleted: false,
-            startDate: { lte: now },
-            endDate: { gte: now },
+      let remainingQty = item.quantity;
+
+      for (const batch of batches) {
+        if (remainingQty <= 0) break;
+
+        const deduct = Math.min(batch.remainingQuantity, remainingQty);
+
+        // 3. Update batch stock
+        await tx.productBatch.update({
+          where: { id: batch.id },
+          data: {
+            remainingQuantity: {
+              decrement: deduct,
+            },
           },
         });
 
-        if (discount) {
-          // Filter items that the discount applies to
-          const applicableItems = orderItemsData.filter((item) =>
-            discount.ProductIds.includes(item.productId),
-          );
+        // 4. Push order item
+        orderItemsData.push({
+          productId: item.productId,
+          batchId: batch.id,
+          quantity: deduct,
+          unitPrice: batch.sellingPrice,
+          totalPrice: batch.sellingPrice * deduct,
+        });
 
-          const applicableSubtotal = applicableItems.reduce(
-            (sum, item) => sum + item.totalPrice,
-            0,
-          );
+        subtotal += batch.sellingPrice * deduct;
 
-          discountAmount = (applicableSubtotal * discount.percentage) / 100;
+        remainingQty -= deduct;
 
-          if (discount.maxAmount && discountAmount > discount.maxAmount) {
-            discountAmount = discount.maxAmount;
-          }
-        }
+        // 5. Stock movement
+        await tx.stockMovement.create({
+          data: {
+            inventoryId: inventory.id,
+            batchId: batch.id,
+            quantity: deduct,
+            type: 'OUT',
+            reason: 'ORDER',
+          },
+        });
       }
 
-      const total = subtotal - discountAmount + payload.shippingCost;
-      const orderNumber = generateOrderNumber();
+      if (remainingQty > 0) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Insufficient stock');
+      }
 
-      // Create order
-      const createdOrder = await tx.order.create({
-        data: {
-          userId,
-          orderNumber,
-          shippingCost: payload.shippingCost,
-          total,
-          discountId: payload.discountId,
-          orderItems: {
-            create: orderItemsData,
-          },
-        },
-      });
-      // create shipment
-      await tx.shipment.create({
-        data: {
-          orderId: createdOrder.id,
-          origin: payload.shipment.origin,
-          destination: payload.shipment.destination,
-          cost: payload.shippingCost,
-        },
+      // 6. Sync inventory quantity
+      const totalStock = await tx.productBatch.aggregate({
+        where: { inventoryId: inventory.id },
+        _sum: { remainingQuantity: true },
       });
 
-      return createdOrder;
+      await tx.inventory.update({
+        where: { id: inventory.id },
+        data: {
+          quantity: totalStock._sum.remainingQuantity || 0,
+        },
+      });
+    }
+
+    const discountAmount = 0;
+    const total = subtotal - discountAmount + payload.shippingCost;
+
+    const orderNumber = generateOrderNumber();
+
+    const createdOrder = await tx.order.create({
+      data: {
+        userId,
+        orderNumber,
+        shippingCost: payload.shippingCost,
+        total,
+        orderItems: {
+          create: orderItemsData,
+        },
+      },
     });
-    return order;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+
+    await tx.shipment.create({
+      data: {
+        orderId: createdOrder.id,
+        origin: payload.shipment.origin,
+        destination: payload.shipment.destination,
+        cost: payload.shippingCost,
+      },
+    });
+
+    return createdOrder;
+  });
+
+  return order;
 };
 const getAllOrderFromDB = async (
   filters: TOrderFilterRequest,

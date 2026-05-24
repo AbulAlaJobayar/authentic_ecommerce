@@ -3,16 +3,9 @@ import moment from 'moment';
 const createProductBatchSchemaValidation = z.object({
   body: z.object({
     batchNumber: z
-      .string({
-        error: (issue) =>
-          issue.input === undefined
-            ? ' batchNumber is Required'
-            : ' Not a string',
-      })
-      .regex(
-        /^BATCH-\d{4}-\d{2}$/,
-        'batchNumber must follow format: BATCH-YYYY-MM'
-      )
+      .string()
+      .trim()
+      .regex(/^LOT\d{6}$/, 'Format: LOT######')
       .trim(),
     expiryDate: z
       .string()
@@ -20,7 +13,7 @@ const createProductBatchSchemaValidation = z.object({
         message: 'Invalid date format, expected YYYY-MM-DD',
       })
       .transform((date) =>
-        moment.utc(date, 'YYYY-MM-DD').toDate().toISOString()
+        moment.utc(date, 'YYYY-MM-DD').toDate().toISOString(),
       )
       .refine((isoDate) => moment(isoDate).isAfter(moment()), {
         message: 'Expiry date must be in the future',
@@ -57,7 +50,7 @@ const createProductBatchSchemaValidation = z.object({
       })
       .regex(
         /^S-\d{2}[A-Z]$/,
-        'Shelf Code must follow format S-01A, S-02B, etc.'
+        'Shelf Code must follow format S-01A, S-02B, etc.',
       )
       .trim(),
     rackCode: z
@@ -107,7 +100,7 @@ const updateProductPatchValidationSchema = z.object({
       })
       .regex(
         /^BATCH-\d{4}-\d{2}$/,
-        'batchNumber must follow format: BATCH-YYYY-MM'
+        'batchNumber must follow format: BATCH-YYYY-MM',
       )
       .trim()
       .optional(),
@@ -117,7 +110,7 @@ const updateProductPatchValidationSchema = z.object({
         message: 'Invalid date format, expected YYYY-MM-DD',
       })
       .transform((date) =>
-        moment.utc(date, 'YYYY-MM-DD').toDate().toISOString()
+        moment.utc(date, 'YYYY-MM-DD').toDate().toISOString(),
       )
       .refine((isoDate) => moment(isoDate).isAfter(moment()), {
         message: 'Expiry date must be in the future',
@@ -163,7 +156,7 @@ const updateProductPatchValidationSchema = z.object({
       })
       .regex(
         /^S-\d{2}[A-Z]$/,
-        'Shelf Code must follow format S-01A, S-02B, etc.'
+        'Shelf Code must follow format S-01A, S-02B, etc.',
       )
       .trim()
       .optional(),

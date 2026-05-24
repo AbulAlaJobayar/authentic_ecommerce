@@ -169,39 +169,43 @@ model Product {
 }
 
 model ProductBatch {
-  id           String    @id @default(cuid())
-  inventory    Inventory @relation(fields: [inventoryId], references: [id])
-  inventoryId  String
-  batchNumber  String
-  expiryDate   DateTime
-  quantity     Int
-  isDeleted    Boolean   @default(false)
-  buyingPrice  Float
-  costPrice    Float
-  sellingPrice Float
-  shelfCode    String
-  rackCode     String
-  supplier     Supplier? @relation(fields: [supplierId], references: [id])
-  supplierId   String?
-  warehouse    Warehouse @relation(fields: [warehouseId], references: [id])
-  warehouseId  String
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id                String          @id @default(cuid())
+  inventory         Inventory       @relation(fields: [inventoryId], references: [id])
+  inventoryId       String
+  batchNumber       String
+  expiryDate        DateTime
+  quantity          Int
+  remainingQuantity Int             @default(0)
+  isDeleted         Boolean         @default(false)
+  buyingPrice       Float
+  costPrice         Float
+  sellingPrice      Float
+  shelfCode         String
+  rackCode          String
+  supplier          Supplier?       @relation(fields: [supplierId], references: [id])
+  supplierId        String?
+  warehouse         Warehouse       @relation(fields: [warehouseId], references: [id])
+  warehouseId       String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  orderItems        OrderItem[]
+  stockMovements    StockMovement[]
 
   @@index([batchNumber, expiryDate])
   @@map("productBatch")
 }
 
 model Inventory {
-  id            String         @id @default(cuid())
-  product       Product        @relation(fields: [productId], references: [id])
-  productId     String         @unique
-  quantity      Int? //calculate total quantity by product batch
-  alertQuantity Int?           @default(5)
-  isDeleted     Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  productBatch  ProductBatch[]
+  id             String          @id @default(cuid())
+  product        Product         @relation(fields: [productId], references: [id])
+  productId      String          @unique
+  quantity       Int? //calculate total quantity by product batch
+  alertQuantity  Int?            @default(5)
+  isDeleted      Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  productBatch   ProductBatch[]
+  stockMovements StockMovement[]
 }
 
 model CartItem {
@@ -241,19 +245,42 @@ model Order {
 }
 
 model OrderItem {
-  id         String   @id @default(cuid())
-  order      Order    @relation(fields: [orderId], references: [id])
+  id         String       @id @default(cuid())
+  order      Order        @relation(fields: [orderId], references: [id])
   orderId    String
-  product    Product  @relation(fields: [productId], references: [id])
+  product    Product      @relation(fields: [productId], references: [id])
   productId  String
+  batch      ProductBatch @relation(fields: [batchId], references: [id])
+  batchId    String
   quantity   Int
   unitPrice  Float // selling price at purchase time
   totalPrice Float // unitPrice * quantity
-  isDeleted  Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  isDeleted  Boolean      @default(false)
+  createdAt  DateTime     @default(now())
 
-  @@index([orderId, productId])
+  @@index([orderId, productId, batchId])
   @@map("orderItem")
+}
+
+model StockMovement {
+  id String @id @default(cuid())
+
+  inventory   Inventory @relation(fields: [inventoryId], references: [id])
+  inventoryId String
+
+  batch   ProductBatch @relation(fields: [batchId], references: [id])
+  batchId String
+
+  type ActionType
+
+  quantity Int
+
+  reason String?
+
+  createdAt DateTime @default(now())
+
+  @@index([inventoryId, batchId, type])
+  @@map("stockMovement")
 }
 
 model Payment {

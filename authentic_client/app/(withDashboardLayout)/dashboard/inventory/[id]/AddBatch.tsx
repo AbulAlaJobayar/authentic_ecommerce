@@ -16,7 +16,10 @@ import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import moment from "moment";
-import { useCreateProductsMutation } from "@/redux/api/productApi";
+import { useCreateBatchMutation } from "@/redux/api/batchApi";
+import { toast } from "sonner";
+
+
 
 
 // ================= VALIDATION =================
@@ -24,26 +27,38 @@ import { useCreateProductsMutation } from "@/redux/api/productApi";
 const batchSchema = z.object({
   batchNumber: z
     .string()
-    .regex(/^LOT\d{6}$/, "Format: LOT######"),
+    .trim()
+    .regex(
+      /^LOT\d{6}$/,
+      "Format: LOT######"
+    ),
 
   expiryDate: z.string().min(1, "Expiry date required"),
+  quantity: z.string()
+    .min(1, "Quantity required"),
+  buyingPrice: z.string()
+    .min(1, "Buying price required"),
+  costPrice: z
+    .string()
+    .min(1, "Cost price required"),
+  sellingPrice: z.string()
+    .min(1, "Selling price required"),
+  shelfCode: z
+    .string()
+    .regex(
+      /^S-\d{2}[A-Z]$/,
+      "Format: S-01A"
+    ),
 
-  quantity: z.coerce.number().min(1),
+  rackCode: z
+    .string()
+    .regex(/^R-\d{2}$/, "Format: R-01"),
 
-  buyingPrice: z.coerce.number().min(1),
+  supplierId: z.string().min(1, "Supplier required"),
 
-  costPrice: z.coerce.number().min(1),
+  warehouseId: z.string().min(1, "Warehouse required"),
 
-  sellingPrice: z.coerce.number().min(1),
-
-  shelfCode: z.string().regex(/^S-\d{2}[A-Z]$/),
-
-  rackCode: z.string().regex(/^R-\d{2}$/),
-
-  supplierId: z.string().min(1),
-
-  warehouseId: z.string().min(1),
-});
+})
 
 type TBatchForm = z.infer<typeof batchSchema>;
 
@@ -52,43 +67,40 @@ type TBatchForm = z.infer<typeof batchSchema>;
 const defaultValues: TBatchForm = {
   batchNumber: "",
   expiryDate: "",
-  quantity: 0,
-  buyingPrice: 0,
-  costPrice: 0,
-  sellingPrice: 0,
+  quantity: "",
+  buyingPrice: "",
+  costPrice: "",
+  sellingPrice: "",
   shelfCode: "",
   rackCode: "",
   supplierId: "",
   warehouseId: "",
 };
-type param ={
-    setOpen:React.Dispatch<React.SetStateAction<boolean>>,
-    data:any
+type param = {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
 // ================= COMPONENT =================
 
-const AddBatch = ({setOpen, data}: param) => {
+const AddBatch = ({ setOpen }: param) => {
+
   const params = useParams();
   const inventoryId = params?.id as string;
 
   const { data: suppliers } = useGetAllSuppliersQuery({});
   const { data: warehouses } = useAllWarehouseQuery({});
-  const [createBatch, { isLoading }] = useCreateProductsMutation();
+  const [createBatch, { isLoading, isError }] = useCreateBatchMutation();
 
   const handleSubmit = async (data: TBatchForm) => {
+    console.log(data)
     const payload = {
       inventoryId,
-
       batchNumber: data.batchNumber,
-      expiryDate: data.expiryDate
-        ? moment(data.expiryDate).toISOString()
-        : null,
-
-      quantity: data.quantity,
-      buyingPrice: data.buyingPrice,
-      costPrice: data.costPrice,
-      sellingPrice: data.sellingPrice,
+      expiryDate: data.expiryDate,
+      quantity: Number(data.quantity),
+      buyingPrice: Number(data.buyingPrice),
+      costPrice: Number(data.costPrice),
+      sellingPrice: Number(data.sellingPrice),
 
       shelfCode: data.shelfCode,
       rackCode: data.rackCode,
@@ -97,23 +109,34 @@ const AddBatch = ({setOpen, data}: param) => {
       warehouseId: data.warehouseId,
     };
 
+
     try {
-    setOpen(false)
+      const res = await createBatch(payload)
+      if (res && res?.data?.success) {
+        toast.success(res?.data?.message || "Batch created successfully", {
+          description: res?.data?.message,
+        });
+        setOpen(false);
+      }
+      else {
+        toast.error(((res?.error as { data: string })?.data) || "Failed to create batch");
+        setOpen(false)
+      }
     } catch (error) {
-      console.log("Batch Create Error:", error);
+
+      console.log(error, "from error")
+      if (isError) {
+        toast.error("Failed to create category");
+        setOpen(false)
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+        setOpen(false)
+      }
     }
-  };
+  }
 
   return (
-    <div className="rounded-3xl border bg-background p-6 shadow-sm">
-      {/* HEADER */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold">Add New Batch</h2>
-        <p className="text-sm text-muted-foreground">
-          Create stock batch for this inventory
-        </p>
-      </div>
-
+    <div>
       {/* FORM */}
       <ATSFrom
         resolver={zodResolver(batchSchema)}
@@ -127,7 +150,7 @@ const AddBatch = ({setOpen, data}: param) => {
           <div className="grid gap-4 md:grid-cols-2">
             <Field>
               <FieldLabel>Batch Number</FieldLabel>
-              <ATSInput name="batchNumber" placeholder="LOT123456" />
+              <ATSInput name="batchNumber" placeholder="LOT200526" />
             </Field>
 
             <Field>

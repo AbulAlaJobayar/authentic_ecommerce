@@ -5,15 +5,9 @@ import Image from "next/image";
 import {
   AlertTriangle,
   Archive,
-//   Calendar,
-//   DollarSign,
   Hash,
   Layers3,
-//   MapPin,
   Package,
-//   ShieldCheck,
-//   Truck,
-//   Warehouse,
   Plus,
 } from "lucide-react";
 
@@ -38,7 +32,7 @@ export const formatDate = (date: string | Date) =>
   moment(date).format("DD MMM YYYY, hh:mm A");
 
 const InventoryContentPage = ({ id }: { id: string }) => {
-const [modelOpen,setModelOpen]=useState(false)
+  const [modelOpen, setModelOpen] = useState(false)
 
 
   const { data, isLoading } = useGetSingleInventoryQuery(id);
@@ -54,13 +48,14 @@ const [modelOpen,setModelOpen]=useState(false)
   const inventory = data?.data;
   const product = inventory?.product;
   const batches = inventory?.productBatch || [];
+  console.log(batches,"from batches")
 
   const statusColor =
     product?.status === "ACTIVE"
       ? "bg-green-100 text-green-700 border-green-200"
       : product?.status === "DRAFT"
-      ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-      : "bg-red-100 text-red-700 border-red-200";
+        ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+        : "bg-red-100 text-red-700 border-red-200";
 
   return (
     <div className="min-h-screen bg-linear-to-b from-muted/40 to-background">
@@ -153,7 +148,7 @@ const [modelOpen,setModelOpen]=useState(false)
               Batch Information
             </CardTitle>
 
-            <Button onClick={()=>setModelOpen(true)}  className="gap-2 rounded-xl shadow-sm">
+            <Button onClick={() => setModelOpen(true)} className="gap-2 rounded-xl shadow-sm">
               <Plus className="h-4 w-4" />
               Add Batch
             </Button>
@@ -173,6 +168,7 @@ const [modelOpen,setModelOpen]=useState(false)
 
                     <DetailRow label="Batch" value={batch?.batchNumber} />
                     <DetailRow label="Qty" value={batch?.quantity} />
+                    <DetailRow label="Remaining Qty" value={batch?.remainingQuantity} />
                     <DetailRow label="Buying" value={`৳ ${batch?.buyingPrice}`} />
                     <DetailRow label="Selling" value={`৳ ${batch?.sellingPrice}`} />
                     <DetailRow label="Cost" value={`৳ ${batch?.costPrice}`} />
@@ -204,8 +200,8 @@ const [modelOpen,setModelOpen]=useState(false)
         </Card>
 
 
-        <ATSModal open={modelOpen} setOpen={setModelOpen}  title="Create New Batch">
-          <AddBatch setOpen={setModelOpen} data={data?.data}/>
+        <ATSModal open={modelOpen} setOpen={setModelOpen} description=" Create stock batch for this inventory" title="Add New Batch">
+          <AddBatch setOpen={setModelOpen} />
         </ATSModal>
 
       </div>
