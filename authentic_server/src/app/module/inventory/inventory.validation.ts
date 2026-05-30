@@ -4,17 +4,9 @@ import { Status } from '../../../../generated/prisma';
 const productSchemaValidation = z
   .object({
     name: z.string().trim().optional(),
-    sku: z
-      .string()
-      .regex(
-        /^[A-Z0-9]+$/,
-        'SKU must contain only uppercase letters, numbers, dashes'
-      )
-      .trim()
-      .optional(),
+   
     description: z.string().trim().optional(),
     status: z.enum(Status).optional(),
-   
   })
   .optional();
 
@@ -31,9 +23,6 @@ const updateProductSchema = z.object({
   }),
 });
 
-
-
-export const InventoryValidation={
-    updateProductSchema
-}
-
+export const InventoryValidation = {
+  updateProductSchema,
+};

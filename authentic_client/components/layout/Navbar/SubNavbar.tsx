@@ -16,10 +16,10 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { useScrollDetection } from "@/app/hooks/useScrollDetection";
+
 
 const SubNavbar = () => {
-  const isScrolled = useScrollDetection(1);
+
   return (
     <div className={"flex justify-between items-center"}>
       <NavigationMenu>
@@ -27,7 +27,7 @@ const SubNavbar = () => {
           <NavigationMenuItem>
             <NavigationMenuTrigger>Suture</NavigationMenuTrigger>
             <NavigationMenuContent className="">
-              <ul className="grid w-[300px] gap-4 absolute left-0 top-0 bg-white">
+              <ul className="grid w-75 gap-4 absolute left-0 top-0 bg-white">
                 <li>
                   <NavigationMenuLink asChild>
                     <Link href="#">
@@ -70,7 +70,7 @@ const SubNavbar = () => {
               List
             </NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid w-[300px] gap-4 absolute left-40 top-0 bg-white">
+              <ul className="grid w-75 gap-4 absolute left-40 top-0 bg-white">
                 <li>
                   <NavigationMenuLink asChild>
                     <Link href="#">
@@ -103,7 +103,7 @@ const SubNavbar = () => {
           <NavigationMenuItem className="hidden md:block">
             <NavigationMenuTrigger>Simple</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid w-[200px] gap-4 absolute left-55 bg-white">
+              <ul className="grid w-50 gap-4 absolute left-55 bg-white">
                 <li>
                   <NavigationMenuLink asChild>
                     <Link href="#">Components</Link>
@@ -121,7 +121,7 @@ const SubNavbar = () => {
           <NavigationMenuItem className="hidden md:block">
             <NavigationMenuTrigger>With Icon</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid w-[200px] gap-4 absolute left-75 bg-white">
+              <ul className="grid w-50 gap-4 absolute left-75 bg-white">
                 <li>
                   <NavigationMenuLink asChild>
                     <Link href="#" className="flex-row items-center gap-2">
@@ -147,19 +147,16 @@ const SubNavbar = () => {
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-      {isScrolled ? (
-        <></>
-      ) : (
-        <>
-          <div className="flex gap-4 items-center">
-            <Phone size={20} />
-            <div className="flex flex-col text-sm ">
-              <p>Hotline</p>
-              <p>+8801928210545</p>
-            </div>
-          </div>
-        </>
-      )}
+
+      <div className="flex gap-4 items-center">
+        <Phone size={20} />
+        <div className="flex flex-col text-sm ">
+          <p>Hotline</p>
+          <p>+8801928210545</p>
+        </div>
+      </div>
+
+
     </div>
   );
 };

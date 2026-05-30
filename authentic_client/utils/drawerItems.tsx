@@ -1,6 +1,6 @@
 import { UserRole } from "@/constant/role";
 import { DrawerItem, userRole } from "@/types";
-import { CircleGauge, Grid2x2Plus, PackagePlus, SquareChartGantt, UserCog, Users, Warehouse } from "lucide-react";
+import { CircleGauge, Grid2x2Plus, SquareChartGantt, UserCog, Users, Warehouse } from "lucide-react";
 
 export const drawerItems = (role: userRole): DrawerItem[] => {
   const roleMenu: DrawerItem[] = [];
@@ -43,11 +43,7 @@ export const drawerItems = (role: userRole): DrawerItem[] => {
           path: "/dashboard/suppliers",
           icon: UserCog
         },
-        {
-          title: "Add Product",
-          path: `/dashboard/addProduct`,
-          icon: PackagePlus,
-        },
+   
         {
           title: "Inventory",
           path: `/dashboard/inventory`,

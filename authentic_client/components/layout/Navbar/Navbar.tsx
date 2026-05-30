@@ -16,20 +16,12 @@ import {
 import Container from "@/components/shared/Container";
 import { Badge } from "@/components/ui/badge";
 import SubNavbar from "./SubNavbar";
-import { useScrollDetection } from "@/app/hooks/useScrollDetection";
 import * as motion from "motion/react-client";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import Link from "next/link";
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 
 const items = [
   {
@@ -55,19 +47,17 @@ const items = [
 ];
 
 const Navbar = () => {
-  const isScrolled = useScrollDetection(0.1);
   const [openItem, setOpenItem] = useState<string | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const handleToggle = (name: string) => {
     setOpenItem((prev) => (prev === name ? null : name));
   };
-  const user = true;
+  const user = false;
   return (
     <>
 
-      {isScrolled ? (
-        <>
+    
           <motion.nav
             initial={{ y: -80 }}
             animate={{ y: 0 }}
@@ -126,85 +116,20 @@ const Navbar = () => {
               </Container>
             </div>
           </motion.nav>
-        </>
-      ) : (<>
-        <motion.nav
-          initial={{ y: 0 }}
-          animate={{ y: isScrolled ? -80 : 0, opacity: isScrolled ? 0 : 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="sticky top-0 left-0 w-full z-50 bg-white shadow-md hidden md:block"
-        >
-          <div className="border-b py-1">
-            <Container>
-              <div className=" flex items-center py-3  justify-between">
-                {/* website logo */}
-                <div className=" ">Authentic Surgical</div>
-                {/* product search */}
-                <div className=" max-w-3/5 w-full">
-                  <SearchProduct />
-                </div>
-                {/* user actions: cart, profile, etc. */}
 
-                <div className="flex items-center gap-3">
-                  {user ? (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Avatar>
-                          <AvatarImage src="https://github.com/shadcn.png" />
-                          <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Add to library</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <>
-                      <Avatar className="hidden md:block">
-                        <AvatarImage src="https://github.com/shadcn.png" />
-                        <AvatarFallback>CN</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p>Sign In</p>
-                        <p className="hidden md:block">Your Account</p>
-                      </div>
-                    </>
-                  )}
-                </div>
 
-                <div className="relative">
-                  <Badge
-                    className="absolute bottom-4 left-4 h-5 min-w-5 rounded-full px-1 font-mono tabular-nums"
-                    variant="destructive"
-                  >
-                    99
-                  </Badge>
-                  <ShoppingBag />
-                </div>
-                {/* </div> */}
-              </div>
-            </Container>
-          </div>
-          <div className="py-1">
-            <Container>
-              <SubNavbar />
-            </Container>
-          </div>
-        </motion.nav>
-
-      </>)}
       {/* small Screen */}
       <nav className="sticky md:hidden bg-white shadow-md  top-0 left-0 w-full z-50">
         <div className="border-b py-1">
           <Container>
             <div className="flex items-center justify-between py-4">
               <div>
-                <Drawer direction="left">
+                <Drawer>
                   <DrawerTrigger asChild>
                     <TextAlignJustify className="cursor-pointer" />
                   </DrawerTrigger>
                   {/* Drawer Content Goes Here */}
-                  <DrawerContent>
+                  <DrawerContent >
                     <DrawerHeader>
                       <div className="flex items-center justify-between">
                         <DrawerTitle className="text-black">

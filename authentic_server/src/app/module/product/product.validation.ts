@@ -12,10 +12,10 @@ const productSchemaValidation = z.object({
       error: (issue) =>
         issue.input === undefined ? 'Sku is Required' : ' Not a string',
     })
-     .regex(
-            /^[A-Z0-9-]+$/,
-            "SKU must contain only uppercase letters, numbers, and hyphens"
-        )
+    .regex(
+      /^[A-Z0-9-]+$/,
+      'SKU must contain only uppercase letters, numbers, and hyphens',
+    )
     .trim(),
 
   image: z.string(),
@@ -121,14 +121,15 @@ const updateProductInterface = z.object({
             : ' Not a string',
       })
       .trim(),
-    // TODO: SKU PATTER DEFINE
 
     sku: z
-      .string({
-        error: (issue) =>
-          issue.input === undefined ? 'Sku is Required' : ' Not a string',
-      })
-      .trim(),
+      .string()
+      .trim()
+      .regex(
+        /^[A-Z0-9-]+$/,
+        'SKU must contain only uppercase letters, numbers, and hyphens',
+      )
+      .optional(),
     baseCost: z.number({
       error: (issue) =>
         issue.input === undefined ? 'base Cost is Required' : ' Not a Number',

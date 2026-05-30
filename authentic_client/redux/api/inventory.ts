@@ -38,27 +38,35 @@ const inventoryApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagType.Product],
     }),
-    updateProducts: build.mutation({
-      query: ({
-        id,
-        data,
-      }: {
-        id: string;
-        data: {
-          name?: string;
-          sku?: string;
-          description?: string;
-          image?: any;
-          status?: string;
-          sellingPrice?: number;
-        };
-      }) => ({
-        url: `/inventory/${id}`,
-        method: "PATCH",
-        data,
-      }),
-      invalidatesTags: [tagType.Inventory],
-    }),
+    updateInventory: build.mutation({
+  query: ({
+    id,
+    data,
+  }: {
+    id: string;
+    data: {
+      product?: {
+        name?: string;
+        sku?: string;
+        description?: string;
+        image?: any;
+        status?: string;
+        sellingPrice?: number;
+      };
+
+      inventory?: {
+        alertQuantity?: number;
+      };
+    };
+  }) => ({
+    url: `/inventory/${id}`,
+    method: "PATCH",
+    data,
+  }),
+
+  invalidatesTags: [tagType.Inventory],
+}),
+
     deleteInventory: build.mutation({
       query: (id: string) => ({
         url: `/inventory/${id}`,
@@ -72,4 +80,5 @@ export const {
   useGetAllInventoryQuery,
   useGetSingleInventoryQuery,
   useDeleteInventoryMutation,
+  useUpdateInventoryMutation,
 } = inventoryApi;

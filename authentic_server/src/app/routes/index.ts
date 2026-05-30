@@ -9,6 +9,7 @@ import { InventoryRouter } from '../module/inventory/inventory.route';
 import { ProductBatchRouter } from '../module/batch/batch.route';
 import { CartRouter } from '../module/cart/cart.route';
 import { OrderRoutes } from '../module/order/order.route';
+import { DiscountRouter } from '../module/discount/discount.route';
 
 const router = Router();
 
@@ -52,6 +53,10 @@ const modulesRoute = [
   {
     path: '/order',
     route: OrderRoutes,
+  },
+  {
+    path: '/discount',
+    route: DiscountRouter,
   },
 ];
 

@@ -37,18 +37,18 @@ const InventoryContentPage = ({ id }: { id: string }) => {
 
   const { data, isLoading } = useGetSingleInventoryQuery(id);
 
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center text-muted-foreground">
-        Loading inventory...
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex h-screen items-center justify-center text-muted-foreground">
+  //       Loading inventory...
+  //     </div>
+  //   );
+  // }
 
   const inventory = data?.data;
   const product = inventory?.product;
   const batches = inventory?.productBatch || [];
-  console.log(batches,"from batches")
+  console.log(batches, "from batches")
 
   const statusColor =
     product?.status === "ACTIVE"
@@ -74,130 +74,143 @@ const InventoryContentPage = ({ id }: { id: string }) => {
 
         </div>
 
-        {/* ================= HERO ================= */}
-        <div className="overflow-hidden rounded-3xl border bg-background shadow-sm">
-          <div className="grid gap-6 lg:grid-cols-3">
-
-            {/* IMAGE */}
-            <div className="relative flex items-center justify-center bg-muted/40 p-6">
-              <div className="relative h-70 w-full overflow-hidden rounded-2xl border bg-white shadow-sm">
-                <Image
-                  src={
-                    product?.image?.[0] !== "no image found"
-                      ? product?.image?.[0]
-                      : "/placeholder.png"
-                  }
-                  alt={product?.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
+        {
+          isLoading ? (
+            <div className="flex h-screen items-center justify-center text-muted-foreground">
+              Loading inventory...
             </div>
+          ) : (
+            <>
+              <div className="overflow-hidden rounded-3xl border bg-background shadow-sm">
+                <div className="grid gap-6 lg:grid-cols-3">
 
-            {/* INFO */}
-            <div className="space-y-5 p-6 lg:col-span-2">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    SKU: {product?.sku}
-                  </p>
-
-                  <h1 className="mt-1 text-3xl font-bold tracking-tight">
-                    {product?.name}
-                  </h1>
-
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Badge className={`${statusColor} rounded-full border px-3`}>
-                      {product?.status}
-                    </Badge>
+                  {/* IMAGE */}
+                  <div className="relative flex items-center justify-center bg-muted/40 p-6">
+                    <div className="relative h-70 w-full overflow-hidden rounded-2xl border bg-white shadow-sm">
+                      <Image
+                        src={
+                          product?.image?.[0] !== "no image found"
+                            ? product?.image?.[0]
+                            : "/placeholder.png"
+                        }
+                        alt={product?.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="rounded-2xl border bg-linear-to-r from-primary/10 to-primary/5 p-5 text-right">
-                  <p className="text-sm text-muted-foreground">
-                    Selling Price
-                  </p>
-                  <h2 className="mt-2 text-3xl font-bold">
-                    ৳ {product?.sellingPrice}
-                  </h2>
+                  {/* INFO */}
+                  <div className="space-y-5 p-6 lg:col-span-2">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          SKU: {product?.sku}
+                        </p>
+
+                        <h1 className="mt-1 text-3xl font-bold tracking-tight">
+                          {product?.name}
+                        </h1>
+
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <Badge className={`${statusColor} rounded-full border px-3`}>
+                            {product?.status}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <div className="rounded-2xl border bg-linear-to-r from-primary/10 to-primary/5 p-5 text-right">
+                        <p className="text-sm text-muted-foreground">
+                          Selling Price
+                        </p>
+                        <h2 className="mt-2 text-3xl font-bold">
+                          ৳ {product?.sellingPrice}
+                        </h2>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      {product?.description}
+                    </p>
+
+                    {/* QUICK STATS */}
+                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                      <InfoCard icon={<Package />} label="Stock" value={inventory?.quantity} />
+                      <InfoCard icon={<AlertTriangle />} label="Alert" value={inventory?.alertQuantity} />
+                      <InfoCard icon={<Layers3 />} label="Category" value={product?.category?.name} />
+                      <InfoCard icon={<Hash />} label="Inventory ID" value={inventory?.id?.slice(0, 12)} />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <Separator />
+              {/* ================= BATCHES ================= */}
+              <Card className="rounded-3xl border shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <Archive className="h-5 w-5" />
+                    Batch Information
+                  </CardTitle>
 
-              <p className="text-sm leading-6 text-muted-foreground">
-                {product?.description}
-              </p>
+                  <Button onClick={() => setModelOpen(true)} className="gap-2 rounded-xl shadow-sm">
+                    <Plus className="h-4 w-4" />
+                    Add Batch
+                  </Button>
+                </CardHeader>
 
-              {/* QUICK STATS */}
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <InfoCard icon={<Package />} label="Stock" value={inventory?.quantity} />
-                <InfoCard icon={<AlertTriangle />} label="Alert" value={inventory?.alertQuantity} />
-                <InfoCard icon={<Layers3 />} label="Category" value={product?.category?.name} />
-                <InfoCard icon={<Hash />} label="Inventory ID" value={inventory?.id?.slice(0, 12)} />
-              </div>
-            </div>
-          </div>
-        </div>
+                <CardContent className="space-y-6">
+                  {batches.map((batch: any) => (
+                    <div
+                      key={batch?.id}
+                      className="rounded-2xl border bg-linear-to-b from-muted/30 to-background p-5 shadow-sm hover:shadow-md transition"
+                    >
+                      <div className="grid gap-5 lg:grid-cols-3">
 
-        {/* ================= BATCHES ================= */}
-        <Card className="rounded-3xl border shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <Archive className="h-5 w-5" />
-              Batch Information
-            </CardTitle>
+                        {/* LEFT */}
+                        <div className="space-y-3">
+                          <SectionTitle title="Batch Details" />
 
-            <Button onClick={() => setModelOpen(true)} className="gap-2 rounded-xl shadow-sm">
-              <Plus className="h-4 w-4" />
-              Add Batch
-            </Button>
-          </CardHeader>
+                          <DetailRow label="Batch" value={batch?.batchNumber} />
+                          <DetailRow label="Qty" value={batch?.quantity} />
+                          <DetailRow label="Remaining Qty" value={batch?.remainingQuantity} />
+                          <DetailRow label="Buying" value={`৳ ${batch?.buyingPrice}`} />
+                          <DetailRow label="Selling" value={`৳ ${batch?.sellingPrice}`} />
+                          <DetailRow label="Cost" value={`৳ ${batch?.costPrice}`} />
+                        </div>
 
-          <CardContent className="space-y-6">
-            {batches.map((batch: any) => (
-              <div
-                key={batch?.id}
-                className="rounded-2xl border bg-linear-to-b from-muted/30 to-background p-5 shadow-sm hover:shadow-md transition"
-              >
-                <div className="grid gap-5 lg:grid-cols-3">
+                        {/* CENTER */}
+                        <div className="space-y-3">
+                          <SectionTitle title="Storage" />
 
-                  {/* LEFT */}
-                  <div className="space-y-3">
-                    <SectionTitle title="Batch Details" />
+                          <DetailRow label="Warehouse" value={batch?.warehouse?.name} />
+                          <DetailRow label="Rack" value={batch?.rackCode} />
+                          <DetailRow label="Shelf" value={batch?.shelfCode} />
+                          <DetailRow label="Expiry" value={formatDate(batch?.expiryDate)} />
+                        </div>
 
-                    <DetailRow label="Batch" value={batch?.batchNumber} />
-                    <DetailRow label="Qty" value={batch?.quantity} />
-                    <DetailRow label="Remaining Qty" value={batch?.remainingQuantity} />
-                    <DetailRow label="Buying" value={`৳ ${batch?.buyingPrice}`} />
-                    <DetailRow label="Selling" value={`৳ ${batch?.sellingPrice}`} />
-                    <DetailRow label="Cost" value={`৳ ${batch?.costPrice}`} />
-                  </div>
+                        {/* RIGHT */}
+                        <div className="space-y-3">
+                          <SectionTitle title="Supplier" />
 
-                  {/* CENTER */}
-                  <div className="space-y-3">
-                    <SectionTitle title="Storage" />
+                          <DetailRow label="Name" value={batch?.supplier?.name} />
+                          <DetailRow label="Phone" value={batch?.supplier?.phone} />
+                          <DetailRow label="Email" value={batch?.supplier?.email} />
+                        </div>
 
-                    <DetailRow label="Warehouse" value={batch?.warehouse?.name} />
-                    <DetailRow label="Rack" value={batch?.rackCode} />
-                    <DetailRow label="Shelf" value={batch?.shelfCode} />
-                    <DetailRow label="Expiry" value={formatDate(batch?.expiryDate)} />
-                  </div>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
 
-                  {/* RIGHT */}
-                  <div className="space-y-3">
-                    <SectionTitle title="Supplier" />
+            </>
+          )
+        }
 
-                    <DetailRow label="Name" value={batch?.supplier?.name} />
-                    <DetailRow label="Phone" value={batch?.supplier?.phone} />
-                    <DetailRow label="Email" value={batch?.supplier?.email} />
-                  </div>
 
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+
 
 
         <ATSModal open={modelOpen} setOpen={setModelOpen} description=" Create stock batch for this inventory" title="Add New Batch">

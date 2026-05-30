@@ -322,11 +322,13 @@ model Shipment {
 model Discount {
   id         String       @id @default(cuid())
   name       String
+  image      String?
   code       String?      @unique
-  ProductIds String[]
+  productIds String[]
   isDeleted  Boolean      @default(false)
   percentage Float        @default(0)
-  maxAmount  Float?
+  totalPrice Float @default(0)
+  discountPrice  Float?
   appliesTo  DiscountType
   active     Boolean      @default(true)
   startDate  DateTime

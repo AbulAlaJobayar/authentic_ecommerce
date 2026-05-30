@@ -26,7 +26,9 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import ATSModal from "@/components/shared/Modal/ATSModal";
+import EditInventory from "./EditInventory";
+import DeleteInventory from "./DeleteInventory";
 
 // ======================================================
 // TYPES
@@ -147,7 +149,7 @@ const QuantityBar = ({
       : "bg-emerald-500";
 
   return (
-    <div className="flex items-center gap-2 min-w-[130px]">
+    <div className="flex items-center gap-2 min-w-32.5">
       <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
         <div
           className={cn(
@@ -465,24 +467,24 @@ const InventoryTable = ({
     // PRICE
     // ======================================================
 
-if (columnKey === "product.sellingPrice") {
-  const activeBatch = getActiveBatch(item);
+    if (columnKey === "product.sellingPrice") {
+      const activeBatch = getActiveBatch(item);
 
-  const sellingPrice =
-    activeBatch?.sellingPrice ??
-    item?.product?.sellingPrice ??
-    0;
+      const sellingPrice =
+        activeBatch?.sellingPrice ??
+        item?.product?.sellingPrice ??
+        0;
 
-  return (
-    <div>
-      <p className="text-sm font-semibold">
-        ৳{sellingPrice}
-      </p>
+      return (
+        <div>
+          <p className="text-sm font-semibold">
+            ৳{sellingPrice}
+          </p>
 
 
-    </div>
-  );
-}
+        </div>
+      );
+    }
     // ======================================================
     // STATUS
     // ======================================================
@@ -506,7 +508,7 @@ if (columnKey === "product.sellingPrice") {
     if (
       columnKey
         .toLowerCase()
-        .includes("createdat")
+        .includes("createdAt")
     ) {
       const value = getNestedValue(
         item,
@@ -636,28 +638,56 @@ if (columnKey === "product.sellingPrice") {
               data.map((item) => (
                 <TableRow
                   key={item.id}
-                  className="hover:bg-muted/40 transition-colors"
+                  className="hover:bg-muted/40 transition-colors cursor-pointer"
+                  onClick={() =>
+                    window.location.href = `/dashboard/inventory/${item.id}`
+                  }
                 >
                   {columns.map((col) => (
-
                     <TableCell
                       key={col.key}
                       className="py-3"
                     >
-                      <Link href={`/dashboard/inventory/${item.id}`}>
-                        {renderCell(col.key, item)}
-                      </Link>
-                    </TableCell>
+                      {col.key === "id" ? (
+                        <div
+                          onClick={(e) =>
+                            e.stopPropagation()
+                          }
+                          className="flex items-center gap-1.5"
+                        >
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-8 w-8"
+                            onClick={() =>
+                              handleEdit(item.id)
+                            }
+                          >
+                            <SquarePen size={14} />
+                          </Button>
 
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-8 w-8 border-red-200 text-red-600 hover:bg-red-50"
+                            onClick={() =>
+                              handleDelete(item.id)
+                            }
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </div>
+                      ) : (
+                        renderCell(col.key, item)
+                      )}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={
-                    columns.length
-                  }
+                  colSpan={columns.length}
                   className="text-center py-20"
                 >
                   <div className="flex flex-col items-center gap-2">
@@ -666,8 +696,7 @@ if (columnKey === "product.sellingPrice") {
                     </p>
 
                     <p className="text-xs text-muted-foreground">
-                      Try changing filters
-                      or search
+                      Try changing filters or search
                     </p>
                   </div>
                 </TableCell>
@@ -681,7 +710,7 @@ if (columnKey === "product.sellingPrice") {
       {/* EDIT MODAL */}
       {/* ====================================================== */}
 
-      {/* <ATSModal
+       <ATSModal
         open={editOpen}
         setOpen={setEditOpen}
         title="Edit Inventory"
@@ -690,24 +719,24 @@ if (columnKey === "product.sellingPrice") {
           id={editedId}
           setOpen={setEditOpen}
         />
-      </ATSModal> */}
+      </ATSModal> 
 
       {/* ====================================================== */}
       {/* DELETE MODAL */}
       {/* ====================================================== */}
 
-      {/* <DeleteInventory
+      <DeleteInventory
         id={deletedId}
         open={deleteOpen}
         setOpen={setDeleteOpen}
-      /> */}
+      />
     </>
   );
 };
 
 export default InventoryTable;
 
- const getActiveBatch = (item: any) => {
+const getActiveBatch = (item: any) => {
   const batches = item?.productBatch || [];
 
   if (!batches.length) return null;

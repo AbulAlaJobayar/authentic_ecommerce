@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import Papa from "papaparse";
 
 import {
   Pagination,
@@ -208,8 +209,8 @@ const InventoryPageContent = () => {
     status,
     categoryId,
   });
-console.log(data?.data?.statistics
-)
+  console.log(data?.data?.statistics
+  )
 
   const { data: categoriesData } =
     useAllCategoryQuery({});
@@ -239,13 +240,7 @@ console.log(data?.data?.statistics
   // LOADING
   // ======================
 
-  if (isLoading) {
-    return (
-      <div className="p-10 text-center text-sm text-muted-foreground">
-        Loading products...
-      </div>
-    );
-  }
+  
 
   // ======================
   // ERROR
@@ -258,6 +253,67 @@ console.log(data?.data?.statistics
       </div>
     );
   }
+  console.log(products.data, "inventory page")
+  // =========================
+  const handleExport = () => {
+    const csvData = products.data.flatMap((item: any) =>
+      item.productBatch.map((batch: any) => ({
+        // Inventory Info
+        inventoryId: item.id,
+        totalQuantity: item.quantity,
+        alertQuantity: item.alertQuantity,
+        inventoryCreatedAt: item.createdAt,
+        inventoryUpdatedAt: item.updatedAt,
+        inventoryDeleted: item.isDeleted,
+
+        // Product Info
+        productId: item.product.id,
+        productName: item.product.name,
+        sku: item.product.sku,
+        description: item.product.description,
+        sellingPrice: item.product.sellingPrice,
+        status: item.product.status,
+        productCreatedAt: item.product.createdAt,
+        productUpdatedAt: item.product.updatedAt,
+        productDeleted: item.product.isDeleted,
+
+        // Category Info
+        categoryId: item.product.category?.id,
+        categoryName: item.product.category?.name,
+
+        // Image
+        image: item.product.image?.join(", "),
+
+        // Batch Info
+        batchId: batch.id,
+        batchNumber: batch.batchNumber,
+        expiryDate: batch.expiryDate,
+        batchQuantity: batch.quantity,
+        buyingPrice: batch.buyingPrice,
+      }))
+    );
+
+    const csv = Papa.unparse(csvData);
+
+    const blob = new Blob([csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "inventory.csv";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  };
 
   // ======================
   // JSX
@@ -293,53 +349,52 @@ console.log(data?.data?.statistics
             </div>
 
             <div className="flex flex-wrap gap-3">
-
-              <Button variant="outline">
-                <Download size={16} />
-                Import
-              </Button>
-
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleExport}>
                 <Download size={16} />
                 Export
               </Button>
-              <Link href="/dashboard/product/addProduct">
+
+
+
+              <Link href="/dashboard/addProduct">
                 <Button className="bg-violet-600 hover:bg-violet-700">
                   <Plus size={16} />
                   Add Product
                 </Button>
-                </Link>
+              </Link>
+
+
 
             </div>
 
           </div>
-          
 
-{/* =============== METRIC CARDS =============== */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 mx-auto">
-        <MetricCard
-          label="Total SKUs"
-          value={data?.data?.statistics?.totalSKUs}
-          sub={`${data?.data?.statistics?.activeProducts} active`}
-        />
-        <MetricCard
-          label="Low stock"
-          value={data?.data?.statistics?.lowStock}
-          sub="below threshold"
-          valueClass="text-amber-600"
-        />
-        <MetricCard
-          label="Out of stock"
-          value={data?.data?.statistics?.outOfStock}
-          sub="need restocking"
-          valueClass="text-red-500"
-        />
-        <MetricCard
-          label="Inventory value"
-          value={`$${Math.round(data?.data?.statistics?.inventoryValue).toLocaleString()}`}
-          sub="at selling price"
-        />
-      </div>
+
+          {/* =============== METRIC CARDS =============== */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 mx-auto">
+            <MetricCard
+              label="Total SKUs"
+              value={data?.data?.statistics?.totalSKUs}
+              sub={`${data?.data?.statistics?.activeProducts} active`}
+            />
+            <MetricCard
+              label="Low stock"
+              value={data?.data?.statistics?.lowStock}
+              sub="below threshold"
+              valueClass="text-amber-600"
+            />
+            <MetricCard
+              label="Out of stock"
+              value={data?.data?.statistics?.outOfStock}
+              sub="need restocking"
+              valueClass="text-red-500"
+            />
+            <MetricCard
+              label="Inventory value"
+              value={`$${Math.round(data?.data?.statistics?.inventoryValue).toLocaleString()}`}
+              sub="at selling price"
+            />
+          </div>
 
 
           {/* ================= FILTERS ================= */}
@@ -568,4 +623,3 @@ console.log(data?.data?.statistics
 };
 
 export default InventoryPageContent;
- 
