@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import httpStatus from 'http-status';
-import { AppError } from '../../error/AppError';
 import { prisma } from '../../shared/prisma';
 import { Request } from 'express';
 import { TCreateOrder, TOrderFilterRequest } from './order.interface';
@@ -9,139 +7,275 @@ import { TPaginationOption } from '../../interfaces/pagination';
 import { paginationHelpers } from '../../helper/paginationHelper';
 import { orderSearchableFields } from './order.constant';
 
+// const createOrderIntoDB = async (req: Request) => {
+//   const userId = req.user.id;
+//   const payload: TCreateOrder = req.body;
+
+//   const user = await prisma.user.findFirst({
+//     where: { id: userId, isDeleted: false },
+//   });
+
+//   if (!user) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+//   }
+
+//   const order = await prisma.$transaction(async (tx) => {
+//     let subtotal = 0;
+
+//     const orderItemsData: any[] = [];
+
+//     for (const item of payload.items) {
+//       // 1. Get inventory
+//       const inventory = await tx.inventory.findFirst({
+//         where: {
+//           productId: item.productId,
+//           isDeleted: false,
+//         },
+//         include: {
+//           product: {
+//             include: {
+//               discount: true,
+//             },
+//           },
+//         },
+//       });
+
+//       if (!inventory) {
+//         throw new AppError(httpStatus.NOT_FOUND, 'Inventory not found');
+//       }
+//       if (inventory?.product?.discount?.percentage) {
+//         const discount = inventory.product.discount.percentage;
+//         const discountedPrice =
+//           inventory.product.sellingPrice * (1 - discount / 100);
+//         inventory.product.sellingPrice = discountedPrice;
+//       }
+//       // 2. Get batches FIFO (expiry first)
+//       const batches = await tx.productBatch.findMany({
+//         where: {
+//           inventoryId: inventory.id,
+//           isDeleted: false,
+//           remainingQuantity: { gt: 0 },
+//           expiryDate: { gt: new Date() },
+//         },
+//         orderBy: {
+//           expiryDate: 'asc',
+//         },
+//       });
+
+//       let remainingQty = item.quantity;
+
+//       for (const batch of batches) {
+//         if (remainingQty <= 0) break;
+
+//         const deduct = Math.min(batch.remainingQuantity, remainingQty);
+
+//         // 3. Update batch stock
+//         await tx.productBatch.update({
+//           where: { id: batch.id },
+//           data: {
+//             remainingQuantity: {
+//               decrement: deduct,
+//             },
+//           },
+//         });
+
+//         // 4. Push order item
+//         orderItemsData.push({
+//           productId: item.productId,
+//           batchId: batch.id,
+//           quantity: deduct,
+//           unitPrice: batch.sellingPrice,
+//           totalPrice: batch.sellingPrice * deduct,
+//         });
+
+//         subtotal += batch.sellingPrice * deduct;
+
+//         remainingQty -= deduct;
+
+//         // 5. Stock movement
+//         await tx.stockMovement.create({
+//           data: {
+//             inventoryId: inventory.id,
+//             batchId: batch.id,
+//             quantity: deduct,
+//             type: 'OUT',
+//             reason: 'ORDER',
+//           },
+//         });
+//       }
+
+//       if (remainingQty > 0) {
+//         throw new AppError(httpStatus.BAD_REQUEST, 'Insufficient stock');
+//       }
+
+//       // 6. Sync inventory quantity
+//       const totalStock = await tx.productBatch.aggregate({
+//         where: { inventoryId: inventory.id },
+//         _sum: { remainingQuantity: true },
+//       });
+
+//       await tx.inventory.update({
+//         where: { id: inventory.id },
+//         data: {
+//           quantity: totalStock._sum.remainingQuantity || 0,
+//         },
+//       });
+//     }
+
+//     const discountAmount = 0; //inventory.product.discount.percentage;
+//     const total = subtotal - discountAmount + payload.shippingCost;
+
+//     const orderNumber = generateOrderNumber();
+
+//     const createdOrder = await tx.order.create({
+//       data: {
+//         userId,
+//         orderNumber,
+//         shippingCost: payload.shippingCost,
+//         total,
+//         orderItems: {
+//           create: orderItemsData,
+//         },
+//       },
+//     });
+
+//     await tx.shipment.create({
+//       data: {
+//         orderId: createdOrder.id,
+//         origin: payload.shipment.origin,
+//         destination: payload.shipment.destination,
+//         cost: payload.shippingCost,
+//       },
+//     });
+
+//     return createdOrder;
+//   });
+
+//   return order;
+// };
+
 const createOrderIntoDB = async (req: Request) => {
   const userId = req.user.id;
   const payload: TCreateOrder = req.body;
 
-  const user = await prisma.user.findFirst({
-    where: { id: userId, isDeleted: false },
-  });
+  return await prisma.$transaction(
+    async (tx) => {
+      let subtotal = 0;
+      const orderItems: any[] = [];
 
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-  }
+      for (const item of payload.items) {
+        // 🔒 LOCK INVENTORY
+        await tx.$queryRaw`
+          SELECT id FROM Inventory
+          WHERE productId = ${item.productId}
+          FOR UPDATE
+        `;
 
-  const order = await prisma.$transaction(async (tx) => {
-    let subtotal = 0;
-
-    const orderItemsData: any[] = [];
-
-    for (const item of payload.items) {
-      // 1. Get inventory
-      const inventory = await tx.inventory.findFirst({
-        where: {
-          productId: item.productId,
-          isDeleted: false,
-        },
-      });
-
-      if (!inventory) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Inventory not found');
-      }
-
-      // 2. Get batches FIFO (expiry first)
-      const batches = await tx.productBatch.findMany({
-        where: {
-          inventoryId: inventory.id,
-          isDeleted: false,
-          remainingQuantity: { gt: 0 },
-          expiryDate: { gt: new Date() },
-        },
-        orderBy: {
-          expiryDate: 'asc',
-        },
-      });
-
-      let remainingQty = item.quantity;
-
-      for (const batch of batches) {
-        if (remainingQty <= 0) break;
-
-        const deduct = Math.min(batch.remainingQuantity, remainingQty);
-
-        // 3. Update batch stock
-        await tx.productBatch.update({
-          where: { id: batch.id },
-          data: {
-            remainingQuantity: {
-              decrement: deduct,
-            },
+        const inventory = await tx.inventory.findFirst({
+          where: {
+            productId: item.productId,
+            isDeleted: false,
+          },
+          include: {
+            product: { include: { discount: true } },
           },
         });
 
-        // 4. Push order item
-        orderItemsData.push({
-          productId: item.productId,
-          batchId: batch.id,
-          quantity: deduct,
-          unitPrice: batch.sellingPrice,
-          totalPrice: batch.sellingPrice * deduct,
+        if (!inventory) throw new Error('Inventory not found');
+
+        const discountPercent = inventory.product.discount?.percentage ?? 0;
+
+        const safeDiscount = Math.min(Math.max(discountPercent, 0), 100);
+
+        let remainingQty = item.quantity;
+
+        const batches = await tx.productBatch.findMany({
+          where: {
+            inventoryId: inventory.id,
+            remainingQuantity: { gt: 0 },
+            isDeleted: false,
+            expiryDate: { gt: new Date() },
+          },
+          orderBy: { expiryDate: 'asc' },
         });
 
-        subtotal += batch.sellingPrice * deduct;
+        for (const batch of batches) {
+          if (remainingQty <= 0) break;
 
-        remainingQty -= deduct;
+          const fresh = await tx.productBatch.findUnique({
+            where: { id: batch.id },
+          });
 
-        // 5. Stock movement
-        await tx.stockMovement.create({
-          data: {
-            inventoryId: inventory.id,
+          if (!fresh || fresh.remainingQuantity <= 0) continue;
+
+          const deduct = Math.min(fresh.remainingQuantity, remainingQty);
+
+          await tx.productBatch.update({
+            where: {
+              id: batch.id,
+              remainingQuantity: { gte: deduct },
+            },
+            data: {
+              remainingQuantity: {
+                decrement: deduct,
+              },
+            },
+          });
+
+          const unitPrice = fresh.sellingPrice;
+
+          const finalPrice = +(unitPrice * (1 - safeDiscount / 100)).toFixed(2);
+
+          orderItems.push({
+            productId: item.productId,
             batchId: batch.id,
             quantity: deduct,
-            type: 'OUT',
-            reason: 'ORDER',
-          },
-        });
+            unitPrice: finalPrice,
+            totalPrice: finalPrice * deduct,
+          });
+
+          subtotal += finalPrice * deduct;
+          remainingQty -= deduct;
+
+          await tx.stockMovement.create({
+            data: {
+              inventoryId: inventory.id,
+              batchId: batch.id,
+              quantity: deduct,
+              type: 'OUT',
+              reason: 'ORDER',
+            },
+          });
+        }
+
+        if (remainingQty > 0) {
+          throw new Error('Stock race condition detected');
+        }
       }
 
-      if (remainingQty > 0) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Insufficient stock');
-      }
+      const shippingCost = payload.shippingCost || 0;
 
-      // 6. Sync inventory quantity
-      const totalStock = await tx.productBatch.aggregate({
-        where: { inventoryId: inventory.id },
-        _sum: { remainingQuantity: true },
-      });
+      const total = subtotal + shippingCost;
 
-      await tx.inventory.update({
-        where: { id: inventory.id },
+      const order = await tx.order.create({
         data: {
-          quantity: totalStock._sum.remainingQuantity || 0,
+          userId,
+          orderNumber: generateOrderNumber(),
+          subtotal,
+          shippingCost,
+          total,
+          orderItems: {
+            create: orderItems,
+          },
         },
       });
-    }
 
-    const discountAmount = 0;
-    const total = subtotal - discountAmount + payload.shippingCost;
-
-    const orderNumber = generateOrderNumber();
-
-    const createdOrder = await tx.order.create({
-      data: {
-        userId,
-        orderNumber,
-        shippingCost: payload.shippingCost,
-        total,
-        orderItems: {
-          create: orderItemsData,
-        },
-      },
-    });
-
-    await tx.shipment.create({
-      data: {
-        orderId: createdOrder.id,
-        origin: payload.shipment.origin,
-        destination: payload.shipment.destination,
-        cost: payload.shippingCost,
-      },
-    });
-
-    return createdOrder;
-  });
-
-  return order;
+      return order;
+    },
+    {
+      isolationLevel: 'Serializable', // 🔥 strongest safety
+    },
+  );
 };
 const getAllOrderFromDB = async (
   filters: TOrderFilterRequest,

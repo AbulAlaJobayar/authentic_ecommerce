@@ -68,18 +68,21 @@ const ATSImageInput = ({
                                 const urls = await Promise.all(
                                     files.map((file) => imageUploader(file))
                                 );
+                                const newImages = [...(image || []), ...urls];
+                                setValue(name, newImages, {
+                                    shouldValidate: true,
+                                    shouldDirty: true,
+                                });
 
-                                setValue(name, urls);
-                                
-                                setImage([...(image || []), ...urls]);
+                                setImage(newImages);
                             }}
                         />
                     </motion.div>
                     {image && image.length > 0 && (
                         <div className="flex gap-4 mt-4">
                             {image.map((img, index) => (
-                                <Image key={index} src={img} alt={`Uploaded ${index}`}  width={120}
-  height={120} className="w-20 h-20 object-cover rounded" />
+                                <Image key={index} src={img} alt={`Uploaded ${index}`} width={120}
+                                    height={120} className="w-20 h-20 object-cover rounded" />
                             ))}
                         </div>
                     )}

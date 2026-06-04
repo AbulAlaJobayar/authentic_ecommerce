@@ -35,28 +35,17 @@ import { useAllDiscountQuery } from "@/redux/api/discountApi";
 import DiscountTable from "./DiscountTable";
 import AddDiscount from "./AddDiscount";
 
-type TDiscountApplyTo =
-    | "ALL_PRODUCTS"
-    | "SPECIFIC_PRODUCTS"
-    | "CATEGORIES";
-
 
 export type TDiscountRow = {
     id: string;
     name: string;
     image: string[];
     code?: string;
-    productIds: string[];
     createdAt: Date;
 
     isDeleted: boolean;
     active: boolean;
-
     percentage: number;
-    totalPrice: number;
-    discountPrice: number;
-
-    appliesTo: TDiscountApplyTo;
 
     startDate: Date;
     endDate: Date;
@@ -70,7 +59,6 @@ const columns: TableColumn<TDiscountRow>[] = [
   { key: "name", label: "Name" },
   { key: "code", label: "Code" },
   { key: "percentage", label: "Discount (%)" },
-  { key: "appliesTo", label: "Applies To" },
   { key: "active", label: "Active" },
   { key: "startDate", label: "Start Date" },
   { key: "endDate", label: "End Date" },
@@ -136,9 +124,9 @@ const DiscountPage = () => {
     // =========================
     // Data
     // =========================
-    const discount = data?.data?.data || [];
+    const discount = data?.data || [];
     const meta = data?.data?.meta || {};
-
+console.log(discount, "discount")
     // =========================
     // Pagination Data
     // =========================

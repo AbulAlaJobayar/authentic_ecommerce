@@ -133,33 +133,38 @@ const DiscountTable = ({
                                                     className="rounded-md object-cover"
                                                 />
                                             )
-
-                                                : column.key === "createdAt" ? (
+                                                : column.key === "startDate" ? (
                                                     <span>{moment(value).format('ll')}</span>
                                                 )
-                                                    : column.key === "isDeleted" ? (
-                                                        <span className={`px-2 py-1 rounded-full text-sm font-medium ${value ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                                                            {value ? "Deleted" : "Active"}
-                                                        </span>
+                                                : column.key === "endDate" ? (
+                                                    <span>{moment(value).format('ll')}</span>
+                                                )
+                                                    : column.key === "createdAt" ? (
+                                                        <span>{moment(value).format('ll')}</span>
                                                     )
+                                                        : column.key === "isDeleted" ? (
+                                                            <span className={`px-2 py-1 rounded-full text-sm font-medium ${value ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                                                                {value ? "Deleted" : "Active"}
+                                                            </span>
+                                                        )
 
-                                                        : column.key === "id" ? (
-                                                            <div className="flex items-center gap-3">
-                                                                <Button size="icon" variant="outline"
-                                                                    onClick={() => handleEdit(value)}
-                                                                >
-                                                                    <SquarePen size={18} />
-                                                                </Button>
+                                                            : column.key === "id" ? (
+                                                                <div className="flex items-center gap-3">
+                                                                    <Button size="icon" variant="outline"
+                                                                        onClick={() => handleEdit(value)}
+                                                                    >
+                                                                        <SquarePen size={18} />
+                                                                    </Button>
 
-                                                                <Button size="icon" variant="destructive"
-                                                                    onClick={() => handleDelete(value)}
-                                                                >
-                                                                    <Trash2Icon size={18} />
-                                                                </Button>
-                                                            </div>
-                                                        ) : (
-                                                            <span>{String(value ?? "")}</span>
-                                                        )}
+                                                                    <Button size="icon" variant="destructive"
+                                                                        onClick={() => handleDelete(value)}
+                                                                    >
+                                                                        <Trash2Icon size={18} />
+                                                                    </Button>
+                                                                </div>
+                                                            ) : (
+                                                                <span>{String(value ?? "")}</span>
+                                                            )}
                                         </TableCell>
                                     );
                                 })}

@@ -18,6 +18,7 @@ import { useAllWarehouseQuery } from "@/redux/api/warehouse";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { toast } from "sonner";
 import z from "zod";
 
 // ================= VALIDATION =================
@@ -114,7 +115,7 @@ const defaultValues: TFormValues = {
         sku: "",
         description: "",
         categoryId: "",
-        image: ""
+        image: []
     },
 
     inventory: {
@@ -175,11 +176,14 @@ const AddProduct = () => {
 
 
         try {
-
-            console.log(data.product.image, image, "my image")
             const res = await createProduct(data);
 
-            console.log(res, "res");
+            if(res && res?.data?.success) {
+                toast.success(res?.data?.message || "Product created successfully", {
+                    description: res?.data?.message,
+                });
+                setImage([]);
+            }
         } catch (error) {
             console.log(error)
         }

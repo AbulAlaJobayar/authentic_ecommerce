@@ -201,7 +201,6 @@ const InventoryPageContent = () => {
   const {
     data,
     isLoading,
-    isError,
   } = useGetAllInventoryQuery({
     page,
     limit,

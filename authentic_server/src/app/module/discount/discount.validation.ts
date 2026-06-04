@@ -7,7 +7,7 @@ import z from 'zod';
 const discountSchemaValidation = z.object({
   name: z.string().trim().min(1, 'Name is required'),
 
-  image: z.string().trim(),
+  image: z.array(z.string()),
 
   code: z.string().trim().optional(),
 
@@ -21,9 +21,9 @@ const discountSchemaValidation = z.object({
 
   active: z.boolean().optional(),
 
-  startDate: z.date(),
+  startDate: z.string(),
 
-  endDate: z.date(),
+  endDate: z.string(),
 });
 
 const createDiscountSchema = z.object({

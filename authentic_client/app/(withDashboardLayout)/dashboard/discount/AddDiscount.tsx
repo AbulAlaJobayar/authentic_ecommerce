@@ -1,208 +1,180 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
 
-import * as React from "react";
-
+"use client"
+import React from "react";
 import ATSFrom from "@/components/shared/Form/ATSForm";
 import ATSInput from "@/components/shared/Form/ATSInput";
-import ATSMultiSelect from "@/components/shared/Form/ATSMultiSelect";
-import ATSSelect from "@/components/shared/Form/ATSSelect";
-
 import { Button } from "@/components/ui/button";
-import DotWave from "@/components/ui/dot-wave";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-
-
-
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import z from "zod";
-import { useCreateDiscountMutation } from "@/redux/api/discountApi";
+import { toast } from "sonner";
+import {
+    useCreateDiscountMutation,
+} from "@/redux/api/discountApi";
+
 import { useGetAllProductsQuery } from "@/redux/api/productApi";
+import ATSImageInput from "@/components/shared/Form/ATSImageInput";
 
-// ======================================================
-// ENUM (adjust import from prisma if needed)
-// ======================================================
-
-export const DiscountType = {
-    ALL_PRODUCTS: "ALL_PRODUCTS",
-    SPECIFIC_PRODUCTS: "SPECIFIC_PRODUCTS",
-    CATEGORIES: "CATEGORIES",
-} as const;
-
-// ======================================================
-// ZOD SCHEMA
-// ======================================================
+// ---------------------- SCHEMA ----------------------
 
 const FormSchema = z.object({
-    name: z.string().trim().min(1, "Name is required"),
-
-    image: z.string().trim().optional(),
-
-    code: z.string().trim().optional(),
-
-    productIds: z.array(z.string()).optional(),
-
-    isDeleted: z.boolean().optional(),
-
-    percentage: z.string().trim(),
-
-    active: z.boolean().optional(),
-
+    name: z.string().min(1),
+    image: z.array(z.string()).default([]),
+    code: z.string().optional(),
+    percentage: z.string(),
+    productIds: z.array(z.string()).default([]),
+    active: z.boolean().default(true),
     startDate: z.string(),
-
     endDate: z.string(),
 });
 
-type TFormValues = z.infer<typeof FormSchema>;
+// type TFormValues = z.infer<typeof FormSchema>;
 
-// ======================================================
-// DEFAULT VALUES
-// ======================================================
 
-const defaultValues: TFormValues = {
-    name: "",
-    image: "",
-    code: "",
-    percentage:"",
-    productIds: [],
-    isDeleted: false,
-    active: true,
-    startDate: "",
-    endDate: " ",
-};
+export default function AddDiscount({ setOpen }: any) {
+    const { data } = useGetAllProductsQuery({});
+    const products = data?.data || [];
 
-// ======================================================
-// TYPES
-// ======================================================
+    const [ids, setIds] = React.useState<string[]>([]);
+    const [image, setImage] = React.useState<string[]>([]);
 
-type TProps = {
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
+    const [createDiscount, { isLoading }] = useCreateDiscountMutation();
 
-// ======================================================
-// COMPONENT
-// ======================================================
+    const handleSubmit = async (values: any) => {
+        const payload = {
+            ...values,
+            percentage: Number(values.percentage),
+            startDate: new Date(values.startDate),
+            endDate: new Date(values.endDate),
+            productIds: ids,
+        };
 
-const AddDiscount = ({ setOpen }: TProps) => {
-    const [createDiscount, { isLoading, isError }] =
-        useCreateDiscountMutation();
-    const { data } = useGetAllProductsQuery({})
-    const products = data?.data
-    console.log(products, "add products")
-    const handleSubmit = async (values: TFormValues) => {
-        console.log(values, "form discount values");
-        try {
-            const res = await createDiscount(values);
+        console.log(payload, "payload")
+        const res = await createDiscount(payload);
 
-            if (res?.data?.success) {
-                toast.success(
-                    res.data.message || "Discount created successfully"
-                );
-
-                setOpen(false);
-            } else {
-                toast.error(
-                    (res?.error as any)?.data || "Failed to create discount"
-                );
-
-                setOpen(false);
-            }
-        } catch (error) {
-            console.log(error);
-
-            if (isError) {
-                toast.error("Failed to create discount");
-            } else if (error instanceof Error) {
-                toast.error(error.message);
-            }
-
+        if (res?.data?.success) {
+            toast.success("Discount created successfully");
             setOpen(false);
+        } else {
+            toast.error("Failed to create discount");
         }
     };
 
     return (
-        <div>
-            <ATSFrom
-                resolver={zodResolver(FormSchema)}
-                onSubmit={handleSubmit}
-                defaultValues={defaultValues}
-                className="p-6 md:p-8"
-            >
-                <FieldGroup>
+        <ATSFrom
+            resolver={zodResolver(FormSchema)}
+            defaultValues={{
+                name: "",
+                image: [],
+                code: "",
+                percentage: 0,
+                active: true,
+                startDate: "",
+                endDate: "",
+            }}
+            onSubmit={handleSubmit}
+        >
+            <div className="space-y-6">
 
-                    {/* NAME */}
-                    <Field>
-                        <FieldLabel>Name</FieldLabel>
-                        <ATSInput name="name" placeholder="Eid Discount" />
-                    </Field>
-
-                    {/* IMAGE */}
-                    <Field>
-                        <FieldLabel>Image URL</FieldLabel>
-                        <ATSInput name="image" placeholder="https://..." />
-                    </Field>
-
-                    {/* CODE */}
-                    <Field>
-                        <FieldLabel>Coupon Code</FieldLabel>
-                        <ATSInput name="code" placeholder="EID10" />
-                    </Field>
-
-                    {/* PERCENTAGE */}
-                    <Field>
-                        <FieldLabel>Percentage</FieldLabel>
-                        <ATSInput
-                            name="percentage"
-                            type="number"
-                            placeholder="10"
+                {/* PRODUCT SELECTOR */}
+                <Card>
+                    <CardHeader>Select Products</CardHeader>
+                    <CardContent>
+                        <ProductSelector
+                            products={products}
+                            ids={ids}
+                            setIds={setIds}
                         />
-                    </Field>
+                    </CardContent>
+                </Card>
 
+                {/* FORM */}
+                <Card>
+                    <CardHeader>Discount Info</CardHeader>
+                    <CardContent className="space-y-4">
+                        <ATSInput name="name" label="Discount Name" />
+                        <ATSInput name="code" label="Coupon Code" />
+                        <ATSImageInput name="image" setImage={setImage} image={image} />
+                        <ATSInput name="percentage" type="number" label="Percentage %" />
+                        <ATSInput name="startDate" type="date" label="Start Date" />
+                        <ATSInput name="endDate" type="date" label="End Date" />
+                    </CardContent>
+                </Card>
 
+                <Button type="submit" className="w-full">
+                    {isLoading ? "Creating..." : "Create Discount"}
+                </Button>
 
-                    {/* PRODUCTS */}
-                    <Field>
-                        <FieldLabel>Products</FieldLabel>
+            </div>
+        </ATSFrom>
+    );
+}
 
-                        <ATSMultiSelect
-                            name="productIds"
-                            options={products}
-                        />
-                    </Field>
+function ProductSelector({ products, ids, setIds }: any) {
+    const [search, setSearch] = React.useState("");
 
-                    {/* START DATE */}
-                    <Field>
-                        <FieldLabel>Start Date</FieldLabel>
-                        <ATSInput name="startDate" type="date" />
-                    </Field>
+    const toggleProduct = (id: string) => {
+        setIds((prev: string[]) => {
+            if (prev.includes(id)) {
+                return prev.filter((i) => i !== id);
+            }
+            return [...prev, id];
+        });
+    };
 
-                    {/* END DATE */}
-                    <Field>
-                        <FieldLabel>End Date</FieldLabel>
-                        <ATSInput name="endDate" type="date" />
-                    </Field>
+    const filtered = React.useMemo(() => {
+        return (products || []).filter((p: any) =>
+            p?.name?.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [products, search]);
 
-                    {/* SUBMIT */}
-                    <Field>
-                        <Button
-                            className="bg-[#6777EF] hover:bg-[#4C60DA]"
-                            type="submit"
+    return (
+        <div className="space-y-3">
+
+            {/* SEARCH */}
+            <Input
+                placeholder="Search products..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+            />
+
+            {/* PRODUCT GRID */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {filtered.map((p: any) => {
+                    const isSelected = ids.includes(p.id);
+
+                    return (
+                        <div
+                            key={p.id}
+                            onClick={() => toggleProduct(p.id)}
+                            className={`border rounded-lg p-2 cursor-pointer transition ${isSelected ? "border-blue-500 ring-2 ring-blue-200" : ""
+                                }`}
                         >
-                            {isLoading ? (
-                                <span>
-                                    Creating <DotWave />
-                                </span>
-                            ) : (
-                                "Create Discount"
-                            )}
-                        </Button>
-                    </Field>
+                            {/* NAME */}
+                            <p className="text-sm font-medium">{p.name}</p>
 
-                </FieldGroup>
-            </ATSFrom>
+                            {/* PRICE */}
+                            <p className="text-xs text-gray-500">
+                                ৳ {p.sellingPrice}
+                            </p>
+
+                            {/* CHECKBOX */}
+                            <div className="mt-2 flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    readOnly
+                                />
+                                <span className="text-xs">
+                                    {isSelected ? "Selected" : "Select"}
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
-};
-
-export default AddDiscount;
+}

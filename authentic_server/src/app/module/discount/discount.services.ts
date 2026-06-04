@@ -23,10 +23,11 @@ const createDiscountIntoDB = async (payload: TCreateDiscount) => {
         id: {
           in: productIds,
         },
-        isDeleted: false,
       },
     });
-
+    // console.log(products,)
+console.log(products,"from db")
+console.log(productIds,"productIds from payload")
     if (products.length !== productIds.length) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
@@ -38,13 +39,13 @@ const createDiscountIntoDB = async (payload: TCreateDiscount) => {
     const discount = await tx.discount.create({
       data: {
         name: payload.name,
-        image: payload.image,
+        image: payload.image[0],
         code: payload.code,
         percentage: payload.percentage || 0,
         maxAmount: payload.maxAmount,
         active: payload.active ?? true,
-        startDate: payload.startDate,
-        endDate: payload.endDate,
+        startDate: new Date(payload.startDate),
+        endDate: new Date(payload.endDate),
       },
     });
 
@@ -67,7 +68,7 @@ const createDiscountIntoDB = async (payload: TCreateDiscount) => {
 const getAllDiscountFromDB = async () => {
   const discounts = await prisma.discount.findMany({
     where: {
-      active: false,
+      active: true,
       endDate: {
         gte: new Date(),
       },
@@ -96,7 +97,7 @@ const updateDiscountFromDB = async (id: string, payload: TUpdateDiscount) => {
     where: {
       id,
     },
-    data: payload,
+    data:{payload},
   });
   return result;
 };
@@ -107,6 +108,7 @@ const deleteDiscountFromDB = async (id: string) => {
     },
     data: {
       isDeleted: true,
+      active: false,
     },
   });
   return result;
