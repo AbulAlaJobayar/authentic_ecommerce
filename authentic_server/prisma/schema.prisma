@@ -50,12 +50,6 @@ enum OrderStatus {
   CANCELLED
 }
 
-enum DiscountType {
-  ALL_PRODUCTS
-  SPECIFIC_PRODUCTS
-  CATEGORIES
-}
-
 enum ShipmentStatus {
   PENDING
   SHIPPED
@@ -163,6 +157,8 @@ model Product {
   updatedAt    DateTime    @updatedAt
   CartItem     CartItem[]
   Wishlist     Wishlist[]
+  discount     Discount?   @relation(fields: [discountId], references: [id])
+  discountId   String?
 
   @@index([sku, name, status])
   @@map("product")
@@ -199,7 +195,7 @@ model Inventory {
   id             String          @id @default(cuid())
   product        Product         @relation(fields: [productId], references: [id])
   productId      String          @unique
-  quantity       Int? //calculate total quantity by product batch
+  quantity       Int?            @default(0)
   alertQuantity  Int?            @default(5)
   isDeleted      Boolean         @default(false)
   createdAt      DateTime        @default(now())
@@ -225,21 +221,22 @@ model CartItem {
 }
 
 model Order {
-  id           String      @id @default(cuid())
-  user         User        @relation(fields: [userId], references: [id])
-  userId       String
-  orderNumber  String?
-  shippingCost Float
-  total        Float // sum of (OrderItems.unitPrice * quantity) + shippingCost - discounts
-  payment      Payment?
-  status       OrderStatus @default(PENDING)
-  shipment     Shipment?
-  discount     Discount?   @relation(fields: [discountId], references: [id])
-  discountId   String?
-  orderItems   OrderItem[]
-  isDeleted    Boolean     @default(false)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id             String          @id @default(cuid())
+  user           User            @relation(fields: [userId], references: [id])
+  userId         String
+  orderNumber    String?
+  shippingCost   Float
+  total          Float // sum of (OrderItems.unitPrice * quantity) + shippingCost - discounts
+  payment        Payment?
+  status         OrderStatus     @default(PENDING)
+  shipment       Shipment?
+  discount       Discount?       @relation(fields: [discountId], references: [id])
+  discountId     String?
+  orderItems     OrderItem[]
+  isDeleted      Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  orderDiscounts OrderDiscount[]
 
   @@index([orderNumber, userId, status])
 }
@@ -319,26 +316,56 @@ model Shipment {
   @@map("shipment")
 }
 
+// model Discount {
+//   id            String       @id @default(cuid())
+//   name          String
+//   image         String?
+//   code          String?      @unique
+//   productIds    String[]
+//   isDeleted     Boolean      @default(false)
+//   percentage    Float        @default(0)
+//   totalPrice    Float        @default(0)
+//   discountPrice Float?
+//   appliesTo     DiscountType
+//   active        Boolean      @default(true)
+//   startDate     DateTime
+//   endDate       DateTime
+//   createdAt     DateTime     @default(now())
+//   updatedAt     DateTime     @updatedAt
+//   orders        Order[]
+
+//   @@index([code])
+//   @@map("discount")
+// }
+
 model Discount {
-  id         String       @id @default(cuid())
-  name       String
-  image      String?
-  code       String?      @unique
-  productIds String[]
-  isDeleted  Boolean      @default(false)
-  percentage Float        @default(0)
-  totalPrice Float @default(0)
-  discountPrice  Float?
-  appliesTo  DiscountType
-  active     Boolean      @default(true)
-  startDate  DateTime
-  endDate    DateTime
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  orders     Order[]
+  id             String          @id @default(cuid())
+  name           String
+  image          String?
+  code           String?         @unique
+  percentage     Float           @default(0)
+  maxAmount      Float?
+  active         Boolean         @default(true)
+  startDate      DateTime
+  endDate        DateTime
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  orders         Order[]
+  orderDiscounts OrderDiscount[]
+  products       Product[]
 
   @@index([code])
   @@map("discount")
+}
+
+model OrderDiscount {
+  id         String @id @default(cuid())
+  orderId    String
+  discountId String
+  amount     Float
+
+  order    Order    @relation(fields: [orderId], references: [id])
+  discount Discount @relation(fields: [discountId], references: [id])
 }
 
 model Review {

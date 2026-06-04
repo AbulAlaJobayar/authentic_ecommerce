@@ -117,7 +117,6 @@ const ProductsPageContent = () => {
   const {
     data,
     isLoading,
-    isError,
   } = useGetAllProductsQuery({
     page,
     limit,
@@ -166,13 +165,7 @@ const ProductsPageContent = () => {
   // ERROR
   // ======================
 
-  if (isError) {
-    return (
-      <div className="p-10 text-center text-red-500">
-        Failed to load products.
-      </div>
-    );
-  }
+
 
   // ======================
   // JSX

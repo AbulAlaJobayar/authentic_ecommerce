@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { Controller, useFormContext } from "react-hook-form";
 import React from "react";
 import imageUploader from "@/helper/imageUploder";
+import Image from "next/image";
 
 type ATSInputProps = {
     size?: number | string;
@@ -16,6 +18,8 @@ type ATSInputProps = {
     id?: string;
     icon?: React.ReactNode;
     placeholder?: string;
+    image?: string[];
+    setImage: any;
 };
 
 const ATSImageInput = ({
@@ -25,6 +29,8 @@ const ATSImageInput = ({
     className,
     id,
     icon,
+    image,
+    setImage
 }: ATSInputProps) => {
     const { control, setValue } = useFormContext();
 
@@ -53,18 +59,30 @@ const ATSImageInput = ({
 
                             type="file"
                             required={required}
+                            multiple
                             id={id || name}
                             name={name}
                             className={cn(className, error && "border-red-500 dark:text-white")}
                             onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                    const url = await imageUploader(file);
-                                    setValue(name, url);
-                                }
+                                const files = Array.from(e.target.files || []);
+                                const urls = await Promise.all(
+                                    files.map((file) => imageUploader(file))
+                                );
+
+                                setValue(name, urls);
+                                
+                                setImage([...(image || []), ...urls]);
                             }}
                         />
                     </motion.div>
+                    {image && image.length > 0 && (
+                        <div className="flex gap-4 mt-4">
+                            {image.map((img, index) => (
+                                <Image key={index} src={img} alt={`Uploaded ${index}`}  width={120}
+  height={120} className="w-20 h-20 object-cover rounded" />
+                            ))}
+                        </div>
+                    )}
 
                     {error && (
                         <motion.p

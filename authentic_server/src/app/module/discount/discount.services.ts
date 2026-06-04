@@ -4,58 +4,70 @@ import { prisma } from '../../shared/prisma';
 import { TCreateDiscount, TUpdateDiscount } from './discount.validation';
 
 const createDiscountIntoDB = async (payload: TCreateDiscount) => {
-  try {
-    const result = await prisma.$transaction(async (tx) => {
-      const products = await tx.product.findMany({
-        where: {
-          id: {
-            in: payload.productIds || [],
-          },
-          isDeleted: false,
-        },
-      });
-      if (!products || products.length === 0) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Products not found');
-      }
-      //Calculate Total Price
-      const totalPrice = products.reduce(
-        (sum, product) => sum + Number(product.sellingPrice),
-        0,
-      );
-      // Discount Amount
-      let discountAmount = 0;
-      if (payload.percentage) {
-        discountAmount = (totalPrice * payload.percentage) / 100;
-      }
-      // finalPrice
-      const finalPrice = totalPrice - discountAmount;
-      // create discount
-      const createDiscount = await tx.discount.create({
-        data: {
-          name: payload.name,
-          image: payload.image,
-          code: payload.code,
-          productIds: payload.productIds,
-          percentage: payload.percentage,
-          price: totalPrice,
-          totalPrice: finalPrice,
-          appliesTo: payload.appliesTo,
-          startDate: payload.startDate,
-          endDate: payload.endDate,
-        },
-      });
-      return createDiscount;
+  const result = await prisma.$transaction(async (tx) => {
+    const isExistCode = await tx.discount.findUnique({
+      where: {
+        code: payload.code,
+      },
     });
-    return result;
-  } catch (error) {
-    return error;
-  }
+    if (isExistCode) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Discount with this code already exists',
+      );
+    }
+    // validate productIds
+    const productIds = payload.productIds || [];
+    const products = await tx.product.findMany({
+      where: {
+        id: {
+          in: productIds,
+        },
+        isDeleted: false,
+      },
+    });
+
+    if (products.length !== productIds.length) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Some products not found or deleted',
+      );
+    }
+
+    // create Discount
+    const discount = await tx.discount.create({
+      data: {
+        name: payload.name,
+        image: payload.image,
+        code: payload.code,
+        percentage: payload.percentage || 0,
+        maxAmount: payload.maxAmount,
+        active: payload.active ?? true,
+        startDate: payload.startDate,
+        endDate: payload.endDate,
+      },
+    });
+
+    // update products with discountId
+    await tx.product.updateMany({
+      where: {
+        id: {
+          in: productIds,
+        },
+      },
+      data: {
+        discountId: discount.id,
+      },
+    });
+    return discount;
+  });
+  return result;
 };
 // get All Discount
 const getAllDiscountFromDB = async () => {
   const discounts = await prisma.discount.findMany({
     where: {
-      isDeleted: false,
+      active: false,
       endDate: {
         gte: new Date(),
       },

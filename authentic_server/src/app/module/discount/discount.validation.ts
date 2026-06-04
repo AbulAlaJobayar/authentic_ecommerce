@@ -1,15 +1,14 @@
-import z from "zod";
-import { DiscountType } from "../../../../generated/prisma";
+import z from 'zod';
 
-/**
- * Discount validation schema
- */
+
+// Discount validation schema
+ 
 
 const discountSchemaValidation = z.object({
-  name: z.string().trim().min(1, "Name is required"),
+  name: z.string().trim().min(1, 'Name is required'),
 
-  image:z.string().trim(),
-  
+  image: z.string().trim(),
+
   code: z.string().trim().optional(),
 
   productIds: z.array(z.string()).optional(),
@@ -19,8 +18,6 @@ const discountSchemaValidation = z.object({
   percentage: z.number().min(0).max(100).optional(),
 
   maxAmount: z.number().optional().nullable(),
-
-  appliesTo: z.enum(DiscountType),
 
   active: z.boolean().optional(),
 
@@ -37,8 +34,8 @@ const updateDiscountSchema = z.object({
   body: discountSchemaValidation.partial(), // allow partial update
 });
 
-export type TCreateDiscount=z.infer<typeof discountSchemaValidation>
-export type TUpdateDiscount=Partial<z.infer<typeof discountSchemaValidation>>
+export type TCreateDiscount = z.infer<typeof discountSchemaValidation>;
+export type TUpdateDiscount = Partial<z.infer<typeof discountSchemaValidation>>;
 export const DiscountValidation = {
   createDiscountSchema,
   updateDiscountSchema,

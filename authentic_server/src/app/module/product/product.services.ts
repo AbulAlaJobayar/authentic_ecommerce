@@ -1,3 +1,4 @@
+import  httpStatus  from 'http-status';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { imageUploader, MulterFile } from '../../shared/imageUpload';
@@ -8,6 +9,7 @@ import { paginationHelpers } from '../../helper/paginationHelper';
 import { productSearchableFields } from './product.constant';
 // import { logger } from '../../config/logger';
 import { Status } from '../../../../generated/prisma';
+import { AppError } from '../../error/AppError';
 
 const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
   try {
@@ -19,7 +21,7 @@ const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
       sku: payload.product.sku,
       name: payload.product.name,
       description: payload.product.description,
-      image: [payload.product.image || 'no image found'],
+      image: payload.product.image ,
       sellingPrice: payload.productBatch.sellingPrice,
       categoryId: payload.product.categoryId,
     };
@@ -51,6 +53,9 @@ const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
       await tx.productBatch.create({ data: productBatchData });
       return createProduct;
     });
+  if (!result) {
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to create product');
+  }
     console.log(result, 'my result');
     return result;
   } catch (err) {

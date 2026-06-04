@@ -18,7 +18,7 @@ const productSchemaValidation = z.object({
     )
     .trim(),
 
-  image: z.string(),
+  image: z.array(z.string().trim().optional()),
   description: z
     .string({
       error: (issue) =>

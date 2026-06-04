@@ -246,13 +246,7 @@ const InventoryPageContent = () => {
   // ERROR
   // ======================
 
-  if (isError) {
-    return (
-      <div className="p-10 text-center text-red-500">
-        Failed to load products.
-      </div>
-    );
-  }
+  
   console.log(products.data, "inventory page")
   // =========================
   const handleExport = () => {

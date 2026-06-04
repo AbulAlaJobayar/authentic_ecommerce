@@ -12,7 +12,7 @@ export type TProduct = {
     sku: string;
     description: string;
     categoryId: string;
-    image:string
+    image:string[]
   };
   inventory: {
     alertQuantity: number;

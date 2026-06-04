@@ -17,6 +17,7 @@ import { useGetAllSuppliersQuery } from "@/redux/api/suppliers";
 import { useAllWarehouseQuery } from "@/redux/api/warehouse";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import z from "zod";
 
 // ================= VALIDATION =================
@@ -45,7 +46,7 @@ const productSchemaValidation = z.object({
         .trim()
         .min(1, "Category is Required"),
 
-       image: z.any(),
+    image: z.array(z.string()).min(1)
 });
 
 const inventorySchemaValidation = z.object({
@@ -113,7 +114,7 @@ const defaultValues: TFormValues = {
         sku: "",
         description: "",
         categoryId: "",
-        image:""
+        image: ""
     },
 
     inventory: {
@@ -161,6 +162,7 @@ const SectionTitle = ({
 // ================= COMPONENT =================
 
 const AddProduct = () => {
+    const [image, setImage] = useState<string[]>([])
 
     const { data: categoriesData } =
         useAllCategoryQuery({});
@@ -170,10 +172,14 @@ const AddProduct = () => {
 
     // ================= submit form===============
     const handleSubmit = async (data: TFormValues) => {
-        console.log(data);
+
+
         try {
-            const res = await createProduct(data)
-            console.log(res, "res")
+
+            console.log(data.product.image, image, "my image")
+            const res = await createProduct(data);
+
+            console.log(res, "res");
         } catch (error) {
             console.log(error)
         }
@@ -254,6 +260,8 @@ const AddProduct = () => {
                                         name="product.image"
                                         id="image"
                                         required
+                                        image={image}
+                                        setImage={setImage}
                                     />
                                 </Field>
 
