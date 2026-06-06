@@ -27,15 +27,15 @@ const SearchProduct = () => {
   const router = useRouter();
 
   const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [, setDebouncedQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [open, setOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // 🔥 Debounce
+  //  Debounce
 
-  // 🔥 API CALL (Express backend)
+  // API CALL (Express backend)
   const fetchProducts = async (searchTerm: string) => {
     try {
       const res = await fetch(
@@ -67,7 +67,7 @@ const SearchProduct = () => {
   }, [query]);
 
 
-  // 🔥 Click outside
+  //  Click outside
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (
       containerRef.current &&
@@ -83,7 +83,7 @@ const SearchProduct = () => {
       document.removeEventListener("mousedown", handleClickOutside);
   }, [handleClickOutside]);
 
-  // 🔥 Submit (Enter or button click)
+  //  Submit (Enter or button click)
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
@@ -127,9 +127,9 @@ const SearchProduct = () => {
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
-            className="absolute z-50 w-full mt-2"
+            className="absolute z-50 w-full mt-4"
           >
-            <Card className=" border bg-white dark:bg-slate-900 py-0">
+            <Card className=" border bg-white dark:bg-slate-900 py-0 ">
               {products?.length > 0 ? (
                 <div className="max-h-80 overflow-y-auto ">
                   {products?.map((product) => (
