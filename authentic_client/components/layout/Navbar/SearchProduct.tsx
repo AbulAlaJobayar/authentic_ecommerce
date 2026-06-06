@@ -1,57 +1,73 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Search, ExternalLink } from "lucide-react";
+import { Search } from "lucide-react";
+import { HiOutlineCurrencyBangladeshi } from "react-icons/hi2";
+const DEBOUNCE_MS = 300;
 
-const DEBOUNCE_MS = 200;
-
-const productsData = [
-  {
-    id: 1,
-    name: "Authentic Leather Wallet",
-    image: "/images/products/wallet.jpg",
-  },
-  { id: 2, name: "Classic Men's Belt", image: "/images/products/wallet.jpg" },
-  { id: 3, name: "Stylish Handbag", image: "/images/products/wallet.jpg" },
-  { id: 4, name: "Brown Leather Shoes", image: "/images/products/wallet.jpg" },
-  { id: 5, name: "Minimal Watch", image: "/images/products/wallet.jpg" },
-  { id: 6, name: "Premium Backpack", image: "/images/products/wallet.jpg" },
-  { id: 7, name: "Travel Duffel Bag", image: "/images/products/wallet.jpg" },
-  { id: 8, name: "Office Laptop Bag", image: "/images/products/wallet.jpg" },
-  { id: 9, name: "Leather Keychain", image: "/images/products/wallet.jpg" },
-  { id: 10, name: "Card Holder", image: "/images/products/wallet.jpg" },
-];
+type Product = {
+  id: number;
+  name: string;
+  image: string[];
+  sellingPrice: number;
+};
 
 const SearchProduct = () => {
+  const router = useRouter();
+
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
   const [open, setOpen] = useState(false);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Debounce user input
+  // 🔥 Debounce
+
+  // 🔥 API CALL (Express backend)
+  const fetchProducts = async (searchTerm: string) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_DATABASE_URL}/product?searchTerm=${searchTerm}`
+      );
+
+      const data = await res.json();
+      setProducts(data.data);
+    } catch (error) {
+      console.error("Search error:", error);
+    }
+  };
+
   useEffect(() => {
     const handler = setTimeout(() => {
-      const trimmed = query.trim().toLowerCase();
+      const trimmed = query.trim();
+
       setDebouncedQuery(trimmed);
-      setOpen(trimmed.length > 0); // open dropdown only when typing
+
+      if (trimmed.length >= 2) {
+        fetchProducts(trimmed);
+        setOpen(true);
+      } else {
+        setOpen(false);
+      }
     }, DEBOUNCE_MS);
+
     return () => clearTimeout(handler);
   }, [query]);
 
-  // Filtered products
-  const filteredProducts = useMemo(() => {
-    if (!debouncedQuery) return [];
-    return productsData.filter((p) =>
-      p.name.toLowerCase().includes(debouncedQuery)
-    );
-  }, [debouncedQuery]);
 
-  // Click outside to close dropdown
+  // 🔥 Click outside
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (
       containerRef.current &&
@@ -63,71 +79,92 @@ const SearchProduct = () => {
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, [handleClickOutside]);
 
-  // Truncate utility
-  const truncate = (text: string, maxLen: number) =>
-    text.length <= maxLen ? text : text.slice(0, maxLen - 3) + "...";
+  // 🔥 Submit (Enter or button click)
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
+    if (!query.trim()) return;
+
+    router.push(`/products?searchTerm=${query.trim()}`);
+    setOpen(false);
+  };
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto px-3 sm:px-0"
+      className="relative w-full max-w-3xl mx-auto"
     >
-      {/* Search Input */}
-      <div className="relative flex items-center ">
-        <Search className="absolute  left-3 w-5 h-5 text-gray-400 dark:text-slate-500" />
+      {/* FORM */}
+      <form
+        onSubmit={handleSearchSubmit}
+        className="relative flex items-center"
+      >
         <Input
           placeholder="Search products..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-10 text-sm sm:text-base dark:bg-black dark:text-slate-200 border-2 border-black w-full py-2 sm:py-3"
+          className="py-5 pr-10 w-full bg-gray-100 dark:bg-black"
         />
-      </div>
 
-      {/* Dropdown Results */}
+        {/* SEARCH BUTTON (ONCLICK + SUBMIT SUPPORT) */}
+        <button
+          type="submit"
+          onClick={() => handleSearchSubmit()}
+          className="absolute right-3 cursor-pointer"
+        >
+          <Search className="w-5 h-5 text-gray-500" />
+        </button>
+      </form>
+
+      {/* DROPDOWN */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0, y: -6 }}
             className="absolute z-50 w-full mt-2"
           >
-            <Card className="bg-white dark:bg-slate-900 border border-border rounded-md shadow-xl overflow-hidden">
-              {filteredProducts.length > 0 ? (
-                <div className="max-h-64 sm:max-h-80 overflow-y-auto">
-                  {filteredProducts.map((product) => (
+            <Card className=" border bg-white dark:bg-slate-900 py-0">
+              {products?.length > 0 ? (
+                <div className="max-h-80 overflow-y-auto ">
+                  {products?.map((product) => (
                     <Link
-                      key={product.id}
+                      key={product?.id}
                       href={`/products/${product.id}`}
                       onClick={() => setOpen(false)}
-                      className="flex items-center justify-between w-full px-4 py-2.5 sm:py-3 hover:bg-gray-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-100 dark:hover:bg-slate-800 border-b border-gray-200"
                     >
-                      <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="flex items-center justify-between gap-6">
                         <Image
-                          src={product.image}
+                          src={product?.image?.map((img: string) => img)[0]}
                           alt={product.name}
-                          width={35}
-                          height={35}
-                          className="rounded object-cover w-8 h-8 sm:w-10 sm:h-10"
+                          width={40}
+                          height={40}
+                          className="rounded"
                         />
-                        <p className="text-xs sm:text-sm md:text-base text-gray-700 dark:text-slate-200 truncate">
-                          {truncate(product.name, 60)}
-                        </p>
+                        <div>
+                          <p className="text-md font-normal">
+                            {product.name}
+                          </p>
+                          <p className="text-sm font-normal text-[#F48721] flex gap-1  items-center">
+                            <HiOutlineCurrencyBangladeshi /> {product.sellingPrice && product.sellingPrice.toFixed(2)}
+                          </p>
+                        </div>
+
                       </div>
-                      <ExternalLink
-                        size={16}
-                        className="text-gray-500 dark:text-slate-400 hidden sm:block"
-                      />
+
+
                     </Link>
                   ))}
                 </div>
               ) : (
-                <p className="text-center text-xs sm:text-sm py-4 text-gray-500 dark:text-slate-500">
-                  No results found.
+                <p className="p-4 text-center text-sm text-gray-500">
+                  No results found
                 </p>
               )}
             </Card>
