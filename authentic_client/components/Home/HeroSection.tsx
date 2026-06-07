@@ -12,19 +12,15 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Discount } from "@/services/action/discount/discount";
+import Link from "next/link";
 
-const slides = [
-  {
-    image: "https://i.ibb.co.com/B5vNQZmW/Screen-Shot-Tool-20250713100047.png",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1542838132-92c53300491e",
-  },
-  {
-    image: "https://images.unsplash.com/photo-1573246123716-6b1782bfc499",
-  },
-];
-
+interface DiscountBanner {
+  id: string;
+  title?: string;
+  image: string;
+  discount?: number;
+}
 const autoplayPlugin = Autoplay({
   delay: 4000,
   stopOnInteraction: false,
@@ -33,56 +29,27 @@ const autoplayPlugin = Autoplay({
 const HeroSection = () => {
   const [api, setApi] = useState<any>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [slides, setSlides] = useState<DiscountBanner[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // const discounts = async()=>{
-  //   const res=await fetch(`${process.env.}`)
-  // }
-  // const userLogin = async (data: FieldValues) => {
-  //   try {
-  //     const res = await fetch(
-  //       `${process.env.NEXT_PUBLIC_DATABASE_URL}/auth/login`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify(data),
-  //         credentials: "include",
-  //       },
-  //     );
-  
-  //     // Handle non-OK responses
-  //     if (!res.ok) {
-  //       const errorResponse = await res.json();
-  //       throw new Error(
-  //         errorResponse.message || "Login failed. Please try again.",
-  //       );
-  //     }
-  
-  //     const userInfo = await res.json();
-  
-  //     // Ensure the response has the expected structure
-  //     if (!userInfo.data) {
-  //       throw new Error("Invalid response from the server.");
-  //     }
-  
-  //     // Handle case where user is already logged in
-  //     console.log("token from user file", userInfo.data.accessToken);
-  //     // Store the access token and redirect
-  //     if (userInfo.data.accessToken) {
-  //       setAccessToken(userInfo.data.accessToken);
-  //     }
-  //     console.log("userinfo", userInfo);
-  //     return userInfo;
-  //   } catch (error) {
-  //     console.error("Error during user login:", error);
-  //     throw new Error(
-  //       error instanceof Error ? error.message : "An unexpected error occurred.",
-  //     );
-  //   }
-  // };
-  const res=fetch(`${process.env.NEXT_PUBLIC_DATABASE_URL}/auth/login}`)
-  const result=res.json()
+  // fetch Discounts
+  useEffect(() => {
+    const fetchDiscounts = async () => {
+      try {
+        const result = await Discount.getAllDiscount();
+
+        // Adjust this based on your API response
+        setSlides(result?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch discounts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDiscounts();
+  }, []);
+
   useEffect(() => {
     if (!api) return;
 
@@ -99,6 +66,15 @@ const HeroSection = () => {
       api.off("reInit", onSelect);
     };
   }, [api]);
+  if (loading) {
+    return (
+      <section className="py-6">
+        <div className="max-w-350 mx-auto">
+          <div className="h-87.5 rounded-2xl bg-gray-100 animate-pulse" />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-6">
@@ -115,14 +91,16 @@ const HeroSection = () => {
               <CarouselContent>
                 {slides.map((slide, index) => (
                   <CarouselItem key={index}>
-                    <div className="relative h-65 sm:h-87.5 lg:h-87.5 rounded">
-                      <Image
-                        src={slide.image}
-                        alt="banner"
-                        fill
-                        priority
-                        className="object-cover"
-                      />
+                    <div className="relative h-50  sm:h-62.5 md:h-75  lg:h-87.5 rounded">
+                      <Link href={`products/?discountId=${slide.id}`}>
+                        <Image
+                          src={slide.image}
+                          alt="banner"
+                          fill
+                          priority
+                          className="object-cover"
+                        />
+                      </Link>
                     </div>
                   </CarouselItem>
                 ))}
@@ -149,26 +127,15 @@ const HeroSection = () => {
           </div>
 
           {/* ================= RIGHT BANNER ================= */}
-          <div className="relative overflow-hidden rounded-2xl h-65 sm:h-87.5 lg:h-87.5 shadow-lg">
-            <Image
-              src="https://images.unsplash.com/photo-1601493700631-2b16ec4b4716"
-              alt="promo"
-              fill
-              className="object-cover"
-            />
-
-            <div className="absolute inset-0 bg-black/20" />
-
-            <div className="absolute bottom-6 left-6 text-white">
-              <h3 className="text-2xl font-bold">Fresh Organic Fruits</h3>
-              <p className="text-sm mt-1 opacity-90">
-                Natural & Healthy Products
-              </p>
-
-              <button className="mt-3 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded-md">
-                Shop Now
-              </button>
-            </div>
+          <div className="relative overflow-hidden hidden lg:block rounded-2xl h-65 none lg:h-87.5 shadow-lg">
+            <Link href={`products/?discountId=${slides[0].id}`}>
+              <Image
+                src={slides[0].image}
+                alt="promo"
+                fill
+                className="object-cover"
+              />
+            </Link>
           </div>
         </div>
       </div>

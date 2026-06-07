@@ -8,7 +8,7 @@ const CommonLayout = ({ children }: { children: React.ReactNode }) => {
     <>
       <div>
         <Navbar />
-        <SubNavbar/>
+      
         <Container>{children}</Container>
       </div>
     </>
