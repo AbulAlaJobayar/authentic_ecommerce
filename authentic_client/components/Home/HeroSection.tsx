@@ -75,13 +75,13 @@ const HeroSection = () => {
       </section>
     );
   }
-
+console.log(slides)
   return (
     <section className="py-6">
       <div className="max-w-350 mx-auto ">
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
           {/* ================= LEFT CAROUSEL ================= */}
-          <div className="relative group overflow-hidden rounded-2xl ">
+          <div className="relative group overflow-hidden rounded-sm ">
             <Carousel
               plugins={[autoplayPlugin]}
               setApi={setApi}
@@ -89,13 +89,15 @@ const HeroSection = () => {
               onMouseLeave={() => autoplayPlugin.reset()}
             >
               <CarouselContent>
-                {slides.map((slide, index) => (
+                {slides.map((slide, index) =>{
+                  console.log(slide.image,"hey image")
+                  return(
                   <CarouselItem key={index}>
-                    <div className="relative h-50  sm:h-62.5 md:h-75  lg:h-87.5 rounded">
+                    <div className="relative h-50  sm:h-62.5  md:h-75  lg:h-87.5 rounded">
                       <Link href={`products/?discountId=${slide.id}`}>
                         <Image
                           src={slide.image}
-                          alt="banner"
+                         alt={`Slide ${index}`}
                           fill
                           priority
                           className="object-cover"
@@ -103,7 +105,7 @@ const HeroSection = () => {
                       </Link>
                     </div>
                   </CarouselItem>
-                ))}
+                )})}
               </CarouselContent>
 
               {/* ================= RECTANGLE ARROWS ================= */}
@@ -127,7 +129,7 @@ const HeroSection = () => {
           </div>
 
           {/* ================= RIGHT BANNER ================= */}
-          <div className="relative overflow-hidden hidden lg:block rounded-2xl h-65 none lg:h-87.5 shadow-lg">
+          <div className="relative overflow-hidden hidden lg:block rounded-sm h-65 none lg:h-87.5 shadow-lg">
             <Link href={`products/?discountId=${slides[0].id}`}>
               <Image
                 src={slides[0].image}

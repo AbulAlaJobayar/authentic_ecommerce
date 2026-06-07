@@ -16,16 +16,8 @@ router.post(
   validateRequest(categoryValidation.createCategorySchemaValidation),
   CategoryController.createCategoryIntoDB,
 );
-router.get(
-  '/',
-  auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
-  CategoryController.getCategoryFromDB,
-);
-router.get(
-  '/:id',
-  auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
-  CategoryController.getSingleFromDB,
-);
+router.get('/', CategoryController.getCategoryFromDB);
+router.get('/:id', CategoryController.getSingleFromDB);
 router.patch(
   '/:id',
   // imageUploader.upload.single('image'),

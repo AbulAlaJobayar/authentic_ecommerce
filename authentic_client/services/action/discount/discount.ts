@@ -4,7 +4,7 @@ const getAllDiscount = async () => {
       `${process.env.NEXT_PUBLIC_DATABASE_URL}/discount`,
       {
         method: "GET",
-        cache: "no-store", // optional for fresh data
+        cache: "no-store",
       }
     );
 

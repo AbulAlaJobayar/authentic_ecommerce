@@ -1,5 +1,4 @@
 import Navbar from "@/components/layout/Navbar/Navbar";
-import SubNavbar from "@/components/layout/Navbar/SubNavbar";
 import Container from "@/components/shared/Container";
 import React from "react";
 
@@ -8,7 +7,6 @@ const CommonLayout = ({ children }: { children: React.ReactNode }) => {
     <>
       <div>
         <Navbar />
-      
         <Container>{children}</Container>
       </div>
     </>
