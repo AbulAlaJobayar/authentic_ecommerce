@@ -42,7 +42,7 @@ const TopCategories = () => {
   }, []);
   return (
     <div>
-      <p className="text-center font-normal text-2xl text-[#041F1E] mb-10">
+      <p className="text-center font-normal text-2xl text-[#041F1E] mb-10 ">
         Featured Categories{" "}
       </p>
 

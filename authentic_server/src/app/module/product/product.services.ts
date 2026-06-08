@@ -1,4 +1,4 @@
-import  httpStatus  from 'http-status';
+import httpStatus from 'http-status';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { imageUploader, MulterFile } from '../../shared/imageUpload';
@@ -21,7 +21,7 @@ const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
       sku: payload.product.sku,
       name: payload.product.name,
       description: payload.product.description,
-      image: payload.product.image ,
+      image: payload.product.image,
       sellingPrice: payload.productBatch.sellingPrice,
       categoryId: payload.product.categoryId,
     };
@@ -53,9 +53,12 @@ const createProductIntoDB = async (payload: TProduct, file: MulterFile) => {
       await tx.productBatch.create({ data: productBatchData });
       return createProduct;
     });
-  if (!result) {
-    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to create product');
-  }
+    if (!result) {
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Failed to create product',
+      );
+    }
     console.log(result, 'my result');
     return result;
   } catch (err) {
@@ -118,7 +121,7 @@ const getAllProductFromDB = async (
       },
       isDeleted: true,
       status: true,
-      discount:true
+      discount: true,
     },
   });
   const total = await prisma.product.count({
@@ -136,7 +139,7 @@ const getAllProductFromDB = async (
 };
 const getSingleProductFromDB = async (id: string) => {
   const result = await prisma.product.findUnique({
-    where: {id},
+    where: { id },
     select: {
       id: true,
       name: true,
@@ -146,7 +149,7 @@ const getSingleProductFromDB = async (id: string) => {
       sellingPrice: true,
       category: true,
       reviews: true,
-      status:true
+      status: true,
     },
   });
   return result;
@@ -155,9 +158,63 @@ const getSingleProductFromDB = async (id: string) => {
 const updateProductFromDB = async (payload: string) => {
   console.log(payload);
 };
+
+const topSealingProducts = async () => {
+  const top = await prisma.orderItem.groupBy({
+    by: ['productId'],
+    _sum: {
+      quantity: true,
+    },
+    orderBy: {
+      _sum: {
+        quantity: 'desc',
+      },
+    },
+    take: 4,
+  });
+
+  let result;
+
+  if (top.length === 0) {
+    // 👉 No sales yet → fallback products
+    const defaultProducts = await prisma.product.findMany({
+      where: {
+        isDeleted: false,
+      },
+      take: 4,
+    });
+
+    result = defaultProducts.map((p) => ({
+      product: p,
+      totalSold: 0,
+    }));
+  } else {
+    const products = await prisma.product.findMany({
+      where: {
+        id: { in: top.map((t) => t.productId) },
+      },
+      select: {
+        id: true,
+        name: true,
+        sku: true,
+        image: true,
+        sellingPrice: true,
+        category: true,
+        discount: true,
+      },
+    });
+
+    result = top.map((t) => ({
+      product: products.find((p) => p.id === t.productId),
+      totalSold: t._sum.quantity ?? 0,
+    }));
+  }
+  return result;
+};
 export const ProductServices = {
   createProductIntoDB,
   getAllProductFromDB,
   updateProductFromDB,
   getSingleProductFromDB,
+  topSealingProducts,
 };

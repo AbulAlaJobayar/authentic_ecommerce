@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -77,58 +75,58 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 } */
- :root {
+:root {
   --radius: 0.625rem;
 
   /* Main UI */
-  --background: #FFFFFF;
-  --foreground: #1F2937;
+  --background: #ffffff;
+  --foreground: #1f2937;
 
   /* Cards & Surfaces */
-  --card: #FFFFFF;
-  --card-foreground: #1F2937;
+  --card: #ffffff;
+  --card-foreground: #1f2937;
 
-  --popover: #FFFFFF;
-  --popover-foreground: #1F2937;
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
 
   /* Primary Action (Best for Surgical/Medical UI) */
-  --primary: #0A84FF;
-  --primary-foreground: #FFFFFF;
+  --primary: #f48721;
+  --primary-foreground: #ffffff;
 
   /* Secondary Medical Green */
-  --secondary: #16A34A;
-  --secondary-foreground: #FFFFFF;
+  --secondary: #041f1e;
+  --secondary-foreground: #ffffff;
 
   /* Muted (for borders, subtle backgrounds) */
-  --muted: #F3F4F6;
-  --muted-foreground: #6B7280;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
 
-  --accent: #14B8A6;
-  --accent-foreground: #FFFFFF;
+  --accent: #f48721;
+  --accent-foreground: #ffffff;
 
   /* Errors */
-  --destructive: #EF4444;
-  --border: #E5E7EB;
-  --input: #E5E7EB;
-  --ring: #60A5FA;
+  --destructive: #ef4444;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #60a5fa;
 
   /* Chart colors (Optional) */
-  --chart-1: #0EA5E9;
-  --chart-2: #22C55E;
-  --chart-3: #3B82F6;
-  --chart-4: #8B5CF6;
-  --chart-5: #F97316;
+  --chart-1: #0ea5e9;
+  --chart-2: #22c55e;
+  --chart-3: #3b82f6;
+  --chart-4: #8b5cf6;
+  --chart-5: #f97316;
 
   /* Sidebar */
-  --sidebar: #F8FAFC;
-  --sidebar-foreground: #1E293B;
-  --sidebar-primary: #0A84FF;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #4C60DA;
-  --sidebar-accent-foreground: #1E293B;
-  --sidebar-border: #E2E8F0;
-  --sidebar-ring: #93C5FD;
-  --sidebar-accent-text:#E2E8F0;
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #1e293b;
+  --sidebar-primary: #0a84ff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #4c60da;
+  --sidebar-accent-foreground: #1e293b;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #93c5fd;
+  --sidebar-accent-text: #e2e8f0;
 }
 
 /* .dark {
@@ -164,45 +162,45 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 } */
- .dark {
-  --background: #0F172A;
-  --foreground: #F8FAFC;
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
 
-  --card: #1E293B;
-  --card-foreground: #F8FAFC;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
 
-  --popover: #1E293B;
-  --popover-foreground: #F8FAFC;
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
 
-  --primary: #3B82F6;
-  --primary-foreground: #FFFFFF;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
 
-  --secondary: #22C55E;
-  --secondary-foreground: #FFFFFF;
+  --secondary: #22c55e;
+  --secondary-foreground: #ffffff;
 
-  --muted: #1E293B;
-  --muted-foreground: #CBD5E1;
+  --muted: #1e293b;
+  --muted-foreground: #cbd5e1;
 
-  --accent: #14B8A6;
-  --accent-foreground: #FFFFFF;
+  --accent: #14b8a6;
+  --accent-foreground: #ffffff;
 
-  --destructive: #EF4444;
+  --destructive: #ef4444;
 
   --border: #334155;
   --input: #334155;
-  --ring: #3B82F6;
+  --ring: #3b82f6;
 
-  --sidebar: #1E293B;
-  --sidebar-foreground: #F8FAFC;
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f8fafc;
 
-  --sidebar-primary: #3B82F6;
-  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
 
   --sidebar-accent: #334155;
-  --sidebar-accent-foreground: #F8FAFC;
+  --sidebar-accent-foreground: #f8fafc;
 
   --sidebar-border: #334155;
-  --sidebar-ring: #3B82F6;
+  --sidebar-ring: #3b82f6;
 }
 
 @layer base {

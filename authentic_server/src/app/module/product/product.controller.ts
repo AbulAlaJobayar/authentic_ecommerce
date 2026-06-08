@@ -12,7 +12,7 @@ const createProductIntoDB = catchAsync(async (req: Request, res: Response) => {
 
   const result = await ProductServices.createProductIntoDB(
     req.body,
-    file as MulterFile
+    file as MulterFile,
   );
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -44,10 +44,20 @@ const getSingleProductFromDB = catchAsync(
       message: 'product Retrieved successfully!',
       data: result,
     });
-  }
+  },
 );
+const topSealingProducts = catchAsync(async (req: Request, res: Response) => {
+  const result = await ProductServices.topSealingProducts();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Top product Retrieved successfully!',
+    data: result,
+  });
+});
 export const ProductController = {
   createProductIntoDB,
   getProductFromDB,
   getSingleProductFromDB,
+  topSealingProducts,
 };
