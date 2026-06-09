@@ -8,7 +8,8 @@ import { productSchema } from './product.validation';
 import { ProductController } from './product.controller';
 
 const router = Router();
-
+router.get('/top/product', ProductController.topSealingProducts);
+router.get('/', ProductController.getProductFromDB);
 router.post(
   '/',
   auth(USER_ROLE.MANAGER, USER_ROLE.SUPER_ADMIN),
@@ -17,7 +18,6 @@ router.post(
   validateRequest(productSchema.createProductSchema),
   ProductController.createProductIntoDB,
 );
-router.get('/top', ProductController.topSealingProducts);
-router.get('/', ProductController.getProductFromDB);
+
 router.get('/:id', ProductController.getSingleProductFromDB);
 export const ProductRouter = router;

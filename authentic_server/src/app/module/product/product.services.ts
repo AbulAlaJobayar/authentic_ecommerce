@@ -160,56 +160,74 @@ const updateProductFromDB = async (payload: string) => {
 };
 
 const topSealingProducts = async () => {
-  const top = await prisma.orderItem.groupBy({
-    by: ['productId'],
-    _sum: {
-      quantity: true,
-    },
-    orderBy: {
+  try {
+    // 1. Get top selling products
+    const top = await prisma.orderItem.groupBy({
+      by: ['productId'],
       _sum: {
-        quantity: 'desc',
+        quantity: true,
       },
-    },
-    take: 4,
-  });
-
-  let result;
-
-  if (top.length === 0) {
-    // 👉 No sales yet → fallback products
-    const defaultProducts = await prisma.product.findMany({
-      where: {
-        isDeleted: false,
+      orderBy: {
+        _sum: {
+          quantity: 'desc',
+        },
       },
       take: 4,
     });
 
-    result = defaultProducts.map((p) => ({
-      product: p,
-      totalSold: 0,
-    }));
-  } else {
+    let result;
+
+    // 2. If no sales → fallback products
+    if (top.length === 0) {
+      const defaultProducts = await prisma.product.findMany({
+        where: {
+          isDeleted: false,
+          status:Status.ACTIVE
+        },
+        include: {
+          discount: true,
+        },
+        take: 4,
+      });
+
+      result = defaultProducts.map((p) => ({
+        product: p,
+        totalSold: 0,
+      }));
+
+      console.log("⚠️ No sales yet, fallback products:", result);
+      return result;
+    }
+
+    // 3. Get products with discount
     const products = await prisma.product.findMany({
       where: {
-        id: { in: top.map((t) => t.productId) },
+        id: {
+          in: top.map((t) => t.productId),
+        },
       },
-      select: {
-        id: true,
-        name: true,
-        sku: true,
-        image: true,
-        sellingPrice: true,
-        category: true,
+      include: {
         discount: true,
       },
     });
 
+    // 4. Optimize lookup using Map (faster than .find)
+    const productMap = new Map();
+    products.forEach((p) => {
+      productMap.set(p.id, p);
+    });
+
+    // 5. Build final result
     result = top.map((t) => ({
-      product: products.find((p) => p.id === t.productId),
+      product: productMap.get(t.productId),
       totalSold: t._sum.quantity ?? 0,
     }));
+
+    return result;
+  } catch (error) {
+    console.error("❌ topSealingProducts error:", error);
+    return [];
   }
-  return result;
 };
 export const ProductServices = {
   createProductIntoDB,

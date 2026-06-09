@@ -492,6 +492,7 @@ const InventoryTable = ({
     if (
       columnKey === "product.status"
     ) {
+      console.log( item.product?.status,"😍😍😍")
       return (
         <StatusBadge
           status={

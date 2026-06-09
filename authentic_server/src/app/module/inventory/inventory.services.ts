@@ -363,7 +363,6 @@ const updateInventoryFromDB = async (
     throw new AppError(httpStatus.NOT_FOUND, ' inventory not found');
   }
   if (payload.product) {
-    console.log(payload.product);
     await prisma.product.update({
       where: { id: inventory.productId },
       data: payload.product,

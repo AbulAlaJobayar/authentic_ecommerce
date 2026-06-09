@@ -71,7 +71,7 @@ const TopCategories = () => {
                 href={`/product?categoryId=${id}`}
                 className="p-1 flex items-center justify-center flex-col gap-3"
               >
-                <Image src={image} alt={name} height={30} width={30} />
+                <Image src={image||"/placeholder.png"} alt={name} height={30} width={30} />
                 <p>{name}</p>
 
                 {/* <Card>

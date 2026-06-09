@@ -1,56 +1,44 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { IoCartOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { getTopProducts } from "@/services/action/products";
-type TDiscount = {
-  id: string;
-  percentage: number;
-};
-type TProducts = {
-  product: {
-    id: string;
-    name: string;
-    image: string;
-    discount: TDiscount;
-    sellingPrice: number;
-  };
-};
 
 const TopSealingProducts = () => {
-  const [products, setProducts] = useState<TProducts[]>([]);
+  const [products, setProducts] = useState<any>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const product = await getTopProducts();
-        console.log(product, "ami product amake new");
         setProducts(product?.data);
       } catch (error) {
         console.log(error);
       }
     };
-
     fetchProducts();
   }, []);
-  console.log(products, "my top products");
   return (
     <div className="bg-amber-50/70 ">
       <p className="text-center font-semibold text-3xl text-[#041F1E] my-6">
         Top Selling Products
       </p>
       <div className="grid grid-cols-2  md:grid-cols-1 lg:grid-cols-2 gap-6">
-        {products?.map((product) => {
+        {products?.map((item: any) => {
+          const product = item.product;
+          // console.log(product.sellingPrice)
           const discount = (
-            (product.sellingPrice * product.discount.percentage) /
+            (Number(product?.sellingPrice) *
+              Number(product?.discount?.percentage)) /
             100
           ).toFixed();
-
-          const image = product.image[0];
+          console.log(product);
+          const image = product?.image[0] || "/placeholder.png";
           return (
             <div
-              key={product.id}
+              key={product?.id}
               className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden"
             >
               <div className="flex flex-col md:flex-row">
@@ -67,17 +55,18 @@ const TopSealingProducts = () => {
 
                 {/* Content */}
                 <div className="w-full md:w-3/5 p-5 flex flex-col justify-center">
-                  <h3 className="text-xl font-semibold text-[#041F1E]"></h3>
-                  {product.name}
+                  <h3 className="text-xl font-semibold text-[#041F1E] whitespace-nowrap">
+                    {product?.name}
+                  </h3>
 
                   {/* Price */}
                   <div className="flex items-center gap-3 mt-2">
                     <span className="text-2xl font-bold text-orange-500">
-                      ৳{Number(product.sellingPrice) - Number(discount)}
+                      ৳{Number(product?.sellingPrice) - Number(discount)}
                     </span>
 
                     <span className="text-lg text-gray-400 line-through">
-                      ৳{product.sellingPrice}
+                      ৳{Number(product?.sellingPrice)}
                     </span>
                   </div>
 
@@ -85,8 +74,8 @@ const TopSealingProducts = () => {
                   <div className="mt-2">
                     <span className="bg-lime-300 text-black text-sm px-3 py-1 rounded-full">
                       Save ৳
-                      {product.sellingPrice -
-                        (Number(product.sellingPrice) - Number(discount))}
+                      {product?.sellingPrice -
+                        (Number(product?.sellingPrice) - Number(discount))}
                     </span>
                   </div>
 

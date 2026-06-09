@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Autoplay from "embla-carousel-autoplay";
@@ -75,7 +74,7 @@ const HeroSection = () => {
       </section>
     );
   }
-console.log(slides)
+
   return (
     <section className="py-6">
       <div className="max-w-350 mx-auto ">
@@ -89,23 +88,24 @@ console.log(slides)
               onMouseLeave={() => autoplayPlugin.reset()}
             >
               <CarouselContent>
-                {slides.map((slide, index) =>{
-                  console.log(slide.image,"hey image")
-                  return(
-                  <CarouselItem key={index}>
-                    <div className="relative h-50  sm:h-62.5  md:h-75  lg:h-87.5 rounded">
-                      <Link href={`products/?discountId=${slide.id}`}>
-                        <Image
-                          src={slide.image}
-                         alt={`Slide ${index}`}
-                          fill
-                          priority
-                          className="object-cover"
-                        />
-                      </Link>
-                    </div>
-                  </CarouselItem>
-                )})}
+                {slides.map((slide, index) => {
+                  console.log(slide.image, "hey image");
+                  return (
+                    <CarouselItem key={index}>
+                      <div className="relative h-50  sm:h-62.5  md:h-75  lg:h-87.5 rounded">
+                        <Link href={`products/?discountId=${slide.id}`}>
+                          <Image
+                            src={slide.image}
+                            alt={`Slide ${index}`}
+                            fill
+                            priority
+                            className="object-cover"
+                          />
+                        </Link>
+                      </div>
+                    </CarouselItem>
+                  );
+                })}
               </CarouselContent>
 
               {/* ================= RECTANGLE ARROWS ================= */}
