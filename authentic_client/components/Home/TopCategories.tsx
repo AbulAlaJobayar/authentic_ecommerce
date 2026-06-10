@@ -65,20 +65,19 @@ const TopCategories = () => {
           {categories?.map(({ image, name, id }, index) => (
             <CarouselItem
               key={index}
-              className="basis-1/4  md:basis-1/6 lg:basis-[12.5%] mx-auto"
+              className="border shadow-sm rounded basis-1/4 md:basis-1/6 lg:basis-[12.5%] mx-auto"
             >
               <Link
                 href={`/product?categoryId=${id}`}
                 className="p-1 flex items-center justify-center flex-col gap-3"
               >
-                <Image src={image||"/placeholder.png"} alt={name} height={30} width={30} />
-                <p>{name}</p>
-
-                {/* <Card>
-                  <CardContent className="flex aspect-square items-center justify-center p-6">
-                    <span className="text-2xl font-semibold">{name}</span>
-                  </CardContent>
-                </Card> */}
+                <Image
+                  src={image || "/placeholder.png"}
+                  alt={name}
+                  height={150}
+                  width={150}
+                />
+                <p className="text-md font-medium">{name}</p>
               </Link>
             </CarouselItem>
           ))}

@@ -21,14 +21,7 @@ const categoryApi = baseApi.injectEndpoints({
       invalidatesTags: [tagType.category],
     }),
     allCategory: build.query({
-      query: ({
-        page ,
-        limit ,
-        searchTerm ,
-        sortBy ,
-        sortOrder ,
-        isDeleted ,
-      }) => ({
+      query: ({ page, limit, searchTerm, sortBy, sortOrder, isDeleted }) => ({
         url: "/category",
         method: "GET",
         params: {
@@ -47,6 +40,7 @@ const categoryApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagType.category],
     }),
+  
     getSingleCategory: build.query({
       query: (id: string) => ({
         url: `/category/${id}`,
@@ -76,7 +70,6 @@ const categoryApi = baseApi.injectEndpoints({
       invalidatesTags: [tagType.category],
     }),
   }),
-
 });
 
 export const {
@@ -85,4 +78,5 @@ export const {
   useGetSingleCategoryQuery,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
+
 } = categoryApi;

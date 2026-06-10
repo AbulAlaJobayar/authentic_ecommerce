@@ -62,22 +62,28 @@ const TopSealingProducts = () => {
                   {/* Price */}
                   <div className="flex items-center gap-3 mt-2">
                     <span className="text-2xl font-bold text-orange-500">
-                      ৳{Number(product?.sellingPrice) - Number(discount)}
+                      ৳
+                      {product.discount
+                        ? Number(product.sellingPrice) - Number(discount)
+                        : Number(product.sellingPrice)}
                     </span>
-
-                    <span className="text-lg text-gray-400 line-through">
-                      ৳{Number(product?.sellingPrice)}
-                    </span>
+                    {product.discount && (
+                      <span className="text-lg text-gray-400 line-through">
+                        ৳{Number(product?.sellingPrice)}
+                      </span>
+                    )}
                   </div>
 
                   {/* Save */}
-                  <div className="mt-2">
-                    <span className="bg-lime-300 text-black text-sm px-3 py-1 rounded-full">
-                      Save ৳
-                      {product?.sellingPrice -
-                        (Number(product?.sellingPrice) - Number(discount))}
-                    </span>
-                  </div>
+                  {product.discount && (
+                    <div className="mt-2">
+                      <span className="bg-lime-300 text-black text-sm px-3 py-1 rounded-full">
+                        Save ৳
+                        {product?.sellingPrice -
+                          (Number(product?.sellingPrice) - Number(discount))}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Buttons */}
                   <div className="flex flex-col sm:flex-row gap-3 mt-5">

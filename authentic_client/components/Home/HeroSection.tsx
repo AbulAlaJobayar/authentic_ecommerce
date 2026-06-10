@@ -78,7 +78,9 @@ const HeroSection = () => {
   return (
     <section className="py-6">
       <div className="max-w-350 mx-auto ">
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
+        {slides.length !== 0 ? (
+          <>
+           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
           {/* ================= LEFT CAROUSEL ================= */}
           <div className="relative group overflow-hidden rounded-sm ">
             <Carousel
@@ -132,7 +134,7 @@ const HeroSection = () => {
           <div className="relative overflow-hidden hidden lg:block rounded-sm h-65 none lg:h-87.5 shadow-lg">
             <Link href={`products/?discountId=${slides[0].id}`}>
               <Image
-                src={slides[0].image}
+                src={slides[0].image || ""}
                 alt="promo"
                 fill
                 className="object-cover"
@@ -140,6 +142,12 @@ const HeroSection = () => {
             </Link>
           </div>
         </div>
+          
+          </>
+         
+        ) : (
+          <div className="h-87.5 rounded-2xl bg-gray-100" />
+        )}
       </div>
     </section>
   );
